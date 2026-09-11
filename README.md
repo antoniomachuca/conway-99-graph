@@ -182,7 +182,25 @@ Fixing the first orbit $O_0$, its stabilizer has order $\lvert \operatorname{Sta
 │   ├── conway_involutions.pdf           # Compiled academic paper
 │   └── references.bib                   # Complete bibliography
 │
-├── docs/                                # Technical Documentation & Audit Logs
+├── references/                          # Primary Literature, Monographs, Preprints & Dossiers
+│   ├── README.md                        # Master bibliography index and citation map
+│   ├── paper_conway_five_1000_dollar_problems.pdf # Conway (1970/2017) original problem formulation
+│   ├── paper_cesarz_woldar.pdf          # Cesarz & Woldar (2025) computer-free classification
+│   ├── paper_crnkovic_maksimovic.pdf    # Crnković & Maksimović (2020) composite order exclusions
+│   ├── thesis_behbahani_lam_2009.pdf    # Behbahani & Lam (2009/2011) orbit matrix foundations
+│   ├── paper_thakkar_2026.pdf           # Thakkar (2026) CAISc 2026 constraint benchmark
+│   ├── book_brouwer_haemers_spectra.pdf # Brouwer & Haemers (2011) Spectra of Graphs monograph
+│   ├── paper_ouimet_greaves.pdf         # Ouimet & Greaves (2026) AI disclosure model
+│   ├── paper_biere_cadical_2019.pdf     # Biere (2019) CaDiCaL SAT Race description
+│   └── paper_heule_drat_trim.pdf        # Heule, Hunt, Wetzler (2014) DRAT-trim verification
+│
+├── agents/                              # Multi-Agent Architecture, State Checkpoints & Audit Logs
+│   ├── README.md                        # Multi-agent role descriptions & operations overview
+│   ├── handover_briefing.md             # Project context and comprehensive handover briefing
+│   ├── audit_log.md                     # Chronological audit log of interventions & verdicts
+│   └── audit_milestones_2026_09_10.md   # Independent audit of Lean 4 & SAT milestones
+│
+├── docs/                                # Technical Documentation & System Specifications
 │   ├── classification_of_involutions_conway99.md # Detailed mathematical technical memory
 │   └── PROMPT.md                        # Full prompt specifications and AI transparency log
 │

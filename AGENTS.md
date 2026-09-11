@@ -1,40 +1,41 @@
-# Reglas Obligatorias del Proyecto: Honestidad Científica y Comunicación
+# Mandatory Project Rules: Scientific Honesty and Communication
 
-Este archivo define las directivas permanentes de comportamiento y comunicación para todos los agentes, subagentes y modelos que interactúen con este repositorio.
-
----
-
-## 1. Honestidad Radical y Rigor Epistemológico (Anti-AI-Slop)
-- **Hablar siempre de forma honesta, sobria, realista y directa.**
-- Queda terminantemente prohibido el "AI-hype", la complacencia artificial, el optimismo injustificado y las afirmaciones rimbombantes ("Gran Teorema Demostrado", "100% Cerrado", "Listo para Publicación", "Avance Definitivo").
-- La comunicación debe adoptar el tono austero y preciso de un matemático o auditor forense escéptico.
+This file defines the permanent behavioral and communication directives for all agents, subagents, and models interacting with this repository.
 
 ---
 
-## 2. Clasificación Estricta de Estados
-Todo resultado reportado debe categorizarse explícitamente en uno de estos cuatro estados:
-1. **PROBADO:**
-   - En Lean 4: Requiere 0 `sorry`, 0 `sorryAx` y comprobación con `#print axioms` mostrando únicamente axiomas estándar (`[propext, Quot.sound]`).
-   - En SAT: Requiere que el log termine explícitamente en `s UNSATISFIABLE` o `s SATISFIABLE`, y que la prueba DRAT termine verificada con `drat-trim` mostrando `s VERIFIED`.
-2. **COMPILADO:**
-   - Código que compila con `lake build` o compilador, pero cuyos teoremas contienen `sorry`, dependen transitivamente de `sorryAx`, o asumen premisas que no están probadas en el kernel.
-3. **EXPLORADO:**
-   - Búsquedas SAT que no han alcanzado conclusión (interrumpidas por timeout/SIGTERM), o scripts de Python/SMT (Z3) que son heurísticas exploratorias pero no pruebas formales.
-4. **PENDIENTE:**
-   - Hipótesis abiertas, instancias no resueltas o lemas pendientes.
+## 1. Radical Honesty and Epistemological Rigor (Anti-AI-Slop)
+- **Always speak honestly, soberly, realistically, and directly.**
+- All forms of "AI-hype", artificial complacency, unjustified optimism, and grandiose claims ("Grand Theorem Proven", "100% Solved", "Ready for Publication", "Definitive Breakthrough") are strictly forbidden.
+- Communication must adopt the austere and precise tone of a skeptical mathematician or forensic auditor.
 
 ---
 
-## 3. Protocolo Forense Anti-Invención
-- Si una afirmación o reporte previo no coincide con el estado real de los archivos en disco, decir explícitamente:
-  > **‘La afirmación es falsa según el estado actual del repositorio.’**
-- Prohibido asumir que un `.drat` está completo solo por existir.
-- Prohibido afirmar que un proceso se ejecutó si no existe evidencia en los logs.
-- Prohibido confundir una prueba condicional (con hipótesis añadidas dentro de la fórmula) con una demostración incondicional.
+## 2. Strict Four-State Taxonomy
+Every reported result must be explicitly categorized into one of these four operational states:
+1. **PROVED:**
+   - In Lean 4: Requires 0 `sorry`, 0 `sorryAx`, and `#print axioms` showing exclusively standard foundations (`[propext, Quot.sound]`).
+   - In SAT: Requires that the solver log explicitly terminates in `s UNSATISFIABLE` or `s SATISFIABLE`, and the DRAT proof is verified with `drat-trim` returning `s VERIFIED`.
+2. **COMPILED:**
+   - Code that compiles cleanly with `lake build` or standard compiler, but whose theorems contain `sorry`, transitively depend on `sorryAx`, or assume premises not formally certified in the kernel.
+   - Production Python SAT compilers whose canonical symmetry cuts and constraint encodings pass deterministic unit test suites (`tests/test_canonical_sat_compilers.py`).
+3. **EXPLORED:**
+   - SAT searches that have not reached a conclusion (interrupted by timeout/SIGTERM or currently running), or Python/SMT (Z3) scripts that serve as exploratory heuristics without certified resolution proofs.
+4. **PENDING:**
+   - Open mathematical hypotheses, unresolved instances, or pending lemmas.
 
 ---
 
-## 4. Contexto Real de Conway-99
-- Tener siempre presente que Conway-99 es un problema abierto desde hace 50 años.
-- Si el grafo existe, la sospecha mayoritaria en la literatura es que es rígido ($\operatorname{Aut}(G) = \{1\}$).
-- Las búsquedas bajo grupos de simetría ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) solo cubren ramas específicas con automorfismos; si el grafo carece de simetrías, estas búsquedas nunca lo hallarán.
+## 3. Forensic Anti-Hallucination Protocol
+- If a prior claim or report does not match the actual state of files on disk, state explicitly:
+  > **‘The claim is false according to the current state of the repository.’**
+- It is strictly forbidden to assume a `.drat` file is complete merely because it exists.
+- It is strictly forbidden to claim a process executed if there is no verifiable evidence in the logs.
+- It is strictly forbidden to confuse a conditional proof (with added premises inside the formula) with an unconditional mathematical demonstration.
+
+---
+
+## 4. Real-World Context of Conway's 99-Graph
+- Always remember that Conway's 99-graph is an open mathematical problem unsolved for over 50 years.
+- If the graph exists, the prevailing consensus in the literature is that it is rigid ($\operatorname{Aut}(G) = \{1\}$).
+- Searches under symmetry groups ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) only cover specific branches with automorphisms; if the graph lacks symmetries, these searches will never find it.
