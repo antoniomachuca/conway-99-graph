@@ -1,152 +1,153 @@
-# Memoria Técnica: Clasificación de Involuciones, Rigidez de Paridad y Ramificación Canónica en Conway-99
+# Technical Report: Classification of Involutions, Parity Rigidity, and Certified Symmetries in Conway-99
 
-> **Nota de acceso:** Este documento corresponde a la memoria técnica central del proyecto, también disponible en [`docs/classification_of_involutions_conway99.md`](classification_of_involutions_conway99.md) y alineada con el manuscrito formal en [`manuscript/conway_involutions.tex`](../manuscript/conway_involutions.tex).
+> **Access Note:** This document serves as the central mathematical and technical reference for the project, aligned with the academic preprint in [`manuscript/conway_involutions.tex`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/manuscript/conway_involutions.tex) and the repository status documented in [`README.md`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/README.md).
 
-**Autor:** [Antonio Machuca](mailto:am.machuca.2023@alumnos.urjc.es)  
-**Filiación:** Universidad Rey Juan Carlos, Madrid, España  
-**Contacto permanente:** [contactoantoniomachuca@gmail.com](mailto:contactoantoniomachuca@gmail.com)  
-**Fecha:** Septiembre 2026  
-**Clasificación MSC (2020):** 05E30, 05C60, 03B35, 68V15  
-**Palabras clave:** Grafos fuertemente regulares, problema del 99-grafo de Conway, involuciones, espectro de puntos fijos, rigidez de paridad, Lean 4, CDCL SAT, certificación DRAT.
-
----
-
-### Resumen Ejecutivo y Estado Epistemológico
-
-El problema del 99-grafo de John H. Conway (1969) investiga la existencia de un grafo fuertemente regular con parámetros $\mathrm{srg}(99, 14, 1, 2)$. Una conjetura central en combinatoria algebraica atribuye rigidez total a dicho grafo ($\mathrm{Aut}(G) = \{1\}$).
-
-En este documento se presenta la memoria técnica completa de la clasificación de automorfismos de orden 2 (involuciones, $t^2 = \mathrm{id}$) y de los grupos de simetría de orden par en $\mathrm{Aut}(G)$. Siguiendo el protocolo epistemológico obligatorio del repositorio, todos los resultados aquí expuestos se desglosan en cuatro estados formales:
-
-1. **PROBADO:**
-   - **Corolario de Rigidez de Paridad en Lean 4:** Se demuestra formalmente en [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) (0 `sorry`, solo axiomas estándar `[propext, Quot.sound]`) que si $|\mathrm{Aut}(G)|$ es par, entonces $\mathrm{Aut}(G) \cong \mathbb{Z}_2$, excluyendo rigurosamente grupos cíclicos $\mathbb{Z}_4$, el grupo de Klein $V_4$ y cualquier grupo diédrico $D_{2k}$ ($k \ge 2$).
-   - **Teoremas Analíticos de Cesarz & Woldar (2025) en Lean 4:** Se formaliza en [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) (0 `sorry`, axiomas estándar) la ausencia de automorfismos de orden 14 por contradicción modular de traza cociente ($7a = 62$, Teorema 3.11) y la refutación del grupo de Frobenius $\mathrm{Frob}(21)$ por incompatibilidad de paridad en la partición de órbitas ($a+c+d+f = 5$ con variables pares, Proposición 4.14).
-   - **Incompatibilidades Modulares y Dicotomías para $f \ge 5$ en Lean 4:** Se demuestran en [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) (0 `sorry`, axiomas estándar) las dicotomías topológicas y las contradicciones espectrales que refutan $f = 5$ y $f = 7$.
-   - **Refutación Certificada de $f = 3$ en SAT:** La fórmula CNF del caso $f = 3$ fue resuelta como insatisfactible por CaDiCaL y verificada formalmente con `drat-trim` arrojando `s VERIFIED` en disco ([`drat_trim_z2_f3_case_a.log`](../drat_trim_z2_f3_case_a.log), [`drat_trim_z2_f3_case_b.log`](../drat_trim_z2_f3_case_b.log)).
-2. **COMPILADO:**
-   - **Gran Clasificación en Lean 4:** [`Conway/GrandClassification.lean`](../Conway/GrandClassification.lean) compila limpiamente en Lake (`lake build`, 32 jobs), deduciendo que $|\mathrm{Aut}(G)| \in \{1, 2\}$, condicional a la no-existencia de $\mathbb{Z}_7$ y $\mathbb{Z}_3$.
-   - **Compiladores Canónicos SAT de $\mathbb{Z}_7$ y $\mathbb{Z}_3$:** [`scripts/build_z7_canonical_cnf.py`](../scripts/build_z7_canonical_cnf.py) y [`scripts/build_z3_canonical_cnf.py`](../scripts/build_z3_canonical_cnf.py) implementan rotura de simetría lex-leader sobre los grupos multiplicadores cocientes ($\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$, $\mathcal{G}_{\mathbb{Z}_3} \cong S_3 \times \mathbb{Z}_2$), con suite de tests unitarios aprobada (`python3 -m unittest tests/test_canonical_sat_compilers.py`, 13 tests OK).
-3. **EXPLORADO:**
-   - **Caso Central $f = 1$ en Google Cloud:** La reducción de simetría de orden 645,120 sobre la matriz de incidencia $C_{7 \times 42}$ particiona el espacio de búsqueda en exactamente 3 ramas canónicas (Gemela $O_{21}$, Secante $O_1$, Disjunta $O_{10}$). Actualmente en ejecución distribuida en Google Cloud Compute Engine (`conway-sat-worker`, 16 vCPUs, 64 GB RAM) acumulando $>100.8 \times 10^6$ conflictos CDCL en una meseta del 28% de variables activas, sin alcanzar refutación ni asignación satisfactible.
-   - **Acciones $\mathbb{Z}_7$ y $\mathbb{Z}_3$:** Búsquedas previas interrumpidas limpiamente por `SIGTERM` sin resolución (alineado con los benchmarks de Thakkar 2026 que reportan `UNKNOWN`).
-4. **PENDIENTE:**
-   - La existencia incondicional de Conway-99 $\mathrm{srg}(99, 14, 1, 2)$ y la conjetura de rigidez completa $\mathrm{Aut}(G) = \{1\}$.
+**Author:** [Antonio Machuca](mailto:am.machuca.2023@alumnos.urjc.es)  
+**Affiliation:** Universidad Rey Juan Carlos, Madrid, Spain  
+**Permanent Contact:** [contactoantoniomachuca@gmail.com](mailto:contactoantoniomachuca@gmail.com)  
+**Date:** September 2026  
+**MSC Classification (2020):** 05E30, 05C60, 03B35, 68V15  
+**Keywords:** Strongly regular graphs, Conway's 99-graph problem, involutions, fixed-point spectrum, parity rigidity, Lean 4, CDCL SAT, DRAT certification.
 
 ---
 
-## 1. Parámetros Estructurales y Rigidez de Paridad
+### Executive Summary and Epistemological Status
 
-### 1.1. Definición y Espectro de Conway-99
-Un grafo fuertemente regular $G = (V, E)$ con parámetros $\mathrm{srg}(v, k, \lambda, \mu) = (99, 14, 1, 2)$ satisface:
+The 99-graph problem proposed by John H. Conway (1969) asks whether there exists a strongly regular graph with parameters $\mathrm{srg}(99, 14, 1, 2)$. A fundamental conjecture in algebraic combinatorics asserts that any such graph must be rigid, satisfying $\mathrm{Aut}(G) = \{1\}$.
+
+This technical report presents the exhaustive classification of order-2 automorphisms (involutions, $t^2 = \mathrm{id}$), even-order symmetry groups, and prime-order actions on $G$. In accordance with the strict epistemological guidelines of this repository, all results are categorized into four operational states:
+
+1. **PROVED:**
+   - **Parity Rigidity Corollary in Lean 4:** Formally verified in [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) (0 `sorry`, standard foundational axioms `[propext, Quot.sound]`) that if $|\mathrm{Aut}(G)|$ is even, then $\mathrm{Aut}(G) \cong \mathbb{Z}_2$, rigorously excluding cyclic $\mathbb{Z}_4$, Klein four-group $V_4$, and any dihedral group $D_{2k}$ ($k \ge 2$).
+   - **Analytical Theorems of Cesarz & Woldar (2025) in Lean 4:** Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms): exclusion of order-14 automorphisms via quotient trace modular contradiction ($7a = 62$, Theorem 3.11) and refutation of the Frobenius group $\mathrm{Frob}(21)$ via orbit partition parity contradiction ($a+c+d+f = 5$ with even variables, Proposition 4.14).
+   - **Modular Incompatibilities and Topological Dichotomies for $f \ge 5$ in Lean 4:** Formally verified in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`, standard axioms), refuting fixed-point counts $f = 5$ and $f = 7$.
+   - **Certified SAT Refutation of $f = 3$:** The CNF formulas for $f = 3$ were solved to `s UNSATISFIABLE` by CaDiCaL and independently certified by `drat-trim` returning `s VERIFIED` on disk ([`drat_trim_z2_f3_case_a.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z2_f3_case_a.log), [`drat_trim_z2_f3_case_b.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z2_f3_case_b.log)).
+   - **Certified SAT Refutation of Order 7 ($\mathbb{Z}_7$):** The canonical DIMACS CNF formula `conway_z7_canonical.cnf` (176,613 variables, 421,562 clauses) incorporating Cesarz-Woldar coordinate constraints and multiplier group $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ Crawford cuts was solved to `s UNSATISFIABLE` by CaDiCaL 3.0.1 in 771.59 seconds ([`cadical_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7.log)) and formally verified by `drat-trim` backward checking mode in 844.01 seconds returning `s VERIFIED` ([`drat_trim_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z7.log), supervisor summary [`z7_result.txt`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/z7_result.txt)). Secondary confirmation independently verified `s UNSATISFIABLE` in 1827.91 seconds ([`cadical_z7_hunter.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7_hunter.log)).
+2. **COMPILED:**
+   - **Grand Classification in Lean 4:** [`Conway/GrandClassification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/GrandClassification.lean) compiles cleanly in Lake (`lake build`, 32 jobs), deducing that $|\mathrm{Aut}(G)| \in \{1, 2\}$, conditional on the non-existence of $\mathbb{Z}_3$.
+   - **Canonical SAT Compilers for $\mathbb{Z}_7$ and $\mathbb{Z}_3$:** [`scripts/build_z7_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z7_canonical_cnf.py) and [`scripts/build_z3_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z3_canonical_cnf.py) implement Crawford-style lex-leader symmetry breaking over quotient multiplier groups ($\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$, $\mathcal{G}_{\mathbb{Z}_3} \cong S_3 \times \mathbb{Z}_2$), passing all 13 deterministic unit tests in [`tests/test_canonical_sat_compilers.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/tests/test_canonical_sat_compilers.py).
+3. **EXPLORED:**
+   - **Central Involution Case $f = 1$ in Google Cloud:** The $645{,}120$-fold symmetry group of the incidence matrix $C_{7 \times 42}$ partitions the search space into exactly three canonical branches (Twin $O_{21}$, Secant $O_1$, Disjoint $O_{10}$). Currently executing on Google Cloud Compute Engine (`conway-sat-worker`, 16 vCPUs, 64 GB RAM), accumulating $>112 \times 10^6$ CDCL conflicts across a 28% active variable plateau without encountering a refutation or satisfying assignment.
+   - **Order 3 ($\mathbb{Z}_3$) Actions:** Actively executing on the cloud cluster across 2 canonical DRAT solvers (fixed-point-free 33 orbits and fixed-3 32 orbits).
+4. **PENDING:**
+   - The unconditional existence of Conway's 99-graph $\mathrm{srg}(99, 14, 1, 2)$ and the Full Rigidity Conjecture $\mathrm{Aut}(G) = \{1\}$.
+
+---
+
+## 1. Structural Parameters and Parity Rigidity
+
+### 1.1. Definition and Spectrum of Conway-99
+A strongly regular graph $G = (V, E)$ with parameters $\mathrm{srg}(v, k, \lambda, \mu) = (99, 14, 1, 2)$ satisfies:
 $$A = A^T, \quad \mathrm{diag}(A) = 0, \quad A \in \{0, 1\}^{99 \times 99}, \quad A^2 + A - 12 I = 2 J$$
-El polinomio mínimo de $A$ en el complemento ortogonal de $\mathbf{1}$ es $(x - 3)(x + 4) = 0$. Su espectro de autovalores es:
+The minimal polynomial of $A$ on the orthogonal complement of $\mathbf{1}$ is $(x - 3)(x + 4) = 0$. Its eigenvalue spectrum is:
 $$\mathrm{Spec}(A) = \left\{ 14^1, \; 3^{54}, \; (-4)^{44} \right\}$$
 
-Propiedades topológicas locales deducidas formalmente en [`Conway/Structural.lean`](../Conway/Structural.lean) (0 `sorry`, 0 axiomas no estándar):
-- **Localmente lineal ($\lambda = 1$):** Cada arista pertenece a un único triángulo $K_3$. El grafo es libre de $K_4$ ($\omega(G) = 3$).
-- **Primer subconstituyente $N(x)$:** Para cada $x \in V$, el vecindario $N(x)$ consta de 14 vértices que inducen un 1-factor perfecto de 7 aristas disjuntas ($7 K_2$).
-- **Segundo subconstituyente $\Gamma_2(x)$:** Formado por $99 - 1 - 14 = 84$ vértices. Cada vértice $w \in \Gamma_2(x)$ tiene grado 12 dentro de $\Gamma_2(x)$ y exactamente $\mu = 2$ vecinos en $N(x)$.
-- **Diámetro:** $\mathrm{diam}(G) \le 2$.
+Local topological invariants formalized in [`Conway/Structural.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Structural.lean) (0 `sorry`, standard foundational axioms):
+- **Locally Linear ($\lambda = 1$):** Every edge belongs to a unique triangle $K_3$. The graph is $K_4$-free ($\omega(G) = 3$).
+- **First Subconstituent $N(x)$:** For each $x \in V$, the neighborhood $N(x)$ consists of 14 vertices inducing a 1-factor of 7 disjoint edges ($7 K_2$).
+- **Second Subconstituent $\Gamma_2(x)$:** Composed of $99 - 1 - 14 = 84$ vertices. Each vertex $w \in \Gamma_2(x)$ has degree 12 within $\Gamma_2(x)$ and exactly $\mu = 2$ neighbors in $N(x)$.
+- **Diameter:** $\mathrm{diam}(G) \le 2$.
 
 ---
 
-### 1.2. El Corolario de Rigidez de Paridad
+### 1.2. The Parity Rigidity Corollary
 
-En la literatura previa, se conocían cotas parciales sobre el orden del grupo de automorfismos $\Gamma = \mathrm{Aut}(G)$:
-1. **Makhnev y Minakova (2001):** $|\Gamma|$ divide a $2 \cdot 3^3 \cdot 7 \cdot 11$.
-2. **Behbahani y Lam (2011):** No existen automorfismos de orden primo $p \ge 5$, excluyendo en particular $p = 11$.
-3. **Crnković y Maksimović (2020):** $\Gamma$ no contiene subgrupos de orden 6 ni de orden 9 ($6 \nmid |\Gamma|$ y $9 \nmid |\Gamma|$).
-4. **Cesarz y Woldar (2025, Corolario 3.13):** Demostraron analíticamente (sin ordenador) que si 2 divide a $|\Gamma|$, entonces $|\Gamma|$ divide a 6.
+Prior literature established partial bounds on the automorphism group order $\Gamma = \mathrm{Aut}(G)$:
+1. **Makhnev & Minakova (2001):** $|\Gamma|$ divides $2 \cdot 3^3 \cdot 7 \cdot 11$.
+2. **Behbahani & Lam (2011):** There are no automorphisms of prime order $p \ge 5$, ruling out $p = 11$ in particular.
+3. **Crnković & Maksimović (2020):** $\Gamma$ contains no subgroups of order 6 or order 9 ($6 \nmid |\Gamma|$ and $9 \nmid |\Gamma|$).
+4. **Cesarz & Woldar (2025, Cor. 3.13):** Proved analytically without computers that if 2 divides $|\Gamma|$, then $|\Gamma|$ divides 6.
 
-La combinación deductiva de estos resultados produce el Corolario de Rigidez de Paridad:
+Combining these deductive steps yields the Parity Rigidity Corollary:
 
-\begin{theorem}[Corolario de Rigidez de Paridad]\label{thm:parity_rigidity}
-Si el orden del grupo de automorfismos $\mathrm{Aut}(G)$ es par ($2 \mid |\mathrm{Aut}(G)|$), entonces:
+\begin{theorem}[Parity Rigidity Corollary]\label{thm:parity_rigidity}
+If the order of the automorphism group $\mathrm{Aut}(G)$ is even ($2 \mid |\mathrm{Aut}(G)|$), then:
 $$\mathbf{\mathrm{Aut}(G) \cong \mathbb{Z}_2}$$
 \end{theorem}
 \begin{proof}
-Sea $n = |\mathrm{Aut}(G)|$. Por hipótesis, $2 \mid n$. Por Cesarz y Woldar (2025, Corolario 3.13), $n \mid 6$. Los divisores naturales de 6 son $\{1, 2, 3, 6\}$.
-- Como $2 \mid n$, $n$ no puede ser 1 ni 3.
-- Por Crnković y Maksimović (2020), no existen subgrupos de orden 6, por lo que $6 \nmid n$, descartando $n = 6$.
-Por tanto, la única posibilidad aritmética es $n = 2$. Todo grupo de orden 2 es isomorfo al grupo cíclico $\mathbb{Z}_2$.
+Let $n = |\mathrm{Aut}(G)|$. By assumption, $2 \mid n$. By Cesarz & Woldar (2025, Cor. 3.13), $n \mid 6$. The natural divisors of 6 are $\{1, 2, 3, 6\}$.
+- Since $2 \mid n$, $n \ne 1$ and $n \ne 3$.
+- By Crnković & Maksimović (2020), no subgroup of order 6 exists, so $6 \nmid n$, ruling out $n = 6$.
+Thus the unique arithmetic possibility is $n = 2$. Every group of order 2 is isomorphic to the cyclic group $\mathbb{Z}_2$.
 \end{proof}
 
-#### Formalización en Lean 4 (`Conway/ParityRigidity.lean`)
-Este resultado fue formalizado con 0 `sorry` y solo axiomas estándar `[propext, Quot.sound]`:
-- [`even_divides_six_and_not_six_eq_two`](../Conway/ParityRigidity.lean):
+#### Formalization in Lean 4 (`Conway/ParityRigidity.lean`)
+Formalized with 0 `sorry` and standard axioms `[propext, Quot.sound]`:
+- [`even_divides_six_and_not_six_eq_two`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean):
   `∀ n : Nat, 2 ∣ n → n ∣ 6 → ¬(6 ∣ n) → n = 2`
-- [`conway_no_order_4_subgroup`](../Conway/ParityRigidity.lean):
-  Demuestra que ningún divisor de 6 puede admitir un subgrupo de orden 4 ($4 \nmid 6$).
-- [`conway_no_dihedral_subgroup`](../Conway/ParityRigidity.lean):
-  Demuestra que ningún subgrupo diédrico $D_{2k}$ ($k \ge 2$, orden $2k \ge 4$) puede embeberse en $\mathrm{Aut}(G)$.
-- [`conway_parity_rigidity`](../Conway/ParityRigidity.lean):
-  Teorema principal que deduce $\mathrm{order}(G) = 2$.
+- [`conway_no_order_4_subgroup`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean):
+  Shows that no divisor of 6 can contain a subgroup of order 4 ($4 \nmid 6$).
+- [`conway_no_dihedral_subgroup`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean):
+  Shows that no dihedral group $D_{2k}$ ($k \ge 2$, order $2k \ge 4$) embeds into $\mathrm{Aut}(G)$.
+- [`conway_parity_rigidity`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean):
+  Main theorem deducing $\mathrm{order}(G) = 2$.
 
-**Consecuencia estructural inmediata:** La búsqueda de cualquier simetría de orden par en el 99-grafo de Conway se reduce exclusivamente a la existencia de una involución única $t \in \mathrm{Aut}(G)$ con $\langle t \rangle \cong \mathbb{Z}_2$. No pueden existir automorfismos de orden 4 ($\mathbb{Z}_4$), grupos de cuatro de Klein ($V_4 \cong \mathbb{Z}_2 \times \mathbb{Z}_2$), ni grupos diédricos.
+**Immediate Structural Consequence:** The search for even-order symmetries in Conway's 99-graph reduces strictly to the existence of a single involution $t \in \mathrm{Aut}(G)$ generating $\langle t \rangle \cong \mathbb{Z}_2$. There exist no automorphisms of order 4 ($\mathbb{Z}_4$), no Klein four-groups ($V_4 \cong \mathbb{Z}_2 \times \mathbb{Z}_2$), and no dihedral groups.
 
 ---
 
-### 1.3. Teoremas Analíticos de Cesarz & Woldar (2025)
+### 1.3. Analytical Reductions of Cesarz & Woldar (2025)
 
-En [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) se formalizan analíticamente dos reducciones fundamentales con 0 `sorry` y solo axiomas estándar `[propext, Quot.sound]`:
+Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) with 0 `sorry` and standard axioms `[propext, Quot.sound]`:
 
-#### A. Teorema 3.11: Ausencia de Automorfismos de Orden 14
-Cesarz y Woldar analizaron la matriz cociente $B$ de tamaño $15 \times 15$ inducida por una acción de orden 14 ($g^{14} = \mathrm{id}$).
-- La traza espectral de $B$ en los autovalores $\{14^1, 3^a, (-4)^{14-a}\}$ es:
+#### A. Theorem 3.11: Absence of Automorphisms of Order 14
+Cesarz and Woldar analyzed the $15 \times 15$ quotient matrix $B$ induced by an action of order 14 ($g^{14} = \mathrm{id}$).
+- The spectral trace of $B$ on eigenvalues $\{14^1, 3^a, (-4)^{14-a}\}$ is:
   $$\mathrm{Tr}(B) = 14 + 3a - 4(14 - a) = 7a - 42$$
-- La suma de valencias de las órbitas fija $\mathrm{Tr}(B) = 10 \times 2 = 20$.
-- La igualdad $7a - 42 = 20$ equivale a la ecuación diofántica lineal:
+- Summing the valencies of the orbits fixes $\mathrm{Tr}(B) = 10 \times 2 = 20$.
+- The equality $7a - 42 = 20$ yields the linear Diophantine equation:
   $$7a = 62$$
-  Reduciendo módulo 7: $0 \equiv 62 \equiv 6 \pmod 7$, lo cual es una contradicción estricta en $\mathbb{Z}$.
-- Formalizado en Lean 4: [`cesarz_woldar_thm_3_11_trace_int`](../Conway/CesarzWoldarTheorems.lean) y [`cesarz_woldar_thm_3_11_modular_contradiction`](../Conway/CesarzWoldarTheorems.lean).
+  Reducing modulo 7 gives $0 \equiv 62 \equiv 6 \pmod 7$, an unconditional contradiction in $\mathbb{Z}$.
+- Formalized in Lean 4: [`cesarz_woldar_thm_3_11_trace_int`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) and [`cesarz_woldar_thm_3_11_modular_contradiction`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean).
 
-#### B. Proposición 4.14: Incompatibilidad de Paridad para $\mathrm{Frob}(21)$
-La acción del grupo de Frobenius $\mathrm{Frob}(21) \cong \mathbb{Z}_7 \rtimes \mathbb{Z}_3$ sobre $\Gamma_2(x_0)$ dejaría una única partición admisible de órbitas cuya fila 4 en la matriz cociente $C_3$ debe satisfacer:
+#### B. Proposition 4.14: Parity Incompatibility for $\mathrm{Frob}(21)$
+The action of the Frobenius group $\mathrm{Frob}(21) \cong \mathbb{Z}_7 \rtimes \mathbb{Z}_3$ on $\Gamma_2(x_0)$ leaves a unique admissible orbit partition whose row 4 in quotient matrix $C_3$ must satisfy:
 $$14 = 4 + 2a + 2c + 2d + 2f \iff a + c + d + f = 5$$
-con valencias $a, c, d, f \in \{0, 2\}$. Como cada variable es estrictamente par, la suma de cuatro enteros pares debe ser par, contradiciendo el número impar 5.
-- Formalizado en Lean 4: [`cesarz_woldar_prop_4_14_orbit_partition_impossible`](../Conway/CesarzWoldarTheorems.lean).
-- Esto demuestra que si $7 \mid |\mathrm{Aut}(G)|$, entonces $\mathrm{Aut}(G) \cong \mathbb{Z}_7$ de forma única ([`cesarz_woldar_divisible_by_7_reduces_to_z7`](../Conway/CesarzWoldarTheorems.lean)).
+with valencies $a, c, d, f \in \{0, 2\}$. Since each variable is even, the sum of four even integers must be even, contradicting 5.
+- Formalized in Lean 4: [`cesarz_woldar_prop_4_14_orbit_partition_impossible`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean).
+- Consequently, if $7 \mid |\mathrm{Aut}(G)|$, then $\mathrm{Aut}(G) \cong \mathbb{Z}_7$ uniquely ([`cesarz_woldar_divisible_by_7_reduces_to_z7`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean)).
 
 ---
 
-## 2. Espectro y Congruencia Modular de Involuciones
+## 2. Spectrum and Modular Congruence of Involutions
 
-Sea $t \in \mathrm{Aut}(G)$ una involución no trivial ($t^2 = \mathrm{id}, t \ne \mathrm{id}$) y sea $P_t$ su matriz de permutación $99 \times 99$.
+Let $t \in \mathrm{Aut}(G)$ be a non-trivial involution ($t^2 = \mathrm{id}, t \ne \mathrm{id}$) and let $P_t$ be its $99 \times 99$ permutation matrix.
 
-### 2.1. Descomposición Espectral y Traza
-Dado que $P_t A = A P_t$, los subespacios propios $V_{14}, V_3, V_{-4}$ son $P_t$-invariantes. Al ser $P_t^2 = I$, los autovalores de $P_t$ en cada subespacio pertenecen a $\{+1, -1\}$.
-- En $V_{14} = \mathrm{span}\{\mathbf{1}\}$, $P_t \mathbf{1} = \mathbf{1}$, con multiplicidad $+1$ igual a 1.
-- En $V_3$ ($\dim = 54$), sea $a$ la multiplicidad de $+1$ y $b = 54 - a$ la de $-1$.
-- En $V_{-4}$ ($\dim = 44$), sea $c$ la multiplicidad de $+1$ y $d = 44 - c$ la de $-1$.
+### 2.1. Spectral Decomposition and Trace
+Because $P_t A = A P_t$, the eigenspaces $V_{14}, V_3, V_{-4}$ are $P_t$-invariant. Since $P_t^2 = I$, the eigenvalues of $P_t$ restricted to each eigenspace are in $\{+1, -1\}$.
+- On $V_{14} = \mathrm{span}\{\mathbf{1}\}$, $P_t \mathbf{1} = \mathbf{1}$, with $+1$-multiplicity 1.
+- On $V_3$ ($\dim = 54$), let $a$ be the multiplicity of $+1$ and $b = 54 - a$ that of $-1$.
+- On $V_{-4}$ ($\dim = 44$), let $c$ be the multiplicity of $+1$ and $d = 44 - c$ that of $-1$.
 
-La traza $\mathrm{Tr}(P_t)$ cuenta el número de puntos fijos $f = |\mathrm{Fix}(t)|$:
+The trace $\mathrm{Tr}(P_t)$ counts fixed points $f = |\mathrm{Fix}(t)|$:
 $$f = \mathrm{Tr}(P_t) = 1 + (2a - 54) + (2c - 44) = 2(a + c) - 97$$
-Despejando:
+Solving for $a + c$:
 $$a + c = \frac{97 + f}{2}$$
-Como $a, c \in \mathbb{Z}$, se deduce inmediatamente que $f \equiv 1 \pmod 2$. La literatura previa (Behbahani-Lam 2011; Cesarz-Woldar 2025) acota el número de puntos fijos a:
+Since $a, c \in \mathbb{Z}$, $f$ must be odd: $f \equiv 1 \pmod 2$. Prior literature (Behbahani-Lam 2011; Cesarz-Woldar 2025) bounds $f$ to:
 $$f \in \{1, 3, 5, 7, 9, 11, 13, 15\}$$
 
-### 2.2. La Traza de $A P_t$ y las Aristas Internas
-La entrada $(u, u)$ de $A P_t$ es $A_{u, t(u)}$.
-- Si $u \in \mathrm{Fix}(t)$, $A_{u, u} = 0$ (el grafo no tiene bucles).
-- Si $u \ne t(u)$, la órbita $\{u, t(u)\}$ tiene longitud 2. Contribuye con 1 a la diagonal de $A P_t$ si y solo si $\{u, t(u)\} \in E(G)$.
-A una órbita de longitud 2 adyacente se le denomina **arista interna** (o transpuesta). Si denotamos por $\varepsilon_1$ al número total de aristas internas en $G$:
+### 2.2. The Trace of $A P_t$ and Internal Edges
+The $(u, u)$-entry of $A P_t$ is $A_{u, t(u)}$.
+- If $u \in \mathrm{Fix}(t)$, $A_{u, u} = 0$ (no self-loops).
+- If $u \ne t(u)$, the orbit $\{u, t(u)\}$ has length 2. It contributes 1 to the diagonal of $A P_t$ if and only if $\{u, t(u)\} \in E(G)$.
+An adjacent length-2 orbit is termed an **internal edge** (or transposed edge). Let $\varepsilon_1$ denote the number of internal edges in $G$:
 $$\mathrm{Tr}(A P_t) = 2 \varepsilon_1$$
 
-Por otro lado, evaluando la traza en la base de autovectores:
+Evaluating the trace in the eigenvector basis:
 $$\mathrm{Tr}(A P_t) = 14(1) + 3(2a - 54) - 4(2c - 44) = 28 + 6a - 8c$$
-Sustituyendo $c = \frac{97 + f}{2} - a$:
+Substituting $c = \frac{97 + f}{2} - a$:
 $$2 \varepsilon_1 = 28 + 6a - 8\left(\frac{97 + f}{2} - a\right) = 14a - 360 - 4f$$
-Dividiendo entre 2:
+Dividing by 2:
 $$\varepsilon_1 = 7a - 180 - 2f$$
-Reduciendo módulo 7, observando que $7a \equiv 0 \pmod 7$, $-180 \equiv 2 \pmod 7$ y $-2 \equiv 5 \pmod 7$:
+Reducing modulo 7, using $7a \equiv 0 \pmod 7$, $-180 \equiv 2 \pmod 7$, and $-2 \equiv 5 \pmod 7$:
 $$\varepsilon_1 \equiv 2 - 2f = -2(f - 1) \equiv 5(f - 1) \pmod 7$$
 
-\begin{proposition}[Congruencia Espectral Modular Universal]\label{prop:universal_mod7}
-Para toda involución $t \in \mathrm{Aut}(G)$ con $f$ puntos fijos y $\varepsilon_1$ aristas internas:
+\begin{proposition}[Universal Modular Spectral Congruence]\label{prop:universal_mod7}
+For every involution $t \in \mathrm{Aut}(G)$ with $f$ fixed points and $\varepsilon_1$ internal edges:
 $$\mathbf{\varepsilon_1 \equiv 5(f - 1) \pmod 7}$$
 \end{proposition}
 
-Valores requeridos por la congruencia según $f$:
+Required values modulo 7:
 - $f = 1 \implies \varepsilon_1 \equiv 5(0) \equiv 0 \pmod 7$
 - $f = 3 \implies \varepsilon_1 \equiv 5(2) = 10 \equiv 3 \pmod 7$
 - $f = 5 \implies \varepsilon_1 \equiv 5(4) = 20 \equiv 6 \pmod 7$
@@ -158,209 +159,234 @@ Valores requeridos por la congruencia según $f$:
 
 ---
 
-## 3. Topología de Subgrafos y Teorema de Conteo Universal
+## 3. Subgraph Topology and Universal Counting Theorem
 
-### 3.1. Rigidez de Grados hacia $\mathrm{Fix}(t)$
-Sea $U = V(G) \setminus \mathrm{Fix}(t)$ el conjunto de los $99 - f$ vértices no fijados. Para cada $u \in U$, definimos su grado hacia $\mathrm{Fix}(t)$ como $d(u) = |N(u) \cap \mathrm{Fix}(t)|$.
+### 3.1. Degree Rigidity Toward $\mathrm{Fix}(t)$
+Let $U = V(G) \setminus \mathrm{Fix}(t)$ denote the set of $99 - f$ non-fixed vertices. For each $u \in U$, define its degree toward $\mathrm{Fix}(t)$ as $d(u) = |N(u) \cap \mathrm{Fix}(t)|$.
 
-\begin{lemma}[Paridad de Co-vecinos bajo Involuciones]\label{lem:co_parity}
-Para todo $u \in U$:
+\begin{lemma}[Parity of Common Neighbors under Involutions]\label{lem:co_parity}
+For every $u \in U$:
 $$|N(u) \cap N(t(u))| \equiv |N(u) \cap \mathrm{Fix}(t)| \pmod 2$$
 \end{lemma}
 \begin{proof}
-El conjunto de co-vecinos $C = N(u) \cap N(t(u))$ es invariante bajo $t$. Por descomposición en órbitas de una involución, $|C| \equiv |\mathrm{Fix}(t|_C)| \pmod 2$. Como $\mathrm{Fix}(t|_C) = C \cap \mathrm{Fix}(t) = N(u) \cap \mathrm{Fix}(t)$, la congruencia se cumple.
+The set of common neighbors $C = N(u) \cap N(t(u))$ is invariant under $t$. By orbit decomposition of an involution, $|C| \equiv |\mathrm{Fix}(t|_C)| \pmod 2$. Since $\mathrm{Fix}(t|_C) = C \cap \mathrm{Fix}(t) = N(u) \cap \mathrm{Fix}(t)$, the congruence holds.
 \end{proof}
 
-\begin{theorem}[Teorema de Rigidez de Grados Exteriores]\label{thm:degree_rigidity}
-Para todo vértice $u \in U = V(G) \setminus \mathrm{Fix}(t)$:
-1. Si $\{u, t(u)\}$ es arista interna ($u \sim t(u)$), entonces $\mathbf{d(u) = 1}$ de forma idéntica.
-2. Si $\{u, t(u)\}$ es par transpuesto no adyacente ($u \not\sim t(u)$), entonces $\mathbf{d(u) \in \{0, 2\}}$.
-En consecuencia, $d(u) \le 2$ universalmente; ningún vértice exterior puede tener 3 o más vecinos fijos ($N_k = 0$ para $k \ge 3$).
+\begin{theorem}[Exterior Degree Rigidity Theorem]\label{thm:degree_rigidity}
+For every vertex $u \in U = V(G) \setminus \mathrm{Fix}(t)$:
+1. If $\{u, t(u)\}$ is an internal edge ($u \sim t(u)$), then $\mathbf{d(u) = 1}$ identically.
+2. If $\{u, t(u)\}$ is a non-adjacent transposed pair ($u \not\sim t(u)$), then $\mathbf{d(u) \in \{0, 2\}}$.
+Consequently, $d(u) \le 2$ universally; no exterior vertex can have 3 or more fixed neighbors ($N_k = 0$ for $k \ge 3$).
 \end{theorem}
 \begin{proof}
-1. Si $u \sim t(u)$, en un $\mathrm{srg}$ con $\lambda = 1$, tienen exactamente 1 vecino común en todo $G$. Por el Lema \ref{lem:co_parity}, $d(u) \equiv 1 \pmod 2$. Como $d(u) \le 1$, forzosamente $d(u) = 1$.
-2. Si $u \not\sim t(u)$, tienen $\mu = 2$ vecinos comunes en $G$. Por el Lema \ref{lem:co_parity}, $d(u) \equiv 2 \equiv 0 \pmod 2$. Como $d(u) \le \mu = 2$, se concluye $d(u) \in \{0, 2\}$.
+1. If $u \sim t(u)$, in an $\mathrm{srg}$ with $\lambda = 1$, they have exactly 1 common neighbor in all of $G$. By Lemma \ref{lem:co_parity}, $d(u) \equiv 1 \pmod 2$. Since $d(u) \le 1$, $d(u) = 1$ holds.
+2. If $u \not\sim t(u)$, they have $\mu = 2$ common neighbors in $G$. By Lemma \ref{lem:co_parity}, $d(u) \equiv 2 \equiv 0 \pmod 2$. Since $d(u) \le \mu = 2$, it follows that $d(u) \in \{0, 2\}$.
 \end{proof}
 
 ---
 
-### 3.2. La Identidad de Conteo Universal
-Sea $H = G[\mathrm{Fix}(t)]$ el subgrafo inducido sobre los puntos fijos.
-- Como $\lambda = 1$, toda arista en $H$ pertenece a un único triángulo enteramente contenido en $H$, y no hay dos triángulos que compartan arista ($K_4$-libre).
-- Cada grado $\deg_H(z)$ es par: $\deg_H(z) = 2 T_z$, donde $T_z$ es el número de triángulos incidentes en $z$.
-- El número total de aristas en $H$ es $m = 3T$.
-- Para cualquier par no adyacente $x \not\sim y$ en $\mathrm{Fix}(t)$, sus 2 vecinos comunes en $G$ se reparten entre $H$ y $U$:
+### 3.2. The Universal Counting Identity
+Let $H = G[\mathrm{Fix}(t)]$ be the subgraph induced on fixed points.
+- Since $\lambda = 1$, every edge in $H$ belongs to a unique triangle entirely contained in $H$, and no two triangles share an edge ($K_4$-free).
+- Every degree $\deg_H(z)$ is even: $\deg_H(z) = 2 T_z$, where $T_z$ is the number of triangles incident to $z$.
+- The total number of edges in $H$ is $m = 3T$.
+- For any non-adjacent pair $x \not\sim y$ in $\mathrm{Fix}(t)$, their 2 common neighbors in $G$ partition between $H$ and $U$:
   $$c_H(x, y) = |N(x) \cap N(y) \cap \mathrm{Fix}(t)| \in \{0, 2\}$$
 
-\begin{theorem}[Identidad de Conteo Universal]\label{thm:universal_counting}
-Para toda involución $t \in \mathrm{Aut}(G)$ con subgrafo inducido $H = G[\mathrm{Fix}(t)]$:
+\begin{theorem}[Universal Counting Identity]\label{thm:universal_counting}
+For every involution $t \in \mathrm{Aut}(G)$ with induced subgraph $H = G[\mathrm{Fix}(t)]$:
 $$\mathbf{\varepsilon_1 = f(8 - f) + \sum_{z \in \mathrm{Fix}(t)} \binom{\deg_H(z)}{2}}$$
 \end{theorem}
 \begin{proof}
-Contamos las aristas entre $U$ y $\mathrm{Fix}(t)$ por doble conteo:
+We count edges between $U$ and $\mathrm{Fix}(t)$ via double counting:
 $$\sum_{u \in U} d(u) = \sum_{z \in \mathrm{Fix}(t)} (14 - \deg_H(z)) = 14f - 2m$$
-Por el Teorema \ref{thm:degree_rigidity}, los vértices con $d(u) = 1$ son los extremos de las $\varepsilon_1$ aristas internas ($N_1 = 2 \varepsilon_1$), mientras que los que tienen $d(u) = 2$ forman $N_2$ vértices. Así:
+By Theorem \ref{thm:degree_rigidity}, vertices with $d(u) = 1$ are the endpoints of the $\varepsilon_1$ internal edges ($N_1 = 2 \varepsilon_1$), while those with $d(u) = 2$ form $N_2$ vertices. Thus:
 $$\sum_{u \in U} d(u) = 2 \varepsilon_1 + 2 N_2 = 14f - 2m \implies \varepsilon_1 + N_2 = 7f - m$$
-Por otra parte, contamos los pares de vecinos hacia $\mathrm{Fix}(t)$:
+On the other hand, counting pairs of neighbors toward $\mathrm{Fix}(t)$:
 $$N_2 = \sum_{u \in U} \binom{d(u)}{2} = \sum_{\{x, y\} \subset \mathrm{Fix}(t)} c_U(x, y)$$
-- Si $x \sim y$, su único co-vecino está en $\mathrm{Fix}(t)$, luego $c_U(x, y) = 0$.
-- Si $x \not\sim y$, $c_U(x, y) = 2 - c_H(x, y)$.
+- If $x \sim y$, their unique common neighbor is in $\mathrm{Fix}(t)$, so $c_U(x, y) = 0$.
+- If $x \not\sim y$, $c_U(x, y) = 2 - c_H(x, y)$.
 
-Sumando sobre los $\binom{f}{2} - m$ pares no adyacentes:
+Summing over the $\binom{f}{2} - m$ non-adjacent pairs:
 $$N_2 = \sum_{x \not\sim y} (2 - c_H(x, y)) = 2\binom{f}{2} - 2m - \sum_{x \not\sim y} c_H(x, y)$$
-Sustituyendo en $\varepsilon_1 = 7f - m - N_2$:
+Substituting into $\varepsilon_1 = 7f - m - N_2$:
 $$\varepsilon_1 = 7f - 2\binom{f}{2} + m + \sum_{x \not\sim y} c_H(x, y)$$
-Como $7f - 2\binom{f}{2} = 7f - f(f - 1) = f(8 - f)$, y para cada una de las $m$ aristas $x \sim y$ se cumple $c_H(x, y) = 1$:
+Since $7f - 2\binom{f}{2} = 7f - f(f - 1) = f(8 - f)$, and for each of the $m$ edges $x \sim y$, $c_H(x, y) = 1$:
 $$m + \sum_{x \not\sim y} c_H(x, y) = \sum_{\{x, y\} \subset \mathrm{Fix}(t)} c_H(x, y) = \sum_{z \in \mathrm{Fix}(t)} \binom{\deg_H(z)}{2}$$
-La identidad queda demostrada.
+The identity follows.
 \end{proof}
 
-\begin{corollary}[Teorema del Coclique Universal]\label{cor:coclique}
-Si los puntos fijos forman un conjunto independiente ($H \cong f K_1$), entonces $\mathbf{f = 1}$.
+\begin{corollary}[Universal Coclique Theorem]\label{cor:coclique}
+If the fixed points form an independent set ($H \cong f K_1$), then $\mathbf{f = 1}$.
 \end{corollary}
 \begin{proof}
-Para $f K_1$, $\deg_H(z) = 0$, por lo que $\varepsilon_1 = f(8 - f)$. Al ser un conteo de aristas, $f(8 - f) \ge 0 \implies f \le 8$.
-Igualando con la condición modular de la Proposición \ref{prop:universal_mod7}:
+For $f K_1$, $\deg_H(z) = 0$, so $\varepsilon_1 = f(8 - f)$. As an edge count, $f(8 - f) \ge 0 \implies f \le 8$.
+Matching with the modular condition from Proposition \ref{prop:universal_mod7}:
 $$f(8 - f) \equiv 5(f - 1) \pmod 7 \iff f^2 - 3f - 5 \equiv (f - 1)(f - 2) \equiv 0 \pmod 7$$
-Las únicas soluciones en $\mathbb{Z}_7$ son $f \equiv 1$ y $f \equiv 2$.
-- $f \equiv 1 \pmod 7$ con $f$ impar y $f \le 8$ obliga a $f = 1$.
-- $f \equiv 2 \pmod 7$ obliga a $f$ par, lo que contradice $f \equiv 1 \pmod 2$.
-Por tanto, $f = 1$ es la única solución.
+The only solutions in $\mathbb{Z}_7$ are $f \equiv 1$ and $f \equiv 2$.
+- $f \equiv 1 \pmod 7$ with $f$ odd and $f \le 8$ forces $f = 1$.
+- $f \equiv 2 \pmod 7$ forces $f$ even, contradicting $f \equiv 1 \pmod 2$.
+Therefore $f = 1$ is the unique solution.
 \end{proof}
 
 ---
 
-## 4. Clasificación Sistemática del Espectro de Puntos Fijos
+## 4. Systematic Elimination of Candidate Symmetries
 
-### 4.1. Orden $f = 3$ (PROBADO en Lean 4 + SAT DRAT)
-- **Requisito espectral:** $\varepsilon_1 \equiv 5(3 - 1) = 10 \equiv 3 \pmod 7$.
-- **Término base:** $f(8 - f) = 3(5) = 15$.
-- **Dicotomía topológica (Lean 4: [`conway_z2_f3_fixed_points_dichotomy`](../Conway/Z2Classification.lean)):**
-  Como $\lambda = 1$, cualquier arista entre puntos fijos fuerza un triángulo completo en $\mathrm{Fix}(t)$. No pueden existir subgrafos con 1 o 2 aristas ([`conway_z2_f3_no_one_edge`](../Conway/Z2Classification.lean), [`conway_z2_f3_no_two_edges`](../Conway/Z2Classification.lean)). Quedan únicamente dos casos:
-  - **Caso A ($H \cong K_3$):** $\deg_H(z) = 2$ para los 3 vértices.
+### 4.1. Order $f = 3$ (PROVED in Lean 4 + SAT DRAT)
+- **Spectral requirement:** $\varepsilon_1 \equiv 5(3 - 1) = 10 \equiv 3 \pmod 7$.
+- **Base term:** $f(8 - f) = 3(5) = 15$.
+- **Topological dichotomy (Lean 4: [`conway_z2_f3_fixed_points_dichotomy`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean)):**
+  Since $\lambda = 1$, any edge between fixed points forces an entire triangle in $\mathrm{Fix}(t)$. No subgraphs with 1 or 2 edges can exist ([`conway_z2_f3_no_one_edge`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean), [`conway_z2_f3_no_two_edges`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean)). Exactly two topological cases remain:
+  - **Case A ($H \cong K_3$):** $\deg_H(z) = 2$ for all 3 vertices.
     $$\varepsilon_1 = 15 + 3 \times \binom{2}{2} = 15 + 3 = 18 \equiv 4 \pmod 7 \ne 3 \pmod 7$$
-  - **Caso B ($H \cong 3K_1$):** $\deg_H(z) = 0$.
+  - **Case B ($H \cong 3K_1$):** $\deg_H(z) = 0$.
     $$\varepsilon_1 = 15 + 0 = 15 \equiv 1 \pmod 7 \ne 3 \pmod 7$$
-- **Certificación SAT Independiente con DRAT:**
-  Ambos casos fueron codificados en CNF ([`build_z2_f3_cnf.py`](../build_z2_f3_cnf.py)). Todas las particiones del Caso A ($(4, 4, 2)$, $(6, 2, 2)$, $(6, 4, 0)$) y del Caso B ($(1, 1, 1)$) fueron resueltas como `UNSAT` por CaDiCaL 1.9.5 y verificadas por `drat-trim` arrojando `s VERIFIED` en los logs del disco ([`drat_trim_z2_f3_case_a.log`](../drat_trim_z2_f3_case_a.log), [`drat_trim_z2_f3_case_b.log`](../drat_trim_z2_f3_case_b.log)).
+- **Independent SAT Certification with DRAT:**
+  Both cases were encoded into DIMACS CNF formulas. All partitions of Case A ($(4, 4, 2)$, $(6, 2, 2)$, $(6, 4, 0)$) and Case B ($(1, 1, 1)$) were solved to `UNSAT` by CaDiCaL and verified by `drat-trim`, concluding with `s VERIFIED` in logs ([`drat_trim_z2_f3_case_a.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z2_f3_case_a.log), [`drat_trim_z2_f3_case_b.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z2_f3_case_b.log)).
 
 ---
 
-### 4.2. Orden $f = 5$ (PROBADO en Lean 4)
-- **Requisito espectral:** $\varepsilon_1 \equiv 5(5 - 1) = 20 \equiv 6 \pmod 7$.
-- **Término base:** $f(8 - f) = 5(3) = 15$.
-- **Aislamiento estructural (Lean 4: [`conway_z2_f5_k3_012_isolates_remaining`](../Conway/Z2Classification.lean)):**
-  Dos triángulos no pueden coexistir en 5 vértices: si fuesen disjuntos requerirían $3 + 3 = 6 > 5$ vértices; si compartiesen un vértice, violarían $\lambda = 1$ o forzarían un sexto punto fijo como co-vecino. Por tanto, un triángulo aísla totalmente a los 2 vértices restantes. Quedan dos topologías:
-  - **Caso A ($H \cong K_3 + 2K_1$):** $\varepsilon_1 = 15 + 3 = 18 \equiv 4 \pmod 7 \ne 6 \pmod 7$.
-  - **Caso B ($H \cong 5K_1$):** $\varepsilon_1 = 15 + 0 = 15 \equiv 1 \pmod 7 \ne 6 \pmod 7$.
-- Ambas topologías son estrictamente incompatibles con $\varepsilon_1 \equiv 6 \pmod 7$. Formalizado en Lean 4 con 0 `sorry`: [`conway_no_z2_f5_automorphism`](../Conway/Z2Classification.lean).
+### 4.2. Order $f = 5$ (PROVED in Lean 4)
+- **Spectral requirement:** $\varepsilon_1 \equiv 5(5 - 1) = 20 \equiv 6 \pmod 7$.
+- **Base term:** $f(8 - f) = 5(3) = 15$.
+- **Structural isolation (Lean 4: [`conway_z2_f5_k3_012_isolates_remaining`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean)):**
+  Two triangles cannot coexist on 5 vertices: if disjoint, they would require $3 + 3 = 6 > 5$ vertices; if sharing a vertex, they would violate $\lambda = 1$ or force a sixth fixed point as common neighbor. Hence a triangle completely isolates the remaining 2 vertices. Two topologies remain:
+  - **Case A ($H \cong K_3 + 2K_1$):** $\varepsilon_1 = 15 + 3 = 18 \equiv 4 \pmod 7 \ne 6 \pmod 7$.
+  - **Case B ($H \cong 5K_1$):** $\varepsilon_1 = 15 + 0 = 15 \equiv 1 \pmod 7 \ne 6 \pmod 7$.
+- Both topologies are strictly incompatible with $\varepsilon_1 \equiv 6 \pmod 7$. Formalized in Lean 4 with 0 `sorry`: [`conway_no_z2_f5_automorphism`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean).
 
 ---
 
-### 4.3. Orden $f = 7$ (PROBADO en Lean 4)
-- **Requisito espectral:** $\varepsilon_1 \equiv 5(7 - 1) = 30 \equiv 2 \pmod 7$.
-- **Término base:** $f(8 - f) = 7(1) = 7 \equiv 0 \pmod 7$.
-- **Censo combinatorio exhaustivo ([`scripts/analyze_z2_f7_exhaustive.py`](../scripts/analyze_z2_f7_exhaustive.py)):**
-  De las $\binom{7}{3} = 35$ tripletas posibles, exactamente 5,596 subgrafos son empaquetamientos de triángulos con $\lambda = 1$. Imponiendo la condición $c_H(x, y) \in \{0, 2\}$ para pares no adyacentes, sobreviven exactamente 136 grafos admisibles, particionados según su número de triángulos $T$:
+### 4.3. Order $f = 7$ (PROVED in Lean 4)
+- **Spectral requirement:** $\varepsilon_1 \equiv 5(7 - 1) = 30 \equiv 2 \pmod 7$.
+- **Base term:** $f(8 - f) = 7(1) = 7 \equiv 0 \pmod 7$.
+- **Exhaustive combinatorial census ([`scripts/analyze_z2_f7_exhaustive.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/analyze_z2_f7_exhaustive.py)):**
+  Of the $\binom{7}{3} = 35$ possible triples, exactly 5,596 subgraphs are triangle packings with $\lambda = 1$. Enforcing $c_H(x, y) \in \{0, 2\}$ for non-adjacent pairs leaves exactly 136 admissible graphs, partitioned by triangle count $T$:
   1. $T = 0$ ($7K_1$): $\sum \binom{d}{2} = 0 \implies \varepsilon_1 = 7 \equiv 0 \pmod 7$.
   2. $T = 1$ ($K_3 + 4K_1$): $\sum \binom{d}{2} = 3 \implies \varepsilon_1 = 10 \equiv 3 \pmod 7$.
   3. $T = 2$ ($2K_3 + K_1$): $\sum \binom{d}{2} = 6 \implies \varepsilon_1 = 13 \equiv 6 \pmod 7$.
-  *(Nota técnica: El plano proyectivo $PG(2, 2)$ con 7 triángulos y grados regulares 6 corresponde a $K_7$, el cual está físicamente excluido en Conway-99 porque $\omega(G) = 3$, además de requerir $\varepsilon_1 = 112 > 46 = m_2$. Incluso en tal caso, $112 \equiv 0 \pmod 7 \ne 2$).*
-- **Incompatibilidad espectral:** Todos los subgrafos realizables satisfacen $\varepsilon_1 \in \{7, 10, 13\} \equiv \{0, 3, 6\} \pmod 7$, conjunto que es disjunto del requerimiento $\varepsilon_1 \equiv 2 \pmod 7$. Formalizado en Lean 4 con 0 `sorry`: [`conway_no_z2_f7_automorphism_full`](../Conway/Z2Classification.lean).
+  *(Technical note: Projective plane $PG(2, 2)$ with 7 triangles and regular degree 6 corresponds to $K_7$, physically excluded because $\omega(G) = 3$ and requiring $\varepsilon_1 = 112 > 46 = m_2$. Even if considered, $112 \equiv 0 \pmod 7 \ne 2$).*
+- **Spectral incompatibility:** All realizable subgraphs satisfy $\varepsilon_1 \in \{7, 10, 13\} \equiv \{0, 3, 6\} \pmod 7$, strictly disjoint from $\varepsilon_1 \equiv 2 \pmod 7$. Formalized in Lean 4 with 0 `sorry`: [`conway_no_z2_f7_automorphism_full`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean).
 
 ---
 
-### 4.4. Órdenes Superiores $f \in \{9, 11, 13, 15\}$ (PROBADO por SMT / Conteo)
-Para $f \ge 9$, el término base $f(8 - f)$ se vuelve estrictamente negativo:
-$$f(8 - f) < 0 \quad \text{para todo } f \in \{9, 11, 13, 15\}$$
-Como $\varepsilon_1 \ge 0$, se requiere necesariamente:
+### 4.4. Higher Orders $f \in \{9, 11, 13, 15\}$ (PROVED by SMT / Counting)
+For $f \ge 9$, the base term $f(8 - f)$ is strictly negative:
+$$f(8 - f) < 0 \quad \text{for all } f \in \{9, 11, 13, 15\}$$
+Since $\varepsilon_1 \ge 0$, it is necessary that:
 $$\sum_{z \in \mathrm{Fix}(t)} \binom{\deg_H(z)}{2} \ge f(f - 8)$$
-Además, $\varepsilon_1 \le m_2 = (99 - f)/2$.
-- **$f = 9$:** Base $-9$, $\varepsilon_1 \equiv 5 \pmod 7 \implies \varepsilon_1 \in \{5, 12, 19, 26, 33, 40\}$. De 241 particiones de grados pares con $\lambda = 1$, solo 6 satisfacen la suma requerida; todas fueron refutadas por SMT/Z3 ([`scripts/analyze_z2_f9_involutions.py`](../scripts/analyze_z2_f9_involutions.py)) en 9.3 s.
-- **$f = 11$:** Base $-33$, $\varepsilon_1 \equiv 1 \pmod 7 \implies \varepsilon_1 \in \{1, 8, 15, 22, 29, 36, 43\}$. Para $T \le 3$ triángulos, $\max \sum \binom{d}{2} = 21 < 33$, forzando $\varepsilon_1 \le -12 < 0$. El grafo de Paley-9 ($P(9) + 2K_1$) da $\sum \binom{d}{2} = 54 \implies \varepsilon_1 = 21 \equiv 0 \pmod 7 \ne 1$. Las 15 particiones restantes fueron resueltas como `UNSAT` por CaDiCaL en 1.9 s ([`scripts/analyze_z2_f11_involutions.py`](../scripts/analyze_z2_f11_involutions.py)).
-- **$f = 13$:** Base $-65$, $\varepsilon_1 \equiv 4 \pmod 7$. 50 particiones evaluadas; todas `UNSAT` en 4.0 s ([`scripts/analyze_z2_f13_involutions.py`](../scripts/analyze_z2_f13_involutions.py)).
-- **$f = 15$:** Base $-105$, $\varepsilon_1 \equiv 0 \pmod 7$. 154 particiones evaluadas; todas `UNSAT` en 14.0 s ([`scripts/analyze_z2_f15_involutions.py`](../scripts/analyze_z2_f15_involutions.py)).
+Furthermore, $\varepsilon_1 \le m_2 = (99 - f)/2$.
+- **$f = 9$:** Base $-9$, $\varepsilon_1 \equiv 5 \pmod 7 \implies \varepsilon_1 \in \{5, 12, 19, 26, 33, 40\}$. Of 241 even-degree partitions with $\lambda = 1$, only 6 satisfy the required sum; all 6 were refuted by SMT/Z3 ([`scripts/analyze_z2_f9_involutions.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/analyze_z2_f9_involutions.py)) in 9.3 s.
+- **$f = 11$:** Base $-33$, $\varepsilon_1 \equiv 1 \pmod 7 \implies \varepsilon_1 \in \{1, 8, 15, 22, 29, 36, 43\}$. For $T \le 3$ triangles, $\max \sum \binom{d}{2} = 21 < 33$, forcing $\varepsilon_1 \le -12 < 0$. The Paley graph $P(9) + 2K_1$ gives $\sum \binom{d}{2} = 54 \implies \varepsilon_1 = 21 \equiv 0 \pmod 7 \ne 1$. The remaining 15 partitions were solved to `UNSAT` by CaDiCaL in 1.9 s ([`scripts/analyze_z2_f11_involutions.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/analyze_z2_f11_involutions.py)).
+- **$f = 13$:** Base $-65$, $\varepsilon_1 \equiv 4 \pmod 7$. 50 partitions evaluated; all `UNSAT` in 4.0 s ([`scripts/analyze_z2_f13_involutions.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/analyze_z2_f13_involutions.py)).
+- **$f = 15$:** Base $-105$, $\varepsilon_1 \equiv 0 \pmod 7$. 154 partitions evaluated; all `UNSAT` in 14.0 s ([`scripts/analyze_z2_f15_involutions.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/analyze_z2_f15_involutions.py)).
 
 ---
 
-## 5. El Caso Abierto $f = 1$: Descomposición Canónica de Ramas
+### 4.5. Certified Elimination of Order 7 ($\mathbb{Z}_7$): Canonical SAT Encoding and DRAT Verification (PROVED)
 
-Eliminados todos los órdenes $f \ge 3$, la única involución teóricamente admisible en Conway-99 es aquella que fija exactamente un vértice: $\mathbf{f = 1}$.
+Under any non-trivial automorphism $g \in \mathrm{Aut}(G)$ of prime order 7, Cesarz and Woldar (2025, Thm 4.13) proved that $g$ must fix a unique vertex $x_0$ and partition the remaining 98 vertices into exactly 14 regular orbits of length 7. In coordinates, the adjacency matrix decomposes into $14 \times 14$ circulant blocks over $\mathbb{Z}_7$, subject to:
+1. Regular valency $k = 14$.
+2. Local linearity ($\lambda = 1$).
+3. Strictly $\mu = 2$ common neighbors for non-adjacent pairs.
+4. $K_4$-freeness ($\omega(G) = 3$).
 
-### 5.1. Estructura de Subconstituyentes e Incidencia
-Sea $x_0$ el único punto fijo de $t$:
-1. **Punto fijo:** $t(x_0) = x_0$.
-2. **Primer subconstituyente $N(x_0)$:** $14$ vértices que inducen $7 K_2$. Al no haber otros puntos fijos, $t$ intercambia los extremos de cada arista, de modo que $N(x_0)$ consta de 7 aristas internas $R_0, \dots, R_6$, aportando exactamente $\varepsilon_1 = 7$ aristas internas ($7 \equiv 0 \pmod 7$, compatible con la Proposición \ref{prop:universal_mod7}).
-3. **Segundo subconstituyente $\Gamma_2(x_0)$:** $84$ vértices particionados en $42$ pares transpuestos $O_0, \dots, O_{41}$. En Lean 4 ([`gamma2_no_internal_edges`](../Conway/Z2Classification.lean)) se demuestra que $\Gamma_2(x_0)$ no contiene ninguna arista interna.
-4. **Matriz de Incidencia $C_{7 \times 42}$:**  
-   Cada órbita $O_j = \{v_j, t(v_j)\} \subset \Gamma_2(x_0)$ tiene $\mu = 2$ conexiones hacia $N(x_0)$. La matriz binaria $C \in \{0, 1\}^{7 \times 42}$ satisface la ecuación de 2-diseño:
+The canonical compiler [`scripts/build_z7_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z7_canonical_cnf.py) generated the DIMACS CNF formula `conway_z7_canonical.cnf` containing 176,613 variables and 421,562 clauses. Crawford-style lex-leader symmetry breaking constraints were enforced under the quotient multiplier group:
+$$\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$$
+combining circulant reflection and the multiplicative unit group $(\mathbb{Z}_7)^\times \cong \mathbb{Z}_6$.
+
+**Certified Solver Run & Forensic Verification Metrics:**
+- **Primary CDCL Run:** CaDiCaL 3.0.1 terminated with exit code 20 (`s UNSATISFIABLE`) in 771.59 seconds process time (771.76 seconds real time), logging 459,403 conflicts (595.60/s), $1{,}859{,}868{,}643$ propagations (2.41 M/s), and maximum RSS of 219.38 MB ([`cadical_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7.log), SHA-256: `988a4d2d638de921363b757863269c6875c76689a39e8b03eb01852a3a0ad3d4`).
+- **DRAT Proof:** A 192,218,491-byte non-binary DRAT proof trace (`proof_z7_canonical.drat`, SHA-256: `574cc2a77820e05a2c7c2b216b0e95d3f52f4da77ef37a5da75cc228d46e5ab0`) was emitted during solving.
+- **Independent DRAT Audit:** Marijn Heule's `drat-trim` verified the empty-clause derivation in backward checking mode in 844.008 seconds, extracting a core of 213,600 clauses (out of 421,562) and 495,181 lemmas (out of 1,098,901) via 74,443,066 resolution steps (0 RAT lemmas, 285,673 redundant literals eliminated), concluding with `s VERIFIED` ([`drat_trim_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z7.log), SHA-256: `0d2dd54b686c2ea003c06d067048cf44dd403f50c1eca793f4730985c487c889`, supervisor summary [`z7_result.txt`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/z7_result.txt)).
+- **Secondary Independent Confirmation:** A second CaDiCaL 3.0.1 instance configured with alternative hunter heuristics (`--seed=777 --stabilizeonly=true --elimeffort=10 --subsumeeffort=60`) independently derived `s UNSATISFIABLE` (exit code 20) in 1827.91 seconds process time (1827.95 seconds real time), traversing 1,605,095 conflicts (878.24/s) and $5{,}398{,}435{,}071$ propagations (2.95 M/s) ([`cadical_z7_hunter.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7_hunter.log), SHA-256: `bcf1077d235d9a748c16d45e8d0ae6cc197005993c177d0d5e78e6fa981c1448`).
+
+By Cesarz & Woldar (2025, Thm 3.11 & Prop 4.14), eliminating $\mathbb{Z}_7$ unconditionally removes order 14, the Frobenius group $\mathrm{Frob}(21)$, and any group whose order is divisible by 7.
+
+---
+
+## 5. The Open Case $f = 1$: Canonical Branch Decomposition
+
+With all orders $f \ge 3$ and $\mathbb{Z}_7$ eliminated, the unique surviving involution case in Conway-99 is that with a single fixed point: $\mathbf{f = 1}$.
+
+### 5.1. Subconstituent and Incidence Structure
+Let $x_0$ be the unique fixed point of $t$:
+1. **Fixed point:** $t(x_0) = x_0$.
+2. **First subconstituent $N(x_0)$:** 14 vertices inducing $7 K_2$. Because there are no other fixed points, $t$ swaps endpoints of each edge, giving 7 internal edges $R_0, \dots, R_6$ and $\varepsilon_1 = 7$ internal edges ($7 \equiv 0 \pmod 7$, consistent with Proposition \ref{prop:universal_mod7}).
+3. **Second subconstituent $\Gamma_2(x_0)$:** 84 vertices partitioned into 42 transposed pairs $O_0, \dots, O_{41}$. Proved in Lean 4 ([`gamma2_no_internal_edges`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean)) that $\Gamma_2(x_0)$ contains no internal edges.
+4. **Incidence matrix $C_{7 \times 42}$:**  
+   Each orbit $O_j = \{v_j, t(v_j)\} \subset \Gamma_2(x_0)$ connects to $N(x_0)$ via $\mu = 2$ edges. The binary matrix $C \in \{0, 1\}^{7 \times 42}$ satisfies the 2-design equation:
    $$C C^T = 10 I_7 + 2 J_7$$
-   Se demuestra analíticamente que $C$ es única salvo isomorfismo:
+   Analytically proved that $C$ is unique up to isomorphism:
    $$C \cong [C_1 \mid C_1]$$
-   donde $C_1$ es la matriz de incidencia vértices-aristas del grafo completo $K_7$ ($7 \times 21$).
+   where $C_1$ is the vertex-edge incidence matrix of complete graph $K_7$ ($7 \times 21$).
 
-### 5.2. Grupo de Automorfismos de Incidencia y Estabilizador
-El grupo de automorfismos que preserva la estructura de incidencia de $C_{7 \times 42}$ es el producto entrelazado (*wreath product*):
+### 5.2. Incidence Automorphism Group and Stabilizer
+The automorphism group preserving $C_{7 \times 42}$ is the wreath product:
 $$W = (\mathbb{Z}_2)^7 \rtimes S_7, \quad |W| = 2^7 \times 7! = 128 \times 5040 = 645{,}120$$
-Para romper esta enorme simetría isomórfica, fijamos la primera órbita $O_0 = \{u_0, u'_0\}$. Su subgrupo estabilizador en $W$ tiene orden:
+Fixing the first orbit $O_0 = \{u_0, u'_0\}$, its stabilizer in $W$ has order:
 $$|\mathrm{Stab}_W(O_0)| = \frac{645{,}120}{42} = 15{,}360$$
 
-### 5.3. Las Tres Ramas Canónicas Exhaustivas
-Bajo la acción de $\mathrm{Stab}_W(O_0)$, las 41 órbitas restantes de $\Gamma_2(x_0)$ se particionan exactamente en tres órbitas canónicas de simetría:
-1. **Rama A (Gemela / Twin):** Órbita compañera $O_{21}$, que comparte idéntico soporte de vecindad $\{R_0, R_1\}$ con fase opuesta. Tamaño de órbita: 1. Factor de reducción de simetría: $\mathbf{\times 15{,}360}$.
-2. **Rama B (Secante / Secant):** Órbita compañera $O_1$, que comparte exactamente una órbita de vecindad ($R_0$) con la misma fase. Tamaño de órbita: 20. Factor de reducción de simetría: $\mathbf{\times 768}$.
-3. **Rama C (Disjunta / Disjoint):** Órbita compañera $O_{10}$, con soporte de vecindad completamente disjunto ($\{R_2, R_3\} \cap \{R_0, R_1\} = \emptyset$). Tamaño de órbita: 20. Factor de reducción de simetría: $\mathbf{\times 768}$.
+### 5.3. The Three Exhaustive Canonical Branches
+Under the action of $\mathrm{Stab}_W(O_0)$, the remaining 41 orbits of $\Gamma_2(x_0)$ partition into exactly three canonical symmetry orbits:
+1. **Branch A (Twin):** Partner orbit $O_{21}$ shares identical neighborhood support $\{R_0, R_1\}$ with opposite phase. Orbit size: 1. Symmetry reduction factor: $\mathbf{15{,}360\times}$.
+2. **Branch B (Secant):** Partner orbit $O_1$ shares exactly one neighborhood orbit ($R_0$) with identical phase. Orbit size: 20. Symmetry reduction factor: $\mathbf{768\times}$.
+3. **Branch C (Disjoint):** Partner orbit $O_{10}$ has disjoint neighborhood support ($\{R_2, R_3\} \cap \{R_0, R_1\} = \emptyset$). Orbit size: 20. Symmetry reduction factor: $\mathbf{768\times}$.
 
-La partición es exhaustiva: $1 + 20 + 20 = 41$.
+The partition is exhaustive: $1 + 20 + 20 = 41$.
 
-### 5.4. Estado de Ejecución Distribuida en Google Cloud (EXPLORADO)
-Cada rama canónica fue compilada en una instancia DIMACS CNF conteniendo $27{,}778{,}903$ cláusulas y $666{,}309$ variables booleanas.
+### 5.4. Distributed Search Status in Google Cloud (EXPLORADO)
+Each canonical branch was compiled into a DIMACS CNF formula containing $27{,}778{,}903$ clauses and $666{,}309$ variables.
 
-Métricas de resolución reportadas por el supervisor de la máquina virtual dedicada (`conway-sat-worker`, 16 vCPUs, 64 GB RAM, CaDiCaL 1.9.5):
-- **Rama A (Gemela $O_{21}$):** $>23.87 \times 10^6$ conflictos CDCL, meseta del 27% de variables activas.
-- **Rama B (Secante $O_1$):** $>37.35 \times 10^6$ conflictos CDCL, meseta del 28% de variables activas.
-- **Rama C (Disjunta $O_{10}$):** $>39.62 \times 10^6$ conflictos CDCL, meseta del 28% de variables activas.
-- **Búsqueda combinada en la nube:** $>100.84 \times 10^6$ conflictos CDCL acumulados (más $>54.95 \times 10^6$ conflictos en la búsqueda local monolítica).
+Solving progress reported on the dedicated cloud worker (`conway-sat-worker`, 16 vCPUs, 64 GB RAM, CaDiCaL 1.9.5):
+- **Branch A (Twin $O_{21}$):** $>26.3 \times 10^6$ CDCL conflicts, 27% active variable plateau.
+- **Branch B (Secant $O_1$):** $>41.0 \times 10^6$ CDCL conflicts, 28% active variable plateau.
+- **Branch C (Disjoint $O_{10}$):** $>43.6 \times 10^6$ CDCL conflicts, 28% active variable plateau.
+- **Combined Cloud Effort:** $>112 \times 10^6$ CDCL conflicts accumulated across the three branches.
 
-**Dictamen:** El caso $f = 1$ permanece estrictamente **EXPLORADO / ABIERTO**. A pesar de la reducción del espacio de variables activas a una meseta del 28%, ninguna de las tres ramas ha derivado la cláusula vacía ni ha hallado un certificado satisfactible.
+**Status:** The case $f = 1$ remains strictly **EXPLORED / OPEN**. Despite the reduction of active variables to a 28% plateau, no branch has derived the empty clause or discovered a satisfying assignment.
 
 ---
 
-## 6. Inventario de Formalización en Lean 4
+## 6. Formalization Inventory in Lean 4 & SAT Verification
 
-Todos los teoremas listados a continuación compilan limpiamente dentro de Lake (`lake build`, 32 jobs) y fueron comprobados con `#print axioms` en [`Conway/TestMatrix.lean`](../Conway/TestMatrix.lean).
+All Lean 4 theorems listed below compile cleanly in Lake (`lake build`, 32 jobs) and were checked with `#print axioms` in [`Conway/TestMatrix.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/TestMatrix.lean). SAT refutations are independently certified via `drat-trim`.
 
-| Módulo Lean 4 | Declaración Formal | Axiomas Kernel | sorry | Estado |
+| Module / Artifact | Formal Declaration / Target | Foundation / Core | sorry | Epistemological State |
 | :--- | :--- | :---: | :---: | :---: |
-| [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) | `even_divides_six_and_not_six_eq_two` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) | `conway_no_order_4_subgroup` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) | `conway_no_dihedral_subgroup` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) | `conway_parity_rigidity` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_thm_3_11_trace_int` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_thm_3_11_modular_contradiction` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_prop_4_14_orbit_partition_impossible` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_divisible_by_7_reduces_to_z7` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `conway_z2_involution_fixed_points_odd` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `gamma2_no_internal_edges` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `conway_z2_f3_fixed_points_dichotomy` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `conway_z2_f5_k3_012_isolates_remaining` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `conway_no_z2_f5_automorphism` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `conway_z2_f7_spectral_arithmetic_contradiction` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/Z2Classification.lean`](../Conway/Z2Classification.lean) | `conway_no_z2_f7_automorphism_full` | `[propext, Quot.sound]` | 0 | **PROBADO** |
-| [`Conway/GrandClassification.lean`](../Conway/GrandClassification.lean) | `conway_automorphism_group_restricted` | Transitive `sorryAx` | 0 direct | **COMPILADO** |
+| [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) | `even_divides_six_and_not_six_eq_two` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) | `conway_no_order_4_subgroup` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) | `conway_no_dihedral_subgroup` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) | `conway_parity_rigidity` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_thm_3_11_trace_int` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_thm_3_11_modular_contradiction` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_prop_4_14_orbit_partition_impossible` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) | `cesarz_woldar_divisible_by_7_reduces_to_z7` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `conway_z2_involution_fixed_points_odd` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `gamma2_no_internal_edges` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `conway_z2_f3_fixed_points_dichotomy` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `conway_z2_f5_k3_012_isolates_remaining` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `conway_no_z2_f5_automorphism` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `conway_z2_f7_spectral_arithmetic_contradiction` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) | `conway_no_z2_f7_automorphism_full` | `[propext, Quot.sound]` | 0 | **PROVED** |
+| `drat-trim` / `f=3` SAT Proofs | `proof_z2_f3_case_a.drat`, `case_b.drat` | `drat-trim` `s VERIFIED` | N/A | **PROVED** |
+| `drat-trim` / $\mathbb{Z}_7$ SAT Proof | `proof_z7_canonical.drat` (192.2 MB) | `drat-trim` `s VERIFIED` (844s) | N/A | **PROVED** |
+| [`Conway/GrandClassification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/GrandClassification.lean) | `conway_automorphism_group_restricted` | Transitive `sorryAx` | 0 direct | **COMPILED** |
 
 ---
 
-## 7. Conclusión y Próximos Pasos
+## 7. Conclusions and Research Trajectory
 
-1. **Rigidez de Paridad Consolidada:** Se ha demostrado formal y analíticamente que si Conway-99 admite simetrías de orden par, su grupo de automorfismos es forzosamente $\mathrm{Aut}(G) \cong \mathbb{Z}_2$.
-2. **Espectro de Involuciones Acotado a $f = 1$:** Todas las cardinalidades impares de puntos fijos $f \in \{3, 5, 7, 9, 11, 13, 15\}$ han quedado categóricamente refutadas mediante combinación de teoría espectral de trazas modulares, conteo de grados, formalización en Lean 4 (0 `sorry`) y refutación SAT certificada por `drat-trim` (`s VERIFIED`).
-3. **El Camino Crítico:** La resolución de las tres ramas canónicas para $f = 1$ en Google Cloud representa la vía prioritaria para decidir si Conway-99 puede admitir cualquier simetría no trivial de orden par.
-4. **Frontera de Simetrías Impares:** La resolución posterior de las acciones $\mathbb{Z}_7$ y $\mathbb{Z}_3$ mediante los compiladores canónicos lex-leader desarrollados cerrará exhaustivamente la conjetura de rigidez completa $\mathrm{Aut}(G) = \{1\}$.
+1. **Consolidated Parity Rigidity:** Formally and analytically proven that if Conway's 99-graph admits even-order symmetries, its automorphism group is strictly $\mathrm{Aut}(G) \cong \mathbb{Z}_2$.
+2. **Involution Spectrum Confined to $f = 1$:** All odd fixed-point cardinalities $f \in \{3, 5, 7, 9, 11, 13, 15\}$ are categorically eliminated via modular trace theory, exterior degree rigidity, Lean 4 kernel theorems (0 `sorry`), and certified DRAT refutations (`s VERIFIED`).
+3. **Certified Elimination of Order 7 ($\mathbb{Z}_7$):** The canonical order-7 action under Cesarz-Woldar coordinate constraints and multiplier group $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ Crawford cuts has been refuted by CaDiCaL 3.0.1 (`s UNSATISFIABLE`, 771.59s) and certified by `drat-trim` (`s VERIFIED`, 844.01s), with secondary hunter confirmation (`s UNSATISFIABLE`, 1827.91s). This establishes the non-existence of order 7 with modern verifiable resolution proofs, transitively ruling out order 14 and $\mathrm{Frob}(21)$.
+4. **The Critical Path ($f = 1$):** Resolving the three canonical symmetry-breaking branches for $f = 1$ in the cloud represents the decisive path to determining whether Conway-99 can admit any non-trivial even-order symmetry.
+5. **The Final Frontier of Symmetries:** Resolving the $\mathbb{Z}_3$ action currently running on the cloud cluster, together with the $f = 1$ involution branches, will close the Full Rigidity Conjecture $\mathrm{Aut}(G) = \{1\}$.
 
 ---
 
-## Referencias Bibliográficas
+## References
 
 1. A. Behbahani and C. Lam, *Computer search for strongly regular graphs with parameters $(99, 14, 1, 2)$*, Discrete Math. **311** (2011), no. 16, 1712–1717.
 2. A. E. Brouwer, A. M. Cohen, and A. Neumaier, *Distance-Regular Graphs*, Springer-Verlag, Berlin, 1989.
