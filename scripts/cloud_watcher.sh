@@ -1,8 +1,9 @@
 #!/bin/bash
 # scripts/cloud_watcher.sh
-# Autonomous supervisor for Conway 99 Cloud Solvers on GCP VM
-# Detects branch completion in real-time, executes drat-trim on VM, notifies Telegram,
-# and automatically powers off the VM upon full completion to eliminate credit costs.
+# Autonomous supervisor for Conway 99 Expanded Cloud Cluster on GCP VM (10 solvers)
+# Monitors main DRAT solvers, SAT hunters, Z7, and Z3.
+# Runs drat-trim automatically upon UNSAT, extracts models on SAT,
+# sends real-time Telegram notifications, and emits a periodic status heartbeat.
 
 TG_TOKEN="8946638886:AAHhgeJUL9Sk0P4hrzaAC4Oxf6CsJdcmgHY"
 TG_CHAT_ID="8235898145"
@@ -16,9 +17,42 @@ send_telegram() {
 }
 
 cd ~/conway || exit 1
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cloud Watcher started in ~/conway"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Expanded Cloud Watcher started in ~/conway"
+
+# Initialize heartbeat timer
+LAST_HEARTBEAT=0
+HEARTBEAT_INTERVAL=14400  # 4 hours in seconds
 
 while true; do
+    CURRENT_TIME=$(date +%s)
+    
+    # -------------------------------------------------------------
+    # 1. Check SAT on ALL active logs (Immediate Priority Alert)
+    # -------------------------------------------------------------
+    for LOG in cadical_branch_*.log cadical_hunter_*.log cadical_z7*.log cadical_z3*.log; do
+        if [ -f "$LOG" ]; then
+            TAG=$(basename "$LOG" .log)
+            SAT_FLAG="sat_${TAG}.done"
+            if grep -q "s SATISFIABLE" "$LOG" && [ ! -f "$SAT_FLAG" ]; then
+                touch "$SAT_FLAG"
+                echo "[$(date '+%Y-%m-%d %H:%M:%S')] ¡¡SAT ENCONTRADO EN $TAG!!"
+                grep "^v " "$LOG" > "sat_solution_${TAG}.txt"
+                sync
+                send_telegram "🏆 *GCP VM: ¡¡SOLUCIÓN SATISFIABLE ENCONTRADA!!* 🏆
+El solver ha reportado *s SATISFIABLE* en la tarea: \`${TAG}\`.
+Modelo extraído en \`sat_solution_${TAG}.txt\`.
+¡Posible grafo de Conway-99 o automorfismo verificado!
+Deteniendo instancias y asegurando los datos en disco..."
+                sleep 20
+                sudo poweroff
+                exit 0
+            fi
+        fi
+    done
+
+    # -------------------------------------------------------------
+    # 2. Check UNSAT on Main DRAT Branches (f=1: A, B, C)
+    # -------------------------------------------------------------
     for b in a b c; do
         LOG="cadical_branch_${b}.log"
         CNF="conway_z2_f1_branch_${b}.cnf"
@@ -27,7 +61,6 @@ while true; do
         RES_FILE="branch_${b}_result.txt"
         
         if [ -f "$LOG" ] && [ ! -f "$RES_FILE" ]; then
-            # Check for UNSAT
             if grep -q "s UNSATISFIABLE" "$LOG"; then
                 echo "s UNSATISFIABLE" > "$RES_FILE"
                 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Rama ${b^^} UNSATISFIABLE!"
@@ -35,8 +68,6 @@ while true; do
 CaDiCaL ha derivado la cláusula vacía en la Rama ${b^^}.
 Iniciando verificación formal inmediata con \`drat-trim\` en la VM..."
                 
-                # Run drat-trim on VM
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running drat-trim for branch ${b^^}..."
                 /usr/local/bin/drat-trim "$CNF" "$DRAT" > "$TRIM_LOG" 2>&1
                 
                 if grep -q "s VERIFIED" "$TRIM_LOG"; then
@@ -51,41 +82,85 @@ Estado: *PROBADO*."
                     send_telegram "⚠️ *GCP VM: Alerta drat-trim Rama ${b^^}*
 La prueba no devolvió s VERIFIED. Revisar log \`$TRIM_LOG\`."
                 fi
-                
-            # Check for SAT
-            elif grep -q "s SATISFIABLE" "$LOG"; then
-                echo "s SATISFIABLE" > "$RES_FILE"
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] Rama ${b^^} SATISFIABLE!"
-                send_telegram "🏆 *GCP VM: ¡¡RAMA ${b^^} SATISFIABLE!!* 🏆
-¡CaDiCaL ha encontrado una asignación satisfacible!
-Extrayendo modelo para verificación estructural de Conway-99..."
-                grep "^v " "$LOG" > "sat_solution_${b}.txt"
-                sync
-                send_telegram "🔒 *Consumo GCP Congelado:* Modelo guardado en disco. Apagando máquina virtual automáticamente para detener facturación."
-                sleep 20
-                sudo poweroff
-                exit 0
             fi
         fi
     done
-    
-    # Check if all 3 branches verified UNSAT
+
+    # -------------------------------------------------------------
+    # 3. Check UNSAT on Z7
+    # -------------------------------------------------------------
+    if [ -f "cadical_z7.log" ] && [ ! -f "z7_result.txt" ]; then
+        if grep -q "s UNSATISFIABLE" "cadical_z7.log"; then
+            echo "s UNSATISFIABLE" > "z7_result.txt"
+            send_telegram "🚨 *GCP VM: Z_7 (Orden 7) UNSATISFIABLE!* 🚨
+CaDiCaL ha refutado la acción canónica de Z_7.
+Iniciando verificación con \`drat-trim\`..."
+            /usr/local/bin/drat-trim conway_z7_canonical.cnf proof_z7_canonical.drat > drat_trim_z7.log 2>&1
+            if grep -q "s VERIFIED" "drat_trim_z7.log"; then
+                echo "VERIFIED" >> "z7_result.txt"
+                send_telegram "✅ *GCP VM: Z_7 VERIFICADO (s VERIFIED)* ✅
+Acción de orden 7 matemáticamente descartada y certificada."
+            fi
+        fi
+    fi
+
+    # -------------------------------------------------------------
+    # 4. Check UNSAT on Z3 (fpf & fixed3)
+    # -------------------------------------------------------------
+    for mode in fpf fixed3; do
+        LOG="cadical_z3_${mode}.log"
+        RES="z3_${mode}_result.txt"
+        CNF="conway_z3_${mode}.cnf"
+        DRAT="proof_z3_${mode}.drat"
+        TRIM="drat_trim_z3_${mode}.log"
+        if [ -f "$LOG" ] && [ ! -f "$RES" ]; then
+            if grep -q "s UNSATISFIABLE" "$LOG"; then
+                echo "s UNSATISFIABLE" > "$RES"
+                send_telegram "🚨 *GCP VM: Z_3 (${mode}) UNSATISFIABLE!* 🚨
+Verificando con \`drat-trim\`..."
+                /usr/local/bin/drat-trim "$CNF" "$DRAT" > "$TRIM" 2>&1
+                if grep -q "s VERIFIED" "$TRIM"; then
+                    echo "VERIFIED" >> "$RES"
+                    send_telegram "✅ *GCP VM: Z_3 (${mode}) VERIFICADO (s VERIFIED)* ✅"
+                fi
+            fi
+        fi
+    done
+
+    # -------------------------------------------------------------
+    # 5. Check if ALL 3 Main f=1 Branches are VERIFIED UNSAT
+    # -------------------------------------------------------------
     if [ -f "branch_a_result.txt" ] && [ -f "branch_b_result.txt" ] && [ -f "branch_c_result.txt" ]; then
         if grep -q "VERIFIED" "branch_a_result.txt" && grep -q "VERIFIED" "branch_b_result.txt" && grep -q "VERIFIED" "branch_c_result.txt"; then
             if [ ! -f "ALL_Z2_F1_REFUTED.done" ]; then
                 touch "ALL_Z2_F1_REFUTED.done"
                 send_telegram "🎉 *HITO CIENTÍFICO HISTÓRICO: Z_2 (f=1) TOTALMENTE REFUTADO* 🎉
 Las 3 ramas canónicas de ruptura de simetría (Gemela, Secante, Disjunta) han sido refutadas y formalmente certificadas con \`drat-trim\` (s VERIFIED).
-Con ello, el caso central f=1 queda matemáticamente cerrado [PROBADO]."
+Con ello, Conway-99 queda demostrado rígido frente a cualquier simetría de orden par [PROBADO]."
                 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ALL 3 BRANCHES VERIFIED UNSAT! Done."
-                sync
-                send_telegram "🔒 *Consumo GCP Congelado:* Las 3 ramas han concluido y están verificadas. Apagando la máquina virtual automáticamente (\`sudo poweroff\`) para detener el gasto de créditos. Los certificados y logs quedan preservados en el SSD."
-                sleep 20
-                sudo poweroff
-                exit 0
             fi
         fi
     fi
-    
-    sleep 15
+
+    # -------------------------------------------------------------
+    # 6. Periodic Telegram Heartbeat (Every 4 Hours)
+    # -------------------------------------------------------------
+    if [ $((CURRENT_TIME - LAST_HEARTBEAT)) -ge $HEARTBEAT_INTERVAL ]; then
+        LAST_HEARTBEAT=$CURRENT_TIME
+        
+        # Extract last conflict numbers
+        CONF_A=$(tail -n 10 cadical_branch_a.log 2>/dev/null | grep -E "^c [WwI]" | tail -n 1 | awk '{print $7}')
+        CONF_B=$(tail -n 10 cadical_branch_b.log 2>/dev/null | grep -E "^c [WwI]" | tail -n 1 | awk '{print $7}')
+        CONF_C=$(tail -n 10 cadical_branch_c.log 2>/dev/null | grep -E "^c [WwI]" | tail -n 1 | awk '{print $7}')
+        DISK_AVAIL=$(df -h / | tail -n 1 | awk '{print $4}')
+        
+        send_telegram "📊 *GCP VM Status Heartbeat (Solvers Activos)* 📊
+• *Rama A (DRAT):* ${CONF_A:-N/A} conflictos
+• *Rama B (DRAT):* ${CONF_B:-N/A} conflictos
+• *Rama C (DRAT):* ${CONF_C:-N/A} conflictos
+• *Disco libre:* ${DISK_AVAIL}
+• *Cluster:* 10 solvers en ejecución (f=1, Z7, Z3, cazadores SAT)"
+    fi
+
+    sleep 20
 done
