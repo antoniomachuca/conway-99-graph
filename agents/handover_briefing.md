@@ -14,14 +14,14 @@ Any agent resuming work on this project must strictly comply with the rules esta
    - **COMPILED:** Code that compiles cleanly but whose theorems depend transitively on `sorry` or external premises not certified in the kernel.
    - **EXPLORED:** Ongoing computations, heuristics, or searches without terminal resolution.
    - **PENDING:** Open hypotheses and unresolved problem instances.
-3. **Real-World Context of Conway-99:** An open problem for over 50 years (existence of a strongly regular graph $\operatorname{srg}(99, 14, 1, 2)$). If the graph exists, the prevailing consensus in the mathematical literature (Brouwer, Cameron) is that it is **rigid** ($\operatorname{Aut}(G) = \{1\}$). Searches under symmetry groups ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) only cover branches admitting automorphisms; if the graph lacks symmetries, these searches will never discover it.
+3. **Real-World Context of Conway-99:** An open problem for over 50 years (existence of a strongly regular graph $\mathrm{srg}(99, 14, 1, 2)$). If the graph exists, the prevailing consensus in the mathematical literature (Brouwer, Cameron) is that it is **rigid** ($\mathrm{Aut}(G) = \{1\}$). Searches under symmetry groups ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) only cover branches admitting automorphisms; if the graph lacks symmetries, these searches will never discover it.
 
 ---
 
 ## 2. Status of the Investigation: Results Achieved
 
 ### A. Involutions $\mathbb{Z}_2$ (Order-2 Automorphisms)
-An involution $t$ is an adjacency-preserving permutation with $t^2 = \mathrm{id}$. Fixed-point parity requires $f = |\operatorname{Fix}(t)|$ to be odd: $f \in \{1, 3, 5, 7, 9, \dots, 15\}$.
+An involution $t$ is an adjacency-preserving permutation with $t^2 = \mathrm{id}$. Fixed-point parity requires $f = |\mathrm{Fix}(t)|$ to be odd: $f \in \{1, 3, 5, 7, 9, \dots, 15\}$.
 
 1. **$f = 3$ [PROVED]:**
    - **Case A (Triangle $K_3$):** Refuted in SAT with CaDiCaL and certified formally with `drat-trim` (`s VERIFIED`) in [`drat_trim_z2_f3_case_a.log`](../drat_trim_z2_f3_case_a.log).
@@ -44,7 +44,7 @@ An involution $t$ is an adjacency-preserving permutation with $t^2 = \mathrm{id}
 
 ### B. Parity Rigidity [PROVED]
 - Formalized in [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) (0 `sorry`, standard axioms):
-  If $|\operatorname{Aut}(G)|$ is even, then $\operatorname{Aut}(G) \cong \mathbb{Z}_2$.
+  If $|\mathrm{Aut}(G)|$ is even, then $\mathrm{Aut}(G) \cong \mathbb{Z}_2$.
   This formally excludes $\mathbb{Z}_4$, Klein $V_4 \cong \mathbb{Z}_2 \times \mathbb{Z}_2$, and dihedral groups $D_{2k}$ ($k \ge 2$).
 
 ---

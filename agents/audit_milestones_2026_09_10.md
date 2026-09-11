@@ -19,7 +19,7 @@ This audit independently verifies all mathematical and computational claims repo
 
 ### Milestone 3: Canonical Branch Architecture for $f = 1$ [EXPLORED]
 - Analytically proved that the incidence submatrix $C_{7 \times 42}$ is unique up to isomorphism ($|W| = 645{,}120$).
-- Proved that the 41 non-base orbits partition into exactly three canonical orbits under $\operatorname{Stab}_W(O_0)$:
+- Proved that the 41 non-base orbits partition into exactly three canonical orbits under $\mathrm{Stab}_W(O_0)$:
   * Branch A (Twin): 1 orbit, $15{,}360\times$ reduction.
   * Branch B (Secant): 20 orbits, $768\times$ reduction.
   * Branch C (Disjoint): 20 orbits, $768\times$ reduction.

@@ -24,17 +24,17 @@ The corresponding parameter tuples $(v, k, 1, 2)$ are:
 
 ## Key Theorems for Conway's 99-Graph ($u = 3$)
 
-Makhnev and Minakova investigate the automorphism group $\operatorname{Aut}(\Gamma)$ of a putative $\operatorname{srg}(99, 14, 1, 2)$ using character theory and subconstituent decomposition:
+Makhnev and Minakova investigate the automorphism group $\mathrm{Aut}(\Gamma)$ of a putative $\mathrm{srg}(99, 14, 1, 2)$ using character theory and subconstituent decomposition:
 
 1. **Order Bound on Even Automorphisms:**
-   If $\operatorname{Aut}(\Gamma)$ contains an involution ($t^2 = \mathrm{id}, t \ne \mathrm{id}$), then:
-   $$|\operatorname{Aut}(\Gamma)| \text{ divides } 42 = 2 \cdot 3 \cdot 7$$
+   If $\mathrm{Aut}(\Gamma)$ contains an involution ($t^2 = \mathrm{id}, t \ne \mathrm{id}$), then:
+   $$|\mathrm{Aut}(\Gamma)| \text{ divides } 42 = 2 \cdot 3 \cdot 7$$
    This excludes any 2-groups of order $\ge 4$ containing non-trivial centralizers, and restricts even automorphism groups to $\{ \mathbb{Z}_2, \mathbb{Z}_6, D_6, \mathbb{Z}_{14}, D_{14}, \mathbb{Z}_{42} \}$.
 
 2. **Exclusion of Prime Divisors $p \ge 11$:**
-   No automorphism of prime order $p \ge 11$ (specifically $p = 11$) can act on $\operatorname{srg}(99, 14, 1, 2)$.
+   No automorphism of prime order $p \ge 11$ (specifically $p = 11$) can act on $\mathrm{srg}(99, 14, 1, 2)$.
 
 3. **Relation to Modern Literature:**
    - **Crnković & Maksimović (2020):** Ruled out orders 6 and 9, eliminating $\mathbb{Z}_6, D_6, \mathbb{Z}_{42}$.
    - **Cesarz & Woldar (2025):** Ruled out order 14 analytically via trace contradiction $7a = 62$.
-   - **Parity Rigidity Corollary (This Project, 2026):** Proves that if $|\operatorname{Aut}(\Gamma)|$ is even, $\operatorname{Aut}(\Gamma) \cong \mathbb{Z}_2$, formally completing the exclusion of all composite even orders.
+   - **Parity Rigidity Corollary (This Project, 2026):** Proves that if $|\mathrm{Aut}(\Gamma)|$ is even, $\mathrm{Aut}(\Gamma) \cong \mathbb{Z}_2$, formally completing the exclusion of all composite even orders.

@@ -14,11 +14,11 @@
 
 ## Abstract
 
-This repository hosts the computational pipelines, mathematical formulations, and formal proofs of an adversarial dual-track framework investigating the existence of **Conway's 99-graph**: a hypothetical strongly regular graph with parameters $\operatorname{srg}(99, 14, 1, 2)$.
+This repository hosts the computational pipelines, mathematical formulations, and formal proofs of an adversarial dual-track framework investigating the existence of **Conway's 99-graph**: a hypothetical strongly regular graph with parameters $\mathrm{srg}(99, 14, 1, 2)$.
 
 Its adjacency matrix $A$ must satisfy:
-$$A = A^T, \quad \operatorname{diag}(A) = 0, \quad A \in \{0, 1\}^{99 \times 99}, \quad A^2 + A - 12 I = 2 J$$
-with distinct eigenvalues $\operatorname{Spec}(A) = \{14^1, 3^{54}, (-4)^{44}\}$. In 1969, John H. Conway offered a \$1,000 prize for deciding whether such a graph exists.
+$$A = A^T, \quad \mathrm{diag}(A) = 0, \quad A \in \{0, 1\}^{99 \times 99}, \quad A^2 + A - 12 I = 2 J$$
+with distinct eigenvalues $\mathrm{Spec}(A) = \{14^1, 3^{54}, (-4)^{44}\}$. In 1969, John H. Conway offered a \$1,000 prize for deciding whether such a graph exists.
 
 In accordance with strict epistemological guidelines, every claim in this repository is audited against the files physically present on disk and categorized according to the four-state taxonomy detailed below.
 
@@ -38,8 +38,8 @@ To eliminate artificial optimism and uncertified assertions, all results in this
    - Symmetry-reduced CNF models running on local hardware or distributed cloud workers, currently accumulating CDCL conflicts without reaching an empty clause or satisfying assignment.
    - Exploratory SMT / integer programming evaluations (Z3, CP-SAT) where runs were stopped by timeout or `SIGTERM` without certifying refutation.
 4. **PENDING (Open Mathematical Problems):**
-   - The unconditional existence or non-existence of Conway's 99-graph $\operatorname{srg}(99, 14, 1, 2)$.
-   - The full Rigidity Conjecture: $\operatorname{Aut}(G) = \{1\}$.
+   - The unconditional existence or non-existence of Conway's 99-graph $\mathrm{srg}(99, 14, 1, 2)$.
+   - The full Rigidity Conjecture: $\mathrm{Aut}(G) = \{1\}$.
 
 ---
 
@@ -67,7 +67,7 @@ flowchart TD
 ```
 
 1. **Track 1 (Constructive SAT/SMT Search & Proof Logging):**
-   - Prescribe candidate prime-order automorphism actions $\operatorname{Aut}(G) \in \{\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7\}$.
+   - Prescribe candidate prime-order automorphism actions $\mathrm{Aut}(G) \in \{\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7\}$.
    - Implement canonical orbit decompositions and algebraic symmetry-breaking constraints (e.g., Crawford lex-leader cuts under quotient multiplier groups $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ and $\mathcal{G}_{\mathbb{Z}_3} \cong S_3 \times \mathbb{Z}_2$).
    - Compile into DIMACS CNF formulas.
    - Execute certified solvers (CaDiCaL 1.9.5) generating non-binary DRAT resolution proof traces, checked via `drat-trim`.
@@ -89,8 +89,8 @@ The table below contrasts historical literature results, recent constraint-progr
 | :--- | :--- | :--- | :--- | :---: |
 | **Order $p \ge 11$** | Excluded (Makhnev-Minakova 2001; Behbahani-Lam 2011) | Excluded from search space | Literature result confirmed; no prime order $p \ge 11$ admitted | **PROVED** |
 | **Order 14** | Excluded analytically by spectral trace contradiction $7a = 62$ (Cesarz-Woldar 2025, Thm 3.11) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
-| **Frobenius $\operatorname{Frob}(21)$** | Excluded by orbit partition parity contradiction $a+c+d+f = 5$ (Cesarz-Woldar 2025, Prop 4.14) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
-| **Parity Rigidity** | If $2 \mid \lvert \operatorname{Aut}(G) \rvert$, then $\operatorname{Aut}(G) \cong \mathbb{Z}_2$ (Cesarz-Woldar 2025 + Crnković-Maksimović 2020) | Unaddressed | Formalized in [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) (0 `sorry`, standard axioms; rules out $\mathbb{Z}_4$, $V_4$, $D_{2k}$) | **PROVED** |
+| **Frobenius $\mathrm{Frob}(21)$** | Excluded by orbit partition parity contradiction $a+c+d+f = 5$ (Cesarz-Woldar 2025, Prop 4.14) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
+| **Parity Rigidity** | If $2 \mid \lvert \mathrm{Aut}(G) \rvert$, then $\mathrm{Aut}(G) \cong \mathbb{Z}_2$ (Cesarz-Woldar 2025 + Crnković-Maksimović 2020) | Unaddressed | Formalized in [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) (0 `sorry`, standard axioms; rules out $\mathbb{Z}_4$, $V_4$, $D_{2k}$) | **PROVED** |
 | **Involutions ($f = 3$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Topological dichotomy $K_3$ vs $3K_1$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`); SAT refutation verified by `drat-trim` (`s VERIFIED`) | **PROVED** |
 | **Involutions ($f = 5$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Structural isolation $K_3+2K_1$ vs $5K_1$ and modular trace contradiction $\varepsilon_1 \equiv 6 \pmod 7$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
 | **Involutions ($f = 7$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | 136 admissible subgraphs ($T \in \{0, 1, 2\}$ under $K_4$-freeness) yielding $\varepsilon_1 \in \{7, 10, 13\} \not\equiv 2 \pmod 7$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
@@ -98,8 +98,8 @@ The table below contrasts historical literature results, recent constraint-progr
 | **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). 3 canonical branches running on Google Cloud (`conway-sat-worker`, 16 vCPUs, >96.4M conflicts, 28% var plateau) | **EXPLORED** |
 | **Order 7 ($\mathbb{Z}_7$)** | Non-existence proved by computer (Behbahani-Lam 2011); $7 \mid \lvert \Gamma \rvert \implies \Gamma \cong \mathbb{Z}_7$ (Cesarz-Woldar 2025) | `UNKNOWN` (48h, 14 cores CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z7_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z7_canonical_cnf.py); tests passing; search interrupted by SIGTERM | **COMPILED / EXPLORED** |
 | **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z3_canonical_cnf.py) (fixed-3 and fpf); tests passing; search interrupted by SIGTERM | **COMPILED / EXPLORED** |
-| **Grand Classification** | $\lvert \operatorname{Aut}(G) \rvert \in \{1, 2\}$ | Unaddressed | Formalized in [`Conway/GrandClassification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/GrandClassification.lean); compiles cleanly, conditional on $\mathbb{Z}_7$ and $\mathbb{Z}_3$ | **COMPILED** |
-| **Full Rigidity Conjecture** | $\operatorname{Aut}(G) = \{1\}$ (Brouwer, Cameron, Haemers) | Open (Frontier at 69.4% constraints) | Conditional on refuting $f = 1$ and ingesting $\mathbb{Z}_7$ / $\mathbb{Z}_3$ certificates | **PENDING** |
+| **Grand Classification** | $\lvert \mathrm{Aut}(G) \rvert \in \{1, 2\}$ | Unaddressed | Formalized in [`Conway/GrandClassification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/GrandClassification.lean); compiles cleanly, conditional on $\mathbb{Z}_7$ and $\mathbb{Z}_3$ | **COMPILED** |
+| **Full Rigidity Conjecture** | $\mathrm{Aut}(G) = \{1\}$ (Brouwer, Cameron, Haemers) | Open (Frontier at 69.4% constraints) | Conditional on refuting $f = 1$ and ingesting $\mathbb{Z}_7$ / $\mathbb{Z}_3$ certificates | **PENDING** |
 | **Existence of $G$** | Open (Conway 1969; Biggs 1969) | Open | Core open problem investigated via dual-track framework | **PENDING** |
 
 ---
@@ -107,14 +107,14 @@ The table below contrasts historical literature results, recent constraint-progr
 ## 4. Key Mathematical Formulations
 
 ### 4.1. Universal Modular Spectral Congruence for Involutions
-Let $t \in \operatorname{Aut}(G)$ be an involution with $f = \lvert \operatorname{Fix}(t) \rvert$ fixed points and $\varepsilon_1 = \lvert \{ \{u, t(u)\} \in E(G) \} \rvert$ internal edges exchanged by $t$. On the eigenspaces $V_{14}, V_3, V_{-4}$ with $+1$-multiplicities $1, a, c$:
-$$a + c = \frac{97 + f}{2}, \quad \operatorname{Tr}(A P_t) = 2 \varepsilon_1 = 28 + 6a - 8c = 14a - 360 - 4f \implies \varepsilon_1 = 7a - 180 - 2f$$
+Let $t \in \mathrm{Aut}(G)$ be an involution with $f = \lvert \mathrm{Fix}(t) \rvert$ fixed points and $\varepsilon_1 = \lvert \{ \{u, t(u)\} \in E(G) \} \rvert$ internal edges exchanged by $t$. On the eigenspaces $V_{14}, V_3, V_{-4}$ with $+1$-multiplicities $1, a, c$:
+$$a + c = \frac{97 + f}{2}, \quad \mathrm{Tr}(A P_t) = 2 \varepsilon_1 = 28 + 6a - 8c = 14a - 360 - 4f \implies \varepsilon_1 = 7a - 180 - 2f$$
 Reducing modulo 7 yields the universal spectral requirement:
 $$\varepsilon_1 \equiv -2(f - 1) \equiv 5(f - 1) \pmod 7$$
 
-### 4.2. Universal Counting Identity on $H = G[\operatorname{Fix}(t)]$
-Double counting outer degrees $d(u) = \lvert N(u) \cap \operatorname{Fix}(t) \rvert$ (which satisfy $d(u) = 1$ for internal edges and $d(u) \in \{0, 2\}$ for transposed pairs) establishes:
-$$\varepsilon_1 = f(8 - f) + \sum_{z \in \operatorname{Fix}(t)} \binom{\deg_H(z)}{2}$$
+### 4.2. Universal Counting Identity on $H = G[\mathrm{Fix}(t)]$
+Double counting outer degrees $d(u) = \lvert N(u) \cap \mathrm{Fix}(t) \rvert$ (which satisfy $d(u) = 1$ for internal edges and $d(u) \in \{0, 2\}$ for transposed pairs) establishes:
+$$\varepsilon_1 = f(8 - f) + \sum_{z \in \mathrm{Fix}(t)} \binom{\deg_H(z)}{2}$$
 - For cocliques ($H \cong f K_1$), this forces $f(8-f) \equiv 5(f-1) \pmod 7 \implies f \in \{1, 2\}$, which uniquely leaves $f = 1$.
 - For $f = 3$: $H \cong K_3 \implies \varepsilon_1 = 18 \equiv 4 \not\equiv 3 \pmod 7$; $H \cong 3K_1 \implies \varepsilon_1 = 15 \equiv 1 \not\equiv 3 \pmod 7$.
 - For $f = 5$: $H \cong K_3+2K_1 \implies \varepsilon_1 = 18 \equiv 4 \not\equiv 6 \pmod 7$; $H \cong 5K_1 \implies \varepsilon_1 = 15 \equiv 1 \not\equiv 6 \pmod 7$.
@@ -125,7 +125,7 @@ For $f = 1$, the fixed vertex $x_0$ has neighborhood $N(x_0) \cong 7K_2$ and sec
 
 The automorphism group of this incidence structure is the wreath product:
 $$W = (\mathbb{Z}_2)^7 \rtimes S_7, \quad |W| = 2^7 \times 7! = 645{,}120$$
-Fixing the first orbit $O_0$, its stabilizer has order $\lvert \operatorname{Stab}_W(O_0) \rvert = 15{,}360$. Under this action, the remaining 41 orbits partition into exactly three canonical branches:
+Fixing the first orbit $O_0$, its stabilizer has order $\lvert \mathrm{Stab}_W(O_0) \rvert = 15{,}360$. Under this action, the remaining 41 orbits partition into exactly three canonical branches:
 1. **Branch A (Twin):** Partner orbit $O_{21}$ shares identical neighborhood support $\{0, 1\}$ with opposite phase. Orbit size: 1. Symmetry reduction factor: $15{,}360\times$.
 2. **Branch B (Secant):** Partner orbit $O_1$ shares exactly one neighborhood orbit ($R_0$) with identical phase. Orbit size: 20. Symmetry reduction factor: $768\times$.
 3. **Branch C (Disjoint):** Partner orbit $O_{10}$ has disjoint neighborhood support. Orbit size: 20. Symmetry reduction factor: $768\times$.

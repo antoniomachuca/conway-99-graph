@@ -37,5 +37,5 @@ Every reported result must be explicitly categorized into one of these four oper
 
 ## 4. Real-World Context of Conway's 99-Graph
 - Always remember that Conway's 99-graph is an open mathematical problem unsolved for over 50 years.
-- If the graph exists, the prevailing consensus in the literature is that it is rigid ($\operatorname{Aut}(G) = \{1\}$).
+- If the graph exists, the prevailing consensus in the literature is that it is rigid ($\mathrm{Aut}(G) = \{1\}$).
 - Searches under symmetry groups ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) only cover specific branches with automorphisms; if the graph lacks symmetries, these searches will never find it.

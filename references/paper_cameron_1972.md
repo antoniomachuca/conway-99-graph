@@ -11,5 +11,5 @@
 ## Relevance to Conway's 99-Graph
 
 Cameron's work on permutation groups and suborbits provides foundational theory for rank-3 and subconstituent analysis of strongly regular graphs:
-- In Conway's 99-graph $\operatorname{srg}(99, 14, 1, 2)$, the neighborhood of any vertex $x$ decomposes into $N(x) \cong 7K_2$ (14 vertices) and the second subconstituent $\Gamma_2(x)$ (84 vertices).
+- In Conway's 99-graph $\mathrm{srg}(99, 14, 1, 2)$, the neighborhood of any vertex $x$ decomposes into $N(x) \cong 7K_2$ (14 vertices) and the second subconstituent $\Gamma_2(x)$ (84 vertices).
 - Cameron's suborbit theorems constrain how automorphisms preserve pairing and distance partitions between $N(x)$ and $\Gamma_2(x)$.

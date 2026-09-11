@@ -21,5 +21,5 @@ Lean 4 (toolchain `v4.33.1`) serves as the foundational proof verification kerne
    - Proves $K_4$-freeness ($\omega(G) = 3$), $7K_2$ neighborhood matchings, and diameter $\le 2$ in [`Conway/Structural.lean`](../Conway/Structural.lean) with 0 `sorry`.
 3. **Analytic Reductions:**
    - Formalizes Cesarz & Woldar Theorems 3.11 and 4.14 in [`Conway/CesarzWoldarTheorems.lean`](../Conway/CesarzWoldarTheorems.lean) with 0 `sorry`.
-   - Proves the Parity Rigidity Corollary ($|\operatorname{Aut}(G)| \text{ even} \implies \operatorname{Aut}(G) \cong \mathbb{Z}_2$) in [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) with 0 `sorry`.
+   - Proves the Parity Rigidity Corollary ($|\mathrm{Aut}(G)| \text{ even} \implies \mathrm{Aut}(G) \cong \mathbb{Z}_2$) in [`Conway/ParityRigidity.lean`](../Conway/ParityRigidity.lean) with 0 `sorry`.
    - Kernel verification is confirmed via `#print axioms` strictly depending on standard foundations `[propext, Quot.sound]`.
