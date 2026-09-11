@@ -16,18 +16,12 @@ The project coordinates specialized subagents operating under strict epistemolog
 
 ---
 
-## 2. Archive Directory Index
+## 2. Active Operational Index
 
 | File | Description | Language |
 | :--- | :--- | :---: |
-| [`handover_briefing.md`](handover_briefing.md) | Comprehensive project state and handover instructions for incoming agents | English |
-| [`audit_log.md`](audit_log.md) | Complete sequential audit log of code changes, repairs, and verification milestones | English |
-| [`audit_milestones_2026_09_10.md`](audit_milestones_2026_09_10.md) | Audit of major milestones achieved across Lean 4 formalization and SAT solving | English |
-| [`state_auditor.md`](state_auditor.md) | Adversarial auditor operational checklist and verification records | English |
-| [`state_z2_solver_operator.md`](state_z2_solver_operator.md) | State of the $\mathbb{Z}_2$ solver pipeline, local and cloud monitoring | English |
-| [`state_sat_compiler_z3.md`](state_sat_compiler_z3.md) | State of the $\mathbb{Z}_3$ (fixed-3) canonical CNF compilation | English |
-| [`state_sat_compiler_z3_fpf.md`](state_sat_compiler_z3_fpf.md) | State of the $\mathbb{Z}_3$ (fixed-point-free) canonical CNF compilation | English |
-| [`audit_sat_compiler_z3.md`](audit_sat_compiler_z3.md) | Adversarial audit of the $\mathbb{Z}_3$ canonical SAT compiler | English |
-| [`audit_sat_compiler_z3_fpf.md`](audit_sat_compiler_z3_fpf.md) | Adversarial audit of the $\mathbb{Z}_3$ fixed-point-free compiler | English |
-| [`audit_z2_solver_operator.md`](audit_z2_solver_operator.md) | Adversarial audit of the $\mathbb{Z}_2$ solver execution logs and certificates | English |
-| [`resume_state.md`](resume_state.md) | Machine-readable resumption checkpoint and daemon configuration | English |
+| [`handover_briefing.md`](handover_briefing.md) | Comprehensive master state and briefing for incoming agents and researchers | English |
+| [`audit_log.md`](audit_log.md) | Master chronological audit log of mathematical verifications, commits, and benchmarks | English |
+
+> [!NOTE]
+> Transient task-specific subagent scratchpads and interim checkpoint notes have been consolidated into `audit_log.md` and archived under `archive/agent_scratch/` to maintain repository clarity and cleanliness.
