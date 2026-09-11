@@ -152,14 +152,46 @@ Con ello, Conway-99 queda demostrado rígido frente a cualquier simetría de ord
         CONF_A=$(tail -n 10 cadical_branch_a.log 2>/dev/null | grep -E "^c [WwI]" | tail -n 1 | awk '{print $7}')
         CONF_B=$(tail -n 10 cadical_branch_b.log 2>/dev/null | grep -E "^c [WwI]" | tail -n 1 | awk '{print $7}')
         CONF_C=$(tail -n 10 cadical_branch_c.log 2>/dev/null | grep -E "^c [WwI]" | tail -n 1 | awk '{print $7}')
+        ACTIVE_COUNT=$(pgrep -fc cadical || echo "0")
         DISK_AVAIL=$(df -h / | tail -n 1 | awk '{print $4}')
         
-        send_telegram "📊 *GCP VM Status Heartbeat (Solvers Activos)* 📊
+        send_telegram "📊 *GCP VM Status Heartbeat* 📊
 • *Rama A (DRAT):* ${CONF_A:-N/A} conflictos
 • *Rama B (DRAT):* ${CONF_B:-N/A} conflictos
 • *Rama C (DRAT):* ${CONF_C:-N/A} conflictos
+• *Solvers Activos:* ${ACTIVE_COUNT} procesos en CPU
 • *Disco libre:* ${DISK_AVAIL}
-• *Cluster:* 10 solvers en ejecución (f=1, Z7, Z3, cazadores SAT)"
+• *Estado:* Z7 PROBADO | Z3 y f=1 en ejecución activa"
+    fi
+
+    # -------------------------------------------------------------
+    # 7. Dynamic Workload Rebalancing (Auto-Refill Freed Cores)
+    # -------------------------------------------------------------
+    # Keep target of 11 active solvers. If any hunter or branch completes,
+    # re-route freed cores to remaining open targets (Branch A or Z3).
+    RUNNING_SOLVERS=$(pgrep -fc cadical || echo "0")
+    if [ "$RUNNING_SOLVERS" -lt 11 ]; then
+        SEED=$(( (RANDOM * 32768 + RANDOM) % 2000000000 + 1 ))
+        
+        # Priority 1: If Branch A is still open, launch hunter on Branch A
+        if [ ! -f "branch_a_result.txt" ]; then
+            HUNTER_LOG="cadical_hunter_a_${SEED}.log"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-refill: Spawning Branch A SAT Hunter (seed $SEED)"
+            nohup /usr/local/bin/cadical --sat --seed="$SEED" conway_z2_f1_branch_a.cnf > "$HUNTER_LOG" 2>&1 &
+            send_telegram "🔄 *GCP VM Auto-Rebalance:* Núcleo liberado reasignado a *Z_2 Rama A* con nueva semilla \`${SEED}\`."
+        # Priority 2: If Z3 FPF is still open, launch hunter on Z3 FPF
+        elif [ ! -f "z3_fpf_result.txt" ]; then
+            HUNTER_LOG="cadical_z3_hunter_fpf_${SEED}.log"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-refill: Spawning Z3 FPF SAT Hunter (seed $SEED)"
+            nohup /usr/local/bin/cadical --sat --seed="$SEED" conway_z3_fpf.cnf > "$HUNTER_LOG" 2>&1 &
+            send_telegram "🔄 *GCP VM Auto-Rebalance:* Núcleo liberado reasignado a *Z_3 FPF* con nueva semilla \`${SEED}\`."
+        # Priority 3: If Z3 Fixed-3 is still open, launch hunter on Z3 Fixed-3
+        elif [ ! -f "z3_fixed3_result.txt" ]; then
+            HUNTER_LOG="cadical_z3_hunter_fixed3_${SEED}.log"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-refill: Spawning Z3 Fixed-3 SAT Hunter (seed $SEED)"
+            nohup /usr/local/bin/cadical --sat --seed="$SEED" conway_z3_fixed3.cnf > "$HUNTER_LOG" 2>&1 &
+            send_telegram "🔄 *GCP VM Auto-Rebalance:* Núcleo liberado reasignado a *Z_3 Fija-3* con nueva semilla \`${SEED}\`."
+        fi
     fi
 
     sleep 20
