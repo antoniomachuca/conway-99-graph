@@ -153,3 +153,17 @@ This file records every intervention, verification, and ruling issued by the Ind
   - Order 7 ($\mathbb{Z}_7$) action is reclassified from **EXPLORED** to **PROVED** across repository taxonomy.
   - In conjunction with Cesarz-Woldar (2025, Thm 3.11 & Prop 4.14), this formally and independently excludes all automorphisms of order 14, $\mathrm{Frob}(21)$, and any group whose order is divisible by 7.
 - **Verdict:** VERIFIED (UNSAT). Empty clause derived and certified by independent proof checking without non-standard axioms or unverified assumptions.
+
+### [2026-09-11 19:18:00 CEST] - Cluster Optimization: Redeployment of Freed Cores to Z_3 and f=1 SAT Hunters
+- **Objective:** Reallocate idle computing cores on Google Cloud VM `conway-sat-worker` following the certified completion and DRAT verification of Order 7 ($\mathbb{Z}_7$).
+- **Compute Infrastructure Audit:**
+  - Active solvers increased from 8 to 11 concurrent CaDiCaL 3.0.1 processes on dedicated vCPUs (5 vCPUs held idle for kernel I/O, monitoring, and verification).
+  - Memory: 7.1 GB used, 56.4 GB RAM available.
+  - Storage: 243 GB SSD free on root partition `/`.
+- **New Worker Deployments (3 Non-DRAT SAT Hunters):**
+  1. *$\mathbb{Z}_3$ FPF SAT Hunter (PID 68294):* `cadical --sat --seed=42 conway_z3_fpf.cnf` (`cadical_z3_hunter_fpf.log`).
+  2. *$\mathbb{Z}_3$ Fixed-3 SAT Hunter (PID 68295):* `cadical --sat --seed=42 conway_z3_fixed3.cnf` (`cadical_z3_hunter_fixed3.log`).
+  3. *$\mathbb{Z}_2$ ($f=1$, Rama A) SAT Hunter 2 (PID 68296):* `cadical --sat --seed=2026 conway_z2_f1_branch_a.cnf` (`cadical_hunter_a_2026.log`) reinforcing the $15{,}360\times$ bottleneck search space.
+- **Safety Verification:** All 3 new workers execute in pure SAT-hunt mode without emitting `.drat` proof traces, resulting in 0 bytes of proof disk consumption.
+- **Supervisor Verification:** Upgraded daemon [`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh) actively monitoring all 11 solver logs for real-time model extraction and automated refutation certification.
+- **Verdict:** VERIFIED (Operational). Cluster fully optimized at 11 vCPUs with complete hardware and disk safety margins maintained.

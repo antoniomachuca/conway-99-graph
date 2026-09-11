@@ -65,13 +65,17 @@ An involution $t$ is an adjacency-preserving permutation with $t^2 = \mathrm{id}
 
 ## 3. Infrastructure & Solver Operations
 
-### A. Google Cloud Platform (10-Solver Cluster)
-- **Virtual Machine:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in `us-central1-b`, 254 GB SSD free).
-- **Process Allocation & Status:** CaDiCaL solvers allocated across dedicated cores with 6 vCPUs held idle for OS responsiveness, filesystem throughput, and proof checking headroom:
-  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 processes):** Branches A, B, C (>112M conflicts accumulated, ~28 hours continuous CPU each, 27%–28% active variable plateau; emitting non-binary DRAT proof traces).
-  2. **$f = 1$ ($\mathbb{Z}_2$) SAT Hunters (3 processes):** Seed 42, `--sat` (no DRAT proof logging to protect disk space; exploring alternative heuristic paths for rapid model discovery).
-  3. **Order 7 ($\mathbb{Z}_7$) Workers (Completed / Refuted & Verified):** Solvers terminated with certified refutation. The primary CDCL worker derived `s UNSATISFIABLE` in 771.59 s, which was independently certified by `drat-trim` (`s VERIFIED`, 844.01 s). The SAT hunter worker independently confirmed `s UNSATISFIABLE` in 1827.91 s.
-  4. **Order 3 ($\mathbb{Z}_3$) Workers (2 processes):** 2 canonical DRAT solvers (fixed-point-free 33 orbits, fixed-3 32 orbits).
+### A. Google Cloud Platform (11-Solver Cluster)
+- **Virtual Machine:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in `us-central1-b`, 243 GB SSD free).
+- **Process Allocation & Status:** 11 active CaDiCaL solvers executing across dedicated vCPUs with 5 vCPUs held idle for OS responsiveness, filesystem throughput, and proof checking headroom:
+  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 processes):** Branches A, B, C (>120M conflicts accumulated, ~31 hours continuous CPU each, 27%–28% active variable plateau; emitting non-binary DRAT proof traces).
+  2. **$f = 1$ ($\mathbb{Z}_2$) SAT Hunters (4 processes, no DRAT):**
+     - Seed 42, `--sat`: Ramas A, B, C exploring alternative heuristic paths.
+     - Seed 2026, `--sat`: Second worker on Rama A reinforcing the bottleneck search space.
+  3. **Order 7 ($\mathbb{Z}_7$) Workers (Completed / Refuted & Verified [PROVED]):** Solvers terminated with certified refutation. The primary CDCL worker derived `s UNSATISFIABLE` in 771.59 s, independently certified by `drat-trim` (`s VERIFIED`, 844.01 s). The SAT hunter worker independently confirmed `s UNSATISFIABLE` in 1827.91 s.
+  4. **Order 3 ($\mathbb{Z}_3$) Workers (4 processes):**
+     - 2 canonical DRAT solvers: fixed-point-free (33 orbits) and fixed-3 (32 orbits), past 4.4M conflicts each.
+     - 2 SAT hunters (seed 42, `--sat`, no DRAT): exploring rapid satisfying model paths for both FPF and fixed-3.
 - **Autonomous Supervisor:** Upgraded daemon [`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh) (PID 52242) polling every 20 seconds:
   - Detects `s SATISFIABLE`: extracts model assignments `^v ` immediately into `sat_solution_<tag>.txt` and syncs disk.
   - Detects `s UNSATISFIABLE`: automatically executes `/usr/local/bin/drat-trim` on corresponding CNF and DRAT files to certify refutation (successfully verified Order 7, recording `s UNSATISFIABLE / VERIFIED` in [`z7_result.txt`](../z7_result.txt)).
