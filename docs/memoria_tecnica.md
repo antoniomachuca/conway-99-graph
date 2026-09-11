@@ -336,16 +336,36 @@ Under the action of $\mathrm{Stab}_W(O_0)$, the remaining 41 orbits of $\Gamma_2
 
 The partition is exhaustive: $1 + 20 + 20 = 41$.
 
-### 5.4. Distributed Search Status in Google Cloud (EXPLORADO)
+### 5.4. Distributed Search Status in Google Cloud (EXPLORED)
 Each canonical branch was compiled into a DIMACS CNF formula containing $27{,}778{,}903$ clauses and $666{,}309$ variables.
 
-Solving progress reported on the dedicated cloud worker (`conway-sat-worker`, 16 vCPUs, 64 GB RAM, CaDiCaL 1.9.5):
-- **Branch A (Twin $O_{21}$):** $>26.3 \times 10^6$ CDCL conflicts, 27% active variable plateau.
-- **Branch B (Secant $O_1$):** $>41.0 \times 10^6$ CDCL conflicts, 28% active variable plateau.
-- **Branch C (Disjoint $O_{10}$):** $>43.6 \times 10^6$ CDCL conflicts, 28% active variable plateau.
-- **Combined Cloud Effort:** $>112 \times 10^6$ CDCL conflicts accumulated across the three branches.
+Solving progress reported on the dedicated cloud worker (`conway-sat-worker`, 16 vCPUs, 64 GB RAM, CaDiCaL 3.0.1):
+- **Branch A (Twin $O_{21}$):** $>28.9 \times 10^6$ CDCL conflicts, 27% active variable plateau.
+- **Branch B (Secant $O_1$):** $>44.5 \times 10^6$ CDCL conflicts, 28% active variable plateau.
+- **Branch C (Disjoint $O_{10}$):** $>47.7 \times 10^6$ CDCL conflicts, 28% active variable plateau.
+- **Combined Cloud Effort:** $>121 \times 10^6$ CDCL conflicts accumulated across the three branches.
 
 **Status:** The case $f = 1$ remains strictly **EXPLORED / OPEN**. Despite the reduction of active variables to a 28% plateau, no branch has derived the empty clause or discovered a satisfying assignment.
+
+### 5.5. Dynamic Workload Rebalancing and Autonomous Supervision Architecture
+To maximize computational throughput on the dedicated Google Cloud host (`e2-standard-16`) without exceeding storage constraints or causing process starvation, we implement an autonomous dual-track portfolio and dynamic replenishment architecture:
+
+1. **Dual-Track Solving Scheme:**
+   - *Deterministic Certification Track:* Core workers allocated to canonical symmetry-breaking formulas (Branches A, B, C for $f=1$; fixed-point-free and fixed-3 for $\mathbb{Z}_3$) log non-binary DRAT resolution traces to disk for independent verification via `drat-trim`.
+   - *Stochastic Model Hunter Track:* Secondary workers execute in parallel with randomized seeds (`--sat --seed=$RANDOM`) and alternate phase selection heuristics without logging proofs (0 bytes proof disk footprint), designed for rapid satisfying assignment discovery across combinatorial plateau regions.
+
+2. **Self-Healing Core Rebalancing Loop:**
+   - The background daemon [`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh) polls active solver processes every 20 seconds.
+   - When a solver terminates (as demonstrated by the certified refutation of $\mathbb{Z}_7$ in 771.59 s), the supervisor immediately detects the freed vCPU capacity and dynamically spawns fresh SAT hunters with distinct seeds targeted at active bottlenecks:
+     - *Priority 1:* $f=1$ Branch A ($15{,}360\times$ reduction factor bottleneck).
+     - *Priority 2:* $\mathbb{Z}_3$ FPF and Fixed-3 open actions.
+   - The pool maintains a stable operating target of 11–12 active solvers on 16 vCPUs, strictly reserving 4–5 vCPUs for kernel I/O scheduling, page cache buffering, and online `drat-trim` execution.
+
+3. **Online Verification, Telemetry, and Safe Teardown:**
+   - *Model Extraction:* On detecting `s SATISFIABLE`, variable assignments `^v ` are immediately isolated to `sat_solution_<tag>.txt` and synced to persistent storage.
+   - *Automated Certification:* On detecting `s UNSATISFIABLE` in any DRAT-logging branch, the daemon automatically invokes `/usr/local/bin/drat-trim` to certify the empty-clause derivation.
+   - *Telemetry:* Dispatches real-time priority alerts and 4-hour status digests via `@Conway_Demon_Bot` (Telegram Bot API).
+   - *Auto-Poweroff:* Upon full resolution of all monitored branches, the machine triggers `sudo poweroff` to halt billing charges.
 
 ---
 

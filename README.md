@@ -296,28 +296,29 @@ Execute the combinatorial enumerator confirming the absence of compatible subgra
 python3 scripts/analyze_z2_f7_exhaustive.py
 ```
 
-### F. Distributed Cloud Computing Infrastructure & 10-Solver Cluster
+### F. Distributed Cloud Computing Infrastructure & 11-Solver Dynamic Pool
 To scale search across the remaining open symmetry cases without exhausting local host capacity, execution is distributed to a dedicated Google Cloud Compute Engine instance:
-- **Host Instance:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in zone `us-central1-b`, with 254 GB free disk space).
-- **Core Allocation & Headroom:** CaDiCaL solvers execute on dedicated vCPUs with idle headroom to preserve operating system responsiveness, kernel I/O buffering, and immediate resource availability for online proof verification.
+- **Host Instance:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in zone `us-central1-b`, with 243 GB free disk space).
+- **Core Allocation & Headroom:** CaDiCaL solvers execute on dedicated vCPUs with 4–5 vCPUs held idle to preserve operating system responsiveness, kernel I/O buffering, and immediate resource availability for online proof verification.
 - **Solver Status & Worker Deployment:**
   1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers):** Dedicated to the canonical symmetry-breaking branches:
-     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 26.3 \times 10^6$ conflicts, 27% active variable plateau.
-     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 41.0 \times 10^6$ conflicts, 28% active variable plateau.
-     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 43.6 \times 10^6$ conflicts, 28% active variable plateau.
-     - *Aggregate Progress:* $> 112 \times 10^6$ accumulated CDCL conflicts (~28 hours continuous CPU each) generating non-binary DRAT proof logs.
-  2. **$f = 1$ ($\mathbb{Z}_2$) SAT Hunters (3 workers):** Configured with seed 42 and flag `--sat` (DRAT logging disabled to conserve disk), prioritizing rapid model discovery and exploring alternative heuristic decision paths across the 3 branches.
-  3. **Order 7 ($\mathbb{Z}_7$) Workers (Terminated / Refuted & Verified):**
+     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 28.9 \times 10^6$ conflicts, 27% active variable plateau.
+     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 44.5 \times 10^6$ conflicts, 28% active variable plateau.
+     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 47.7 \times 10^6$ conflicts, 28% active variable plateau.
+     - *Aggregate Progress:* $> 121 \times 10^6$ accumulated CDCL conflicts (~31 hours continuous CPU each) generating non-binary DRAT proof logs.
+  2. **$f = 1$ ($\mathbb{Z}_2$) SAT Hunters (4 workers):** Seed 42 across Branches A, B, C plus an additional hunter on Rama A with seed 2026 and `--sat` (DRAT logging disabled to conserve disk), prioritizing rapid model discovery across the $15{,}360\times$ bottleneck search space.
+  3. **Order 7 ($\mathbb{Z}_7$) Workers (Terminated / Refuted & Verified [PROVED]):**
      - Primary canonical CDCL solver generated `proof_z7_canonical.drat` (192.2 MB) and derived `s UNSATISFIABLE` in 771.59 s (459,403 conflicts). Formally verified by `drat-trim` in 844.01 s (`s VERIFIED`, [`drat_trim_z7.log`](drat_trim_z7.log)).
      - Secondary SAT hunter (`--seed=777`, alternative heuristics) independently verified `s UNSATISFIABLE` in 1827.91 s (1,605,095 conflicts, [`cadical_z7_hunter.log`](cadical_z7_hunter.log)).
-  4. **Order 3 ($\mathbb{Z}_3$) Workers (2 workers):**
-     - 1 canonical solver for the fixed-point-free action (33 orbits) with DRAT proof logging.
-     - 1 canonical solver for the fixed-3 action (32 orbits) with DRAT proof logging, compiled via [`scripts/build_z3_canonical_cnf.py`](scripts/build_z3_canonical_cnf.py).
-- **Autonomous Cloud Supervisor:**
-  Supervision is managed by the upgraded background daemon [`scripts/cloud_watcher.sh`](scripts/cloud_watcher.sh) (PID 52242):
+  4. **Order 3 ($\mathbb{Z}_3$) Workers (4 workers):**
+     - 2 canonical DRAT solvers: fixed-point-free (33 orbits) and fixed-3 (32 orbits), past 4.4M conflicts each, compiled via [`scripts/build_z3_canonical_cnf.py`](scripts/build_z3_canonical_cnf.py).
+     - 2 SAT hunters (seed 42, `--sat`, no DRAT): exploring rapid satisfying model paths for both actions.
+- **Autonomous Cloud Supervisor & Dynamic Auto-Refill Pool:**
+  Supervision is managed by the background daemon [`scripts/cloud_watcher.sh`](scripts/cloud_watcher.sh) (PID 68900):
+  - **Dynamic Core Replenishment:** As workers terminate (e.g., following the certified refutation of $\mathbb{Z}_7$), the daemon detects freed vCPUs and dynamically spawns fresh SAT hunters with distinct seeds (`$RANDOM`) prioritizing active bottlenecks ($f=1$ Branch A and $\mathbb{Z}_3$).
   - **Real-Time Model Extraction:** Monitors all solver logs every 20 seconds. Upon detection of `s SATISFIABLE`, immediately extracts variable assignments `^v ` to disk (`sat_solution_<tag>.txt`) with filesystem sync.
-  - **Automated Verification:** Upon detection of `s UNSATISFIABLE` in any DRAT-logging branch, automatically triggers `/usr/local/bin/drat-trim` against the CNF and proof file to independently verify the empty-clause derivation (as successfully executed for Order 7, producing `z7_result.txt` with `s UNSATISFIABLE / VERIFIED`).
-  - **Telemetry & Monitoring:** Emits real-time priority alerts to `@Conway_Demon_Bot` via the Telegram Bot API and broadcasts periodic 4-hour status heartbeats recording conflict counts and free storage.
+  - **Automated Verification:** Upon detection of `s UNSATISFIABLE` in any DRAT-logging branch, automatically triggers `/usr/local/bin/drat-trim` against the CNF and proof file to independently verify the empty-clause derivation (as executed for Order 7).
+  - **Telemetry & Monitoring:** Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and broadcasts periodic 4-hour status heartbeats.
 - **Local Host State:**
   All solver instances on the local Mac M2 workstation remain 100% STOPPED (0% CPU utilization, 93 GiB SSD free), eliminating local thermal throttling and guaranteeing system stability.
 
