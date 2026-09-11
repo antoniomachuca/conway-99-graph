@@ -1,0 +1,73 @@
+# =============================================================================
+# Conway 99-Graph Project: .gitignore
+# Rigorous exclusions for large artifacts, solver binaries, and build outputs
+# =============================================================================
+
+# Lean 4 build artifacts
+.lake/
+/.lake/
+build/
+*.olean
+*.ilean
+*.o
+
+# SAT proof traces (multi-gigabyte files)
+*.drat
+*.drat.bz2
+*.clrat*
+*.lrat*
+proof_*.drat
+
+# SAT formulas and CNF instances (large problem instances)
+*.cnf
+*.cnf.bz2
+
+# Solver runtime logs and monitoring logs
+*.log
+*.log.*
+*.log-*-*
+monitor_*_state.json
+
+# Native solver binaries & solver compilation directories
+cadical
+cadical-rel-1.9.5/
+drat-trim/
+kissat
+
+# Data, instance archives, cloud outputs, and scratch directories
+archive/
+instances/
+cloud_results/
+scratch/
+
+# Python bytecode & temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# LaTeX auxiliary files (keep only .tex, .bib, .sty, and manuscript/conway_involutions.pdf)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.out
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+
+# Scratch images
+*.png
+

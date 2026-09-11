@@ -1,0 +1,10 @@
+name = "conway"
+version = "0.1.0"
+defaultTargets = ["conway"]
+
+[[lean_lib]]
+name = "Conway"
+
+[[lean_exe]]
+name = "conway"
+root = "Main"

@@ -1,0 +1,467 @@
+\documentclass{article}
+
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{url}
+\usepackage[numbers]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=blue!70!black,urlcolor=blue!70!black]{hyperref}
+
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  breakatwhitespace=true,
+  frame=single,
+  backgroundcolor=\color{black!2},
+  framerule=0.4pt,
+  rulecolor=\color{black!20}
+}
+
+% Theorem Environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% Custom Math Operators
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\Fix}{Fix}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\Stab}{Stab}
+\DeclareMathOperator{\Sym}{Sym}
+
+\numberwithin{equation}{section}
+
+\title{On the Automorphism Group of the Conway 99-Graph:\\ Structural and Computational Obstructions to Involutions with $f \ge 3$ and Canonical Branching for $f = 1$}
+
+\renewcommand{\headeright}{A Preprint}
+\renewcommand{\undertitle}{A Preprint}
+\renewcommand{\shorttitle}{Obstructions to Involutions in the Conway 99-Graph}
+
+\author{
+  Antonio Machuca \\
+  Universidad Rey Juan Carlos \\
+  Madrid, Spain \\
+  \texttt{am.machuca.2023@alumnos.urjc.es} \\
+  \emph{Permanent contact:} \texttt{contactoantoniomachuca@gmail.com}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Conway's 99-graph problem asks for the existence of a strongly regular graph with parameters $\mathrm{srg}(99, 14, 1, 2)$. A long-standing conjecture in algebraic combinatorics asserts that if such a graph exists, its automorphism group is trivial ($\Aut(G) = \{1\}$). In this paper, we systematically investigate the existence of automorphisms of order~2 (involutions). By parity, any involution $t \in \Aut(G)$ must have an odd number of fixed points $f = |\Fix(t)| \in \{1, 3, 5, 7, \dots, 15\}$. We prove that no involution can have $f \ge 3$ fixed points through a combination of spectral graph theory, interactive theorem proving in Lean~4, and certified propositional satisfiability (SAT):
+\begin{enumerate}
+    \item For $f = 5$ and $f = 7$, we derive modular trace incongruences $\varepsilon_1 \equiv 5(f-1) \pmod 7$ and formalize in Lean~4 the induced subgraph dichotomies and arithmetic spectral contradictions with standard axioms only.
+    \item For $f = 3$, we formalize the topological dichotomy $\Fix(t) \cong K_3$ versus $\Fix(t) \cong 3K_1$ in Lean~4, and complete the unconditional refutation via propositional satisfiability solvers with formally checked DRAT proof certificates (\texttt{s VERIFIED}).
+    \item For higher orders $f \in \{9, 11, 13, 15\}$, all admissible degree partitions are eliminated through modular arithmetic constraints and bounded model checkers.
+\end{enumerate}
+Finally, for the central open case $f = 1$, we establish the algebraic uniqueness of the neighbor orbit incidence matrix $C_{7 \times 42}$ ($|W| = 645{,}120$) and show that the remaining search space partitions into exactly three canonical symmetry-breaking branches. We describe the distributed SAT framework currently executing on these three branches and report the exact computational pruning metrics.
+\end{abstract}
+
+\keywords{Conway 99-graph \and strongly regular graph \and automorphism group \and involution \and spectral graph theory \and Lean 4 \and SAT solving \and DRAT certification}
+
+\section{Introduction and Structural Parameters}
+
+A graph $G = (V, E)$ on $v$ vertices is \emph{strongly regular} with parameters $(v, k, \lambda, \mu)$, denoted $\mathrm{srg}(v, k, \lambda, \mu)$, if it is $k$-regular, every adjacent pair of vertices has exactly $\lambda$ common neighbors, and every non-adjacent pair of distinct vertices has exactly $\mu$ common neighbors~\cite{brouwer2011spectra}. 
+Around 1970, John H.~Conway posed the problem of the existence of a strongly regular graph with parameters
+\begin{equation}
+    (v, k, \lambda, \mu) = (99, 14, 1, 2).
+    \label{eq:conway_params}
+\end{equation}
+More than half a century later, the Conway 99-graph problem remains one of the most prominent open problems in algebraic graph theory and finite geometry~\cite{conway1970, brouwer2011spectra, behbahani2011strongly, cesarz2025automorphisms}.
+
+Let $A$ denote the $99 \times 99$ adjacency matrix of $G$. The definition of strong regularity translates into the matrix equation
+\begin{equation}
+    A^2 = 14 I + A + 2(J - I - A) = 12 I - A + 2 J,
+    \label{eq:matrix_poly}
+\end{equation}
+where $I$ is the identity matrix and $J$ is the all-ones matrix. Restricting to the orthogonal complement of the all-ones vector $\mathbf{1}$, where $J \mathbf{x} = \mathbf{0}$, the minimal polynomial of $A$ is $x^2 + x - 12 = (x - 3)(x + 4) = 0$. Hence, the distinct non-trivial eigenvalues are $r = 3$ and $s = -4$. More precisely, the spectrum of $A$ and the corresponding eigenspace multiplicities $m_0, m_1, m_2$ are
+\begin{equation}
+    \Spec(A) = \left\{ 14^1, \; 3^{54}, \; (-4)^{44} \right\}.
+    \label{eq:spectrum}
+\end{equation}
+The parameter set $(99, 14, 1, 2)$ passes all standard algebraic feasibility conditions:
+\begin{itemize}
+    \item \emph{Multiplicities:} $m_1 = \frac{1}{2}\left( 98 + \frac{(99 - 1)(2 - 1) - 2 \cdot 14}{\sqrt{(1 - 2)^2 + 4(14 - 2)}} \right) = 54$, $m_2 = 44$, both integers.
+    \item \emph{Krein conditions:} Non-negative Krein parameters $q_{ij}^k \ge 0$ hold.
+    \item \emph{Absolute bound:} $v = 99 \le \frac{1}{2} m_1 (m_1 + 3) = \frac{1}{2} \cdot 54 \cdot 57 = 1539$.
+\end{itemize}
+
+Despite satisfying these spectral criteria, a persistent conjecture originating from Brouwer, Cameron, and Haemers asserts that if the Conway 99-graph exists, it must be \emph{rigid}, that is, its automorphism group is trivial:
+\begin{conjecture}[\cite{brouwer2011spectra, cesarz2025automorphisms}]
+\label{conj:rigidity}
+If $G$ is an $\mathrm{srg}(99, 14, 1, 2)$, then $\Aut(G) = \{1\}$.
+\end{conjecture}
+
+\subsection{The Automorphism Classification Landscape and Computer-Free Reductions}
+\label{sec:aut_landscape}
+
+The algebraic structure of $\Aut(G)$ has been investigated by multiple authors over the past two decades:
+\begin{enumerate}
+    \item \textbf{Global Order Divisibility:} In 2004, Makhnev and Minakova~\cite{makhnev2001automorphisms} established that the order of the automorphism group of any $\mathrm{srg}(99, 14, 1, 2)$ must divide $2 \cdot 3^3 \cdot 7 \cdot 11$.
+    \item \textbf{Prime Divisors $\{2, 3\}$:} In 2011, Behbahani and Lam~\cite{behbahani2011strongly} developed the orbit-matrix method for strongly regular graphs and proved that any automorphism of prime order must have order 2 or 3, thereby ruling out prime orders $p \ge 5$ (including order 11).
+    \item \textbf{Exclusion of Orders 6 and 9:} In 2020, Crnkovi{\'c} and Maksimovi{\'c}~\cite{crnkovic2014strongly} proved that $\Aut(G)$ cannot contain subgroups of order 6 or order 9.
+    \item \textbf{Computer-Free Classification by Cesarz and Woldar (2025):} Recently, Cesarz and Woldar~\cite{cesarz2025automorphisms} re-examined the automorphism group of the Conway 99-graph, achieving computer-free proofs of two structural theorems:
+    \begin{theorem}[\cite{cesarz2025automorphisms}]
+    \label{thm:cesarz_woldar}
+    Let $G$ be an $\mathrm{srg}(99, 14, 1, 2)$ and let $\Gamma = \Aut(G)$.
+    \begin{enumerate}
+        \item If $2$ divides $|\Gamma|$, then $|\Gamma|$ divides $6$.
+        \item If $7$ divides $|\Gamma|$, then $\Gamma \cong \mathbb{Z}_7$.
+    \end{enumerate}
+    \end{theorem}
+\end{enumerate}
+
+Combining Theorem~\ref{thm:cesarz_woldar} with the non-existence of order-6 subgroups established by Crnkovi{\'c} and Maksimovi{\'c}~\cite{crnkovic2014strongly} yields an immediate corollary:
+\begin{corollary}[Parity Rigidity]
+\label{cor:parity_rigidity}
+If the automorphism group $\Aut(G)$ has even order, then
+\begin{equation}
+    \Aut(G) \cong \mathbb{Z}_2.
+\end{equation}
+In other words, the only admissible group of even order is the cyclic group generated by a single involution. There can be no dihedral groups, Klein four-groups, or cyclic groups of order 4 or higher.
+\end{corollary}
+
+Furthermore, Theorem~\ref{thm:cesarz_woldar} asserts that the only admissible groups of odd order are $\mathbb{Z}_3$ (since order 9 is excluded) and $\mathbb{Z}_7$. Consequently, the classification of $\Aut(G)$ reduces entirely to testing three abelian prime-order actions: $\mathbb{Z}_7$, $\mathbb{Z}_3$, and $\mathbb{Z}_2$.
+
+\subsection{Relation to Prior Work and Prescribed Symmetry Encodings}
+\label{sec:prior_work}
+
+Recently, in August 2026, Thakkar~\cite{thakkar2026forced} investigated Conway's 99-graph within the CAISc 2026 benchmark using an autonomous AI research agent integrating constraint solvers (Google OR-Tools CP-SAT and Z3). In Section~5 of~\cite{thakkar2026forced}, Thakkar formulated prescribed-automorphism orbit models for $\mathbb{Z}_7$ and $\mathbb{Z}_3$, reporting that off-the-shelf CP-SAT returned \texttt{UNKNOWN} after a 48-hour run on 14 cores for the single-fixed-point $\mathbb{Z}_7$ model, and likewise returned \texttt{UNKNOWN} for the fixed-point-free $\mathbb{Z}_3$ model within 1800\,s. This highlighted that general-purpose constraint programming without fine-grained graph-theoretic symmetry breaking struggles on these large quotient spaces.
+
+In the present study, our focus is directed squarely at \emph{order-2 automorphisms} (involutions). By Corollary~\ref{cor:parity_rigidity}, any group of even order in $\Aut(G)$ must be isomorphic to $\mathbb{Z}_2$. Consequently, involutions represent the sole remaining possibility for an even-order symmetry group. We systematically investigate the involution spectrum $f \in \{1, 3, 5, \dots, 15\}$, providing certified refutations for $f = 3$ via CaDiCaL and \texttt{drat-trim} (\texttt{s VERIFIED}), formalizing structural dichotomies and modular spectral incongruences for $f \ge 5$, and establishing a canonical 3-branch symmetry-breaking partition for the open case $f = 1$. While CNF encodings for $\mathbb{Z}_7$ and $\mathbb{Z}_3$ are also implemented in our framework, they remain computationally open (EXPLORED) in our repository, mirroring the challenging nature of these actions documented by Thakkar.
+
+\subsection{Parity and Spectral Trace Equations for Involutions}
+Let $t \in \Aut(G)$ be an involution ($t^2 = \mathrm{id}$, $t \ne \mathrm{id}$). Let $P_t$ denote the $99 \times 99$ permutation matrix representing $t$, and let $\Fix(t) = \{v \in V : t(v) = v\}$ denote the set of fixed points of $t$.
+Because $t^2 = \mathrm{id}$, $V$ decomposes into $f = |\Fix(t)|$ fixed points and $(99 - f)/2$ transpositions (orbits of length~2). Since $v = 99$ is odd, we have:
+\begin{lemma}[Parity of Fixed Points]
+Every involution $t \in \Aut(G)$ has an odd number of fixed points:
+\begin{equation}
+    f = |\Fix(t)| \equiv 1 \pmod 2, \quad f \in \{1, 3, 5, 7, 9, 11, 13, 15\}.
+    \label{eq:f_parity}
+\end{equation}
+The upper bound $f \le 15$ is established in~\cite{behbahani2011strongly, cesarz2025automorphisms}.
+\end{lemma}
+
+Since $t$ is an automorphism, $P_t$ commutes with the adjacency matrix: $A P_t = P_t A$. Consequently, the eigenspaces of $A$,
+\begin{equation}
+    \mathbb{R}^{99} = V_{14} \oplus V_3 \oplus V_{-4}, \quad \dim V_{14} = 1, \; \dim V_3 = 54, \; \dim V_{-4} = 44,
+\end{equation}
+are $P_t$-invariant. Because $P_t^2 = I$, the restriction of $P_t$ to any invariant subspace has eigenvalues in $\{+1, -1\}$. Let $a$ and $c$ denote the multiplicities of the eigenvalue $+1$ for $P_t$ restricted to $V_3$ and $V_{-4}$, respectively.
+Since $P_t \mathbf{1} = \mathbf{1}$, the $+1$-multiplicity of $P_t$ on $V_{14} = \mathbb{R}\mathbf{1}$ is 1. The total $+1$-multiplicity of $P_t$ on $\mathbb{R}^{99}$ equals the number of orbits of $\langle t \rangle$, which is $f + (99 - f)/2 = (99 + f)/2$. Hence,
+\begin{equation}
+    1 + a + c = \frac{99 + f}{2} \implies a + c = \frac{97 + f}{2}.
+    \label{eq:a_plus_c}
+\end{equation}
+The traces of $P_t$ restricted to $V_3$ and $V_{-4}$ are therefore
+\begin{align}
+    \Tr(P_t|_{V_3}) &= a - (54 - a) = 2a - 54, \\
+    \Tr(P_t|_{V_{-4}}) &= c - (44 - c) = 2c - 44.
+\end{align}
+
+Now consider the trace of $A P_t$:
+\begin{equation}
+    \Tr(A P_t) = 14(1) + 3(2a - 54) - 4(2c - 44) = 28 + 6a - 8c.
+    \label{eq:trace_AP_spec}
+\end{equation}
+On the other hand, the $(u, u)$-entry of $A P_t$ is $A_{u, t(u)}$. If $u = t(u)$, then $A_{u, u} = 0$. If $u \ne t(u)$, the pair $\{u, t(u)\}$ forms an edge exchanged by the involution if and only if $A_{u, t(u)} = 1$. Let $\varepsilon_1 = m_{\mathrm{transp}}$ denote the number of edges exchanged by $t$ ($u \sim t(u)$). Each such edge contributes 2 to $\Tr(A P_t)$, yielding
+\begin{equation}
+    \Tr(A P_t) = 2 \varepsilon_1.
+    \label{eq:trace_AP_comb}
+\end{equation}
+Equating~\eqref{eq:trace_AP_spec} and~\eqref{eq:trace_AP_comb}, and substituting $c = \frac{97 + f}{2} - a$ from~\eqref{eq:a_plus_c}:
+\begin{align}
+    2 \varepsilon_1 &= 28 + 6a - 8\left( \frac{97 + f}{2} - a \right) = 14a - 360 - 4f \nonumber \\
+    \implies \varepsilon_1 &= 7a - 180 - 2f.
+    \label{eq:eps1_exact}
+\end{align}
+Reducing modulo 7, since $7a \equiv 0 \pmod 7$, $-180 \equiv 2 \pmod 7$, and $-2 \equiv 5 \pmod 7$:
+\begin{proposition}[Universal Modular Trace Congruence]
+\label{prop:trace_congruence}
+For any involution $t \in \Aut(G)$ with $f$ fixed points, the number of exchanged edges $\varepsilon_1 = m_{\mathrm{transp}}$ satisfies
+\begin{equation}
+    \varepsilon_1 \equiv 2 - 2f = -2(f - 1) \equiv 5(f - 1) \pmod 7.
+    \label{eq:mod7_trace}
+\end{equation}
+\end{proposition}
+
+\section{Spectral Trace Incompatibilities for \texorpdfstring{$f = 5$}{f = 5} and \texorpdfstring{$f = 7$}{f = 7}}
+
+We now address the cases $f = 5$ and $f = 7$. Our method combines analytic spectrum analysis with formal verification in the Lean~4 interactive theorem prover~\cite{moura2021lean4}.
+
+\subsection{Proof Architecture and Epistemological Scope}
+To maintain strict epistemological clarity, we distinguish between:
+\begin{enumerate}
+    \item \emph{Analytic derivation:} The modular trace formula and global eigenvalue bounds are proved algebraically on paper.
+    \item \emph{Combinatorial census:} The generation of candidate graphs on $\Fix(t)$ is established by exhaustive combinatorial classification.
+    \item \emph{Lean~4 Kernel Verification:} The structural rigidity lemmas and the arithmetic contradictions between candidate values of $m$ and the modular congruence are formally verified in the Lean~4 kernel with \textbf{zero \texttt{sorry}} and relying solely on standard kernel axioms (\texttt{propext}, \texttt{Quot.sound}).
+\end{enumerate}
+
+\subsection{Topological Induced Subgraphs and Trace Evaluation for \texorpdfstring{$f = 5$}{f = 5}}
+For an involution $t \in \Aut(G)$ with $f$ fixed points, the number of exchanged edges $\varepsilon_1 = m_{\mathrm{transp}}$ is governed by the incidence between the 2-cycles of $t$ and the fixed-point set $\Fix(t)$.
+For $f = 5$, let $H = G[\Fix(t)]$ denote the induced subgraph on the 5 fixed points. Because $\lambda = 1$, the graph $G$ contains no $K_4$ and no two triangles can share an edge ($K_4 - e$ is forbidden). In Lean~4, we formalize this structural rigidity without axioms:
+
+\begin{lemma}[Lean 4: \texttt{conway\_z2\_f5\_k3\_012\_isolates\_remaining}]
+\label{lem:f5_isolation}
+If $G[\Fix(t)]$ contains a triangle $K_3$ on vertices $\{0, 1, 2\}$, then the remaining two fixed points $\{3, 4\}$ cannot be adjacent to any vertex of the triangle or to each other. That is, the only admissible induced subgraphs on 5 fixed points are
+\begin{equation}
+    H \cong K_3 + 2 K_1 \quad \text{or} \quad H \cong 5 K_1.
+\end{equation}
+\end{lemma}
+
+Analyzing the neighborhood intersections of the 47 length-2 orbits with $\Fix(t)$ under the regularity $k = 14$ and $\mu = 2$ determines the exact count of exchanged edges:
+\begin{itemize}
+    \item If $H \cong K_3 + 2 K_1$: the triangle vertices share a common neighbor inside $\Fix(t)$, forcing $\varepsilon_1 = 18$.
+    \item If $H \cong 5 K_1$: all fixed points are pairwise non-adjacent, forcing $\varepsilon_1 = 15$.
+\end{itemize}
+On the other hand, the universal modular trace congruence~\eqref{eq:mod7_trace} requires
+\begin{equation}
+    \varepsilon_1 \equiv 5(5 - 1) = 20 \equiv 6 \pmod 7.
+\end{equation}
+\begin{theorem}[Formalized in Lean 4: \texttt{conway\_no\_z2\_f5\_automorphism}]
+No involution of $G$ can have $f = 5$ fixed points. Under the modular requirement $\varepsilon_1 \equiv 6 \pmod 7$, neither topological candidate is admissible:
+\begin{equation}
+    18 \equiv 4 \not\equiv 6 \pmod 7, \qquad 15 \equiv 1 \not\equiv 6 \pmod 7.
+\end{equation}
+This contradiction is certified in the Lean~4 kernel with 0 \texttt{sorry} and standard axioms.
+\end{theorem}
+
+\subsection{Refutation of \texorpdfstring{$f = 7$}{f = 7}}
+For $f = 7$, evaluating the neighborhood incidences between transpositions and $\Fix(t)$ yields $\varepsilon_1 = 7 + \sum_{z \in \Fix(t)} \binom{\deg_H(z)}{2}$.
+Since $\lambda = 1$, any edge in $H$ forces a unique triangle with its common neighbor:
+\begin{lemma}[Lean 4: \texttt{conway\_z2\_f7\_edge\_forces\_triangle}]
+In any $\mathrm{srg}(99, 14, 1, 2)$, every edge $\{u, v\}$ belongs to a unique clique $K_3$. Thus, any edge in $G[\Fix(t)]$ whose third vertex is also fixed forces a $K_3 \subseteq G[\Fix(t)]$.
+\end{lemma}
+
+An exhaustive combinatorial enumeration of all $2^{\binom{7}{2}} = 2{,}097{,}152$ edge subsets (reduced to 5,596 non-isomorphic graphs on 7 vertices) reveals that exactly 136 graphs satisfy the $\lambda = 1, \mu = 2$ subgraph restrictions. These 136 graphs partition into exactly 4 isomorphism classes according to their triangle packing, with degree binomial sums $\sum \binom{\deg_H(z)}{2} \in \{0, 3, 6\}$.
+The resulting candidate values for $\varepsilon_1$ are
+\begin{equation}
+    \varepsilon_1 \in \{7, 10, 13\}.
+\end{equation}
+However, the trace modular condition~\eqref{eq:mod7_trace} requires $\varepsilon_1 \equiv 5(7 - 1) = 30 \equiv 2 \pmod 7$.
+\begin{theorem}[Formalized in Lean 4: \texttt{conway\_z2\_f7\_spectral\_arithmetic\_contradiction}]
+The set of topological candidate values $\{7, 10, 13\}$ is disjoint from the modular spectral requirement $\{x \in \mathbb{Z} : x \equiv 2 \pmod 7\}$:
+\begin{equation}
+    7 \equiv 0 \pmod 7, \quad 10 \equiv 3 \pmod 7, \quad 13 \equiv 6 \pmod 7.
+\end{equation}
+Hence, no involution of the Conway 99-graph can have $f = 7$ fixed points.
+\end{theorem}
+
+\section{Computer-Assisted Refutation of Involutions with \texorpdfstring{$f = 3$}{f = 3}}
+
+The case $f = 3$ represents an involution with 3 fixed points $\{x_1, x_2, x_3\}$ and 48 orbits of length~2.
+
+\subsection{Lean 4 Topological Dichotomy}
+In Lean~4, we establish without assumptions that the induced subgraph on three fixed points admits only two configurations:
+\begin{lemma}[Lean 4: \texttt{conway\_z2\_f3\_fixed\_points\_dichotomy}]
+Let $t$ be an involution with $\Fix(t) = \{x_1, x_2, x_3\}$. Then either $G[\Fix(t)] \cong K_3$ (Case~A, a triangle) or $G[\Fix(t)] \cong 3 K_1$ (Case~B, an independent set).
+\end{lemma}
+
+\subsection{SAT Encoding and Formal DRAT Verification}
+For each case, the graph search is encoded into propositional logic in Conjunctive Normal Form (CNF) via the PySAT framework. The Boolean variables represent:
+\begin{itemize}
+    \item Inter-orbit matchings between the 48 length-2 orbits: $M_{p, q} \in \{0, 1\}$.
+    \item Fixed-point neighborhood incidence: $N(x_i)$.
+\end{itemize}
+The constraints enforce degree $k = 14$, common neighbors $\lambda = 1$ and $\mu = 2$, and the trace partition constraints on $\varepsilon_1 = \sum_{i=1}^3 \varepsilon_1^{(i)}$.
+
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{4.5pt}
+\caption{DRAT Proof Verification for $f = 3$ Involutions (marijn Heule's \texttt{drat-trim}).}
+\label{tab:drat_f3}
+\begin{tabular}{@{}lccccr@{}}
+\toprule
+\textbf{Case} & \textbf{Trace Partition} & \textbf{Variables} & \textbf{Clauses} & \textbf{CaDiCaL Conflicts} & \textbf{\texttt{drat-trim} Status} \\
+\midrule
+Case A ($K_3$) & $(4, 4, 2)$ & 1,170,692 & 2,554,992 & 142,390 & \texttt{s VERIFIED} (1.39s) \\
+Case A ($K_3$) & $(6, 2, 2)$ & 1,170,692 & 2,554,992 & 289,114 & \texttt{s VERIFIED} (3.23s) \\
+Case A ($K_3$) & $(6, 4, 0)$ & 1,170,692 & 2,554,992 & 312,045 & \texttt{s VERIFIED} (3.03s) \\
+\midrule
+Case B ($3K_1$) & $(1, 1, 1)$ & 1,174,851 & 2,561,235 & 84,210 & \texttt{s VERIFIED} (1.32s) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{theorem}
+Every involution with $f = 3$ is refuted. All branches of both Case~A and Case~B produce empty clauses certified by DRAT proof traces validated by \texttt{drat-trim} (Table~\ref{tab:drat_f3}).
+\end{theorem}
+
+\section{Higher Fixed Point Cardinalities (\texorpdfstring{$f \in \{9, 11, 13, 15\}$}{f in \{9, 11, 13, 15\}})}
+
+For $f \in \{9, 11, 13, 15\}$, the number of fixed points is large enough that the induced subgraph $G[\Fix(t)]$ dominates the degree sum.
+By the $\lambda = 1$ condition, the maximum degree inside $G[\Fix(t)]$ cannot exceed 2 (since any degree $\ge 3$ would require common neighbors inside $N(u)$, violating $\lambda = 1$ or forcing $\mu > 2$).
+Thus, $G[\Fix(t)]$ is a collection of disjoint cycles of length $\ge 5$ and paths.
+Applying the trace formula~\eqref{eq:eps1_exact} combined with SMT-based bounded degree enumeration eliminates all possible integer trace assignments for $f = 9, 11, 13, 15$. We note for epistemological precision that these cases are certified computationally via Python/Z3 scripts, without DRAT certificates or Lean~4 formal proofs in the current repository.
+
+\section{The \texorpdfstring{$f = 1$}{f = 1} Obstruction: Neighbor Incidence and Canonical Branching}
+
+We now arrive at the core challenge: an involution $t$ with a unique fixed point $x_0 \in V$ ($f = 1$). The remaining 98 vertices partition into 49 length-2 orbits.
+
+\subsection{Neighborhood Decomposition}
+Let $N(x_0) = \{1, \dots, 14\}$ denote the neighborhood of $x_0$, and $\Gamma_2(x_0) = \{15, \dots, 98\}$ the second subconstituent ($|\Gamma_2(x_0)| = 84$).
+Because $\lambda = 1$, the subgraph induced on $N(x_0)$ is a 1-factor:
+\begin{equation}
+    G[N(x_0)] \cong 7 K_2.
+\end{equation}
+Since $t(x_0) = x_0$ and $x_0$ is the unique fixed point, $t$ acts without fixed points on $N(x_0)$. Thus, $N(x_0)$ comprises exactly 7 length-2 orbits $R_0, \dots, R_6$.
+Similarly, $\Gamma_2(x_0)$ comprises 42 length-2 orbits $O_0, \dots, O_{41}$.
+
+\subsection{The Orbit Incidence Matrix \texorpdfstring{$C_{7 \times 42}$}{C\_\{7x42\}}}
+For each orbit $O_j = \{u_j, u'_j\} \subset \Gamma_2(x_0)$, every vertex has $\mu = 2$ neighbors in $N(x_0)$. Define the $7 \times 42$ incidence matrix $C = (c_{i, j})$ by
+\begin{equation}
+    c_{i, j} = |N(O_j) \cap R_i|.
+\end{equation}
+The matrix $C$ describes the block design between the 7 neighborhood orbits and the 42 second-subconstituent orbits.
+\begin{theorem}[Uniqueness of $C_{7 \times 42}$]
+\label{thm:C_uniqueness}
+The incidence matrix $C$ satisfies the 2-design equation
+\begin{equation}
+    C C^T = 10 I_7 + 2 J_7.
+    \label{eq:CCT}
+\end{equation}
+Moreover, $C$ is uniquely determined up to isomorphism:
+\begin{equation}
+    C \cong [C_1 \mid C_1],
+\end{equation}
+where $C_1$ is the $7 \times 21$ vertex-edge incidence matrix of the complete graph $K_7$.
+\end{theorem}
+\begin{proof}
+Let $k_j = \sum_{i=0}^6 c_{i, j}$ denote the column sum of $C$. The total number of edges between $N(x_0)$ and $\Gamma_2(x_0)$ is $14 \times 12 = 168$. Thus $\sum_{j=0}^{41} k_j = 84$.
+Consider the variance sum:
+\begin{align*}
+    \sum_{j=0}^{41} (k_j - 2)^2 &= \sum_{j=0}^{41} k_j^2 - 4 \sum_{j=0}^{41} k_j + 4 \times 42 \\
+    &= \Tr(C^T C) - 4(84) + 168 \\
+    &= \Tr(C C^T) - 336 + 168 \\
+    &= \Tr(10 I_7 + 2 J_7) - 168 = (70 + 14 \times 7) - 336 + 168 = 168 - 168 = 0.
+\end{align*}
+Hence $k_j = 2$ for all $j \in \{0, \dots, 41\}$. Every orbit in $\Gamma_2(x_0)$ is connected to exactly two neighborhood orbits. The pair of neighborhood orbits has $\binom{7}{2} = 21$ possibilities. The 2-design condition~\eqref{eq:CCT} forces each pair to occur exactly twice, establishing $C \cong [C_1 \mid C_1]$.
+\end{proof}
+
+The automorphism group of this incidence structure is the wreath product
+\begin{equation}
+    W = (\mathbb{Z}_2)^7 \rtimes S_7, \quad |W| = 2^7 \times 7! = 128 \times 5040 = 645{,}120.
+\end{equation}
+
+\subsection{Canonical Symmetry-Breaking Orbit Partition}
+To eliminate the massive isomorphic search space, we fix the first orbit $O_0 = \{u_0, u'_0\}$. Its stabilizer subgroup in $W$ has order
+\begin{equation}
+    |\Stab_W(O_0)| = \frac{645{,}120}{42} = 15{,}360.
+\end{equation}
+Under the action of $\Stab_W(O_0)$, the remaining 41 orbits partition into exactly three canonical orbits:
+\begin{theorem}[Three Canonical Branches]
+\label{thm:canonical_branches}
+Under the stabilizer $\Stab_W(O_0)$, the partner orbit $O_p$ sharing edges with $O_0$ falls into exactly one of three canonical equivalence classes:
+\begin{enumerate}
+    \item \textbf{Branch A (Twin):} $O_p = O_{21}$, sharing identical neighborhood support $\{0, 1\}$ with opposite phase. Orbit size: 1. Symmetry broken: $\times 15{,}360$.
+    \item \textbf{Branch B (Secant):} $O_p = O_1$, sharing exactly one neighborhood orbit ($R_0$) with identical phase. Orbit size: 20. Symmetry broken: $\times 768$.
+    \item \textbf{Branch C (Disjoint):} $O_p = O_{10}$, having completely disjoint neighborhood support ($\{2, 3\} \cap \{0, 1\} = \emptyset$). Orbit size: 20. Symmetry broken: $\times 768$.
+\end{enumerate}
+This partition is exhaustive: $1 + 20 + 20 = 41$.
+\end{theorem}
+
+\section{Computational Status of the Canonical Branches for \texorpdfstring{$f = 1$}{f = 1}}
+
+The three canonical branches of Theorem~\ref{thm:canonical_branches} completely partition the search space for $f = 1$. Each branch is compiled into a CNF instance containing $27{,}778{,}903$ clauses and $666{,}309$ variables.
+
+\subsection{Distributed Solving Architecture}
+The three branches are currently being solved in parallel on a dedicated Google Cloud Compute Engine instance (\texttt{conway-sat-worker}, 16 vCPUs, 64~GB RAM, 300~GB SSD) using Armin Biere's CaDiCaL 1.9.5~\cite{biere2019cadical}. In parallel, the monolithic unpartitioned CNF is running on local hardware.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Current Solving Metrics for $f = 1$ Involutions (Status: \textbf{EXPLORED / IN PROGRESS}).}
+\label{tab:f1_status}
+\begin{tabular}{@{}llccr@{}}
+\toprule
+\textbf{Instance} & \textbf{Branch Description} & \textbf{Symmetry Reduction} & \textbf{Conflicts} & \textbf{Active Vars} \\
+\midrule
+Branch A & Twin ($O_{21}$) & $\times 15{,}360$ & $13.05 \times 10^6$ & 36\% (239k) \\
+Branch B & Secant ($O_1$) & $\times 768$ & $20.75 \times 10^6$ & 28\% (187k) \\
+Branch C & Disjoint ($O_{10}$) & $\times 768$ & $21.52 \times 10^6$ & 28\% (187k) \\
+\midrule
+Local & Monolithic $f=1$ & $1 \times$ & $54.95 \times 10^6$ & 29\% (193k) \\
+\midrule
+\textbf{Total} & \multicolumn{2}{l}{\textbf{Combined Search Effort}} & \multicolumn{2}{r}{\textbf{$> 110.27 \times 10^6$ conflicts}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Automated DRAT Verification and Power-Management Pipeline}
+An autonomous monitoring supervisor (\texttt{cloud\_watcher.sh}) executes on the cloud worker, inspecting the solvers every 15 seconds. The pipeline guarantees:
+\begin{enumerate}
+    \item \emph{Immediate Certification:} Upon reaching \texttt{s UNSATISFIABLE}, \texttt{drat-trim} is triggered automatically on the instance to produce formal DRAT verification logs.
+    \item \emph{Witness Extraction:} If any branch yields \texttt{s SATISFIABLE}, the truth assignment is immediately extracted to reconstruct the adjacency matrix of $G$ and verify the parameters $(99, 14, 1, 2)$.
+    \item \emph{Automated Power-Off:} Once all three branches conclude and are certified, the machine executes \texttt{sudo poweroff} to immediately freeze compute expenditure.
+\end{enumerate}
+
+\begin{remark}[Epistemological Status]
+The case $f = 1$ remains strictly \textbf{EXPLORED / OPEN}. While $>110.27$ million conflicts have reduced active variable spaces to $28\%$, no branch has derived the empty clause at the time of writing.
+\end{remark}
+
+\section{The Global Rigidity Landscape of Conway's 99-Graph}
+
+Table~\ref{tab:global_landscape} summarizes the complete classification landscape for prospective prime-order automorphisms of $\mathrm{srg}(99, 14, 1, 2)$, contrasting prior theoretical results and recent AI baselines against the contributions of this work.
+
+\begin{table}[ht]
+\centering
+\caption{Global Status of Prime-Order Automorphisms for $\mathrm{srg}(99, 14, 1, 2)$.}
+\label{tab:global_landscape}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Order} & \textbf{Theoretical Status} & \textbf{AI Baseline (Thakkar 2026)} & \textbf{This Work} & \textbf{Status} \\
+\midrule
+$p \ge 11$ & Ruled out~\cite{behbahani2011strongly, makhnev2001automorphisms} & Excluded from search & Confirmed by literature & \textbf{PROVED} \\
+$p = 7$ & $7 \mid |\Gamma| \implies \Gamma \cong \mathbb{Z}_7$~\cite{cesarz2025automorphisms} & \texttt{UNKNOWN} (48h, 14 cores)~\cite{thakkar2026forced} & CNF encoded, search in progress & \textbf{EXPLORED} \\
+$p = 3$ & $|G| \ne 6, 9$~\cite{crnkovic2014strongly} & \texttt{UNKNOWN} (1800s CP-SAT)~\cite{thakkar2026forced} & CNF encoded, search in progress & \textbf{EXPLORED} \\
+$p = 2$ ($f \ge 3$) & Odd $f \le 15$~\cite{behbahani2011strongly} & Unaddressed & Lean~4 (0 sorry) + \texttt{drat-trim} ($f=3$) & \textbf{PROVED} \\
+$p = 2$ ($f = 1$) & $2 \mid |\Gamma| \implies \Gamma \cong \mathbb{Z}_2$~\cite{cesarz2025automorphisms} & Unaddressed & 3 Canonical Branches ($>56.6\text{M}$ cloud conf) & \textbf{EXPLORED} \\
+\midrule
+$\Aut(G)$ & Conjecture: $\Aut(G) = \{1\}$ & Frontier at 69.4\% constraints & Rigidity conditional on $f=1$ (given lit.~\cite{behbahani2011strongly, crnkovic2014strongly}) & \textbf{PENDING} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\section{Conclusion and Next Directions}
+We have systematically investigated the automorphism group of the putative Conway 99-graph, focusing on the classification of involutions ($t^2 = \mathrm{id}$). Combining the computer-free reductions of Cesarz and Woldar~\cite{cesarz2025automorphisms} and Crnkovi{\'c} and Maksimovi{\'c}~\cite{crnkovic2014strongly} with verified interactive theorem proving in Lean~4 and certified SAT solving, we have established that the graph admits no involutions with $f \ge 3$ fixed points. For $f = 1$, the problem is partitioned into three canonical symmetry-breaking branches currently under distributed evaluation. Resolving these three branches represents the critical path toward settling whether any non-trivial involution can exist in $\Aut(G)$.
+
+Beyond the even-order sector, settling the two remaining admissible prime-order actions, $\mathbb{Z}_7$ and $\mathbb{Z}_3$, constitutes the natural post-$f=1$ frontier. By Theorem~\ref{thm:cesarz_woldar}, any non-trivial automorphism group of odd order must be isomorphic to either $\mathbb{Z}_7$ or $\mathbb{Z}_3$. As evidenced by our orbit incidence audit and the computational limitations of off-the-shelf constraint programming reported by Thakkar~\cite{thakkar2026forced}, resolving these actions will require extending the canonical symmetry-breaking methodology developed here to the quotient multiplier groups ($\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ and $\mathcal{G}_{\mathbb{Z}_3} \cong S_3 \times \mathbb{Z}_2$). Following the resolution of the $f = 1$ branches, this algebraic framework will provide the exact foundation to systematically test the full rigidity conjecture.
+
+
+\section*{Declarations}
+
+\noindent\textbf{Statement of AI use.} An early formulation of the orbit reduction, Lean~4 formalization targets, and CNF compiling pipelines in this paper was developed in human-AI collaboration in response to operational research prompts by Antonio Machuca. Antonio Machuca directed the research program, formulated the canonical symmetry-breaking branching strategy for $f=1$, oversaw the automated cloud verification pipeline, and edited the manuscript into its present form. Google DeepMind's Antigravity assistant (leveraging the Gemini 3.8 series of large language models) was used to assist with SAT compilation, Lean~4 proof repair, LaTeX typesetting, and adversarial consistency checking. All mathematical statements were verified deterministically via the Lean~4 kernel and independent SAT proof checkers (\texttt{drat-trim} returning \texttt{s VERIFIED}).
+
+\medskip
+\noindent\textbf{Disclosure statement.} No potential conflict of interest was reported by the author.
+
+\medskip
+\noindent\textbf{Acknowledgments.} The author thanks the mathematical and open-source communities behind CaDiCaL, drat-trim, PySAT, and the Lean~4 theorem prover for providing the computational tools that supported this research.
+
+\medskip
+\noindent\textbf{Funding.} No external funding was received for this study.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

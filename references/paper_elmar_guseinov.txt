@@ -1,0 +1,363 @@
+
+
+=== PAGE 1 ===
+
+Five New Results on Conway's 99-Graph Problem
+Elmar G. (elmarguseinov@yahoo.com)
+Conway's 99-graph problem asks about the existence of a 99-vertex graph G in which all pairs of adjacent vertices have exactly
+one common neighbor and all pairs of non-adjacent vertices have exactly two common neighbors. In 2022-2023, I obtained the
+following five results:
+1. G is not a subgraph of a strongly regular graph srg(243, 22, 1, 2).
+2. G can not be obtained by a generalization of Berlekamp-Van Lint-Seidel's construction.
+3. G is Cartesian indecomposable.
+4. G contains no Hamming graph H(4,3).
+5. The independence number of G is at least 10.
+
+
+=== PAGE 2 ===
+
+I. Conway's 99-graph is not a subgraph of a strongly regular graph srg(243,22,1,2)
+We consider simple graphs with a non-empty vertex set and use the following symbols:
+(A)g - the subgraph of a graph G = (V, E) induced by a subset A V (we will omit the subscript where it is possible)
+Ec - the edge set of a graph G
+[k) = {1,..., k}
+degc(v) - the degree of a vertex u € V of a graph G = (V, E) (we will omit the subscript where it is possible)
+No - the set of neighbors of a vertex u
+O, = N, U {v}
+Pk (A) - the set of all k-element subsets of a set A
+Ve - the vertex set of a graph G
+Definition 1.1. A 6 (n) graph is an n-vertex graph (V, E) such that all pairs of its adjacent vertices have exactly one common
+neighbor and all pairs of its non-adjacent vertices have exactly two common neighbors, i. e.
+{u, 0} € P2(V) : {u, v} € E → [Nun No| = 1^ {u, v} & E → [Nun No| = 2
+Example 1.1 (E. R. Berlekamp et al., A strongly regular graph derived from the perfect ternary Golay code).
+Let us consider the following construction of a 6 (243) graph. We take all elements of the group
+(2/37) = Z/37x... XI/3Z as V and then elements (0, 0, 1, 0, 1), (0, 0, 1, 1, 1), (0, 1, 0, 0, 1), (0, 1, 0, 1, 0), (0, 1, 1, 1, 0),
+(1, 0, 0, 1, 0), (1, 0, 0, 1, 1), (1, 0, 1, 0, 0), (1, 1, 0, 0, 1), (1, 1, 1, 0, 0), (1, 1, 1, 1, 1). Taking the last elements and their additive
+inverses gives us the set A with 22 elements and we put
+V{U, 0} E P2(V): {u, U} € E→U-VE A
+We will return to this construction in the next part to show that its natural generalization can not give a 6(99) graph.
+Conjecture 1.1 (Conway's 99-graph problem). A 6(99) graph exists.
+In view of Conjecture 1.1 and Example 1.1, we may ask whether some 6 (243) graph contains a 6 (99) graph as a subgraph.
+Theorem 1.1 gives a negative answer to this question.
+
+
+=== PAGE 3 ===
+
+Lemma 1.1. A 6 (n) graph is v/ 2n - 2-regular.
+Proof. Let G = (V, E) be a 6 (n) graph. The case n = 1 is straightforward since then G is regular of degree 0 = V2 • 1 - 2.
+The case n = 2 is vacuously true since there is no 6 (2) graph (two vertices of a 2-graph do not have a common neighbor).
+Thus we assume n 2 3. Let us first prove G is regular. Let u and u be adjacent vertices and w is their unique common
+neighbor. We have (Nu wy)n (No (wy = 0. Let a € Nu \ {wy, then a and v are non-adjacent. Thus a and u have
+exactly to common neighbors of which one is u. Let b # u is the second common neighbor of a and v. We have b # w, since
+otherwise a and u are two common neighbors of the adjacent vertices u and w. Thus we conclude a € No \ wy. This
+determines a function f: Nu {w} → No \ {wy such that f(a) is a common neighbor of a and u for all a € Ny {wy. Now
+consider distinct vertices a, a' € Nu \ {w}. If f(a) = f(a') = b, then a, a' and v are three common neighbors of u and b. This
+gives a contradiction with Definition 1.1. Thus we conclude f is injective which implies Nu {w} < No \ {w}. The same
+argument gives us |No | {w}| < |Nu \ {w}| and we conclude deg(u) = deg(v), i. e. any two adjacent vertices have the same
+degree. Now it u and v are two non-adjacent vertices, then we take their common neighbor w and conclude
+deg(u) = deg(w) = deg(v). This implies G is regular.
+Now assume G is k-regular. Note that k ≥ 2. Indeed, if G is complete, then n = 3 since n > 3 gives us adjacent vertices with
+two or more common neighbors. Thus k = 2. If G is not complete, then each vertex u is non-adjacent with another vertex u
+(this follows from the regularity of G). Thus u and u have two common neighbors which gives 2 ≤ deg(u) = k. Now consider
+a vertex u € V. Let v € Nu. We see that u has exactly one neighbor in Nu. Thus v has k - 2 neighbors in V \ Ow. Thus the
+number of edges between Nu and V \ Ou is m = k(k - 2). On the other hand, each of n - k - 1 vertices of V \ Ou has
+exactly two neighbors in Nu (the vertices of V \ Ou are non-adjacent with u). Thus m = 2(n - k - 1). This implies
+k(k - 2) = 2(n - k - 1) and k = v2n - 2
+Definition 1.2. A strongly regular graph srg(n, k, a, c) is an n-vertex k-regular graph such that all pairs of its adjacent
+vertices have exactly a common neighbors and all pairs of its non-adjacent vertices have exactly c common neighbors.
+Corollary 1.1. For a given n, the following statements are equivalent:
+1. G is a strongly regular graph srg(n, v2n - 2, 1, 2).
+2. For some k, G is a strongly regular graph srg(n, k, 1, 2).
+3. G is a 6 (n) graph.
+Proof. Follows from Definitions 1.1, 1.2 and Lemma 1.1
+
+
+=== PAGE 4 ===
+
+Lemma 1.2. Suppose G is a strongly regular graph srg(n, k, 1, 2), H is a strongly regular graph srg(n', k', 1, 2) and H is a
+subgraph of G. Then n' (k - k) ≤n -n'.
+Proof. Note that H is an induced subgraph of G. Indeed, suppose {U, vy € Pa(Va) and {u, v) € Eg \ En. Since u and v are
+non-adjacent in H, they have two common neighbors. But u and v can not have two common neighbors since they are
+adjacent. This contradiction shows H is induced. We conclude that each of n' elements of Vi has exactly k - k' neighbors in
+Vc \ V. Thus the number of edges between Vi and Vc \ Vy is n' (k - k'). On the other hand, each vertex in Vc \ VH may
+have at most one neighbor in Vir. Indeed, suppose a vertex u € Va \ Vi has two neighbors v, u € Vi. If vand v are
+adjacent, then they have a common neighbor w € Va. Thus the adjacent vertices v and ' have two common neighbors u and
+w. If v and ' are non-adjacent, then they have two common neighbors w1, w2 € Vi. Thus v and ' have three common
+neighbors u, wi and wz. These contradictions show that each vertex in Ve \ Va may have at most one neighbor in VH. Since
+(Va | VH| =n- n', this gives n'(k - k) <n -n'
+Theorem 1.1. A 6(99) graph is not a subgraph of a 6 (243) graph.
+Proof. Suppose G is a 6 (243) graph containing a 6 (99) graph H as a subgraph. Lemma 1.1 implies G is a strongly regular
+graph srg (243, 22, 1, 2) and H is a strongly regular graph srg(99, 14, 1, 2). But 99(22 - 14) > 243 - 99 which gives a
+contradiction with Lemma 1.2
+
+
+=== PAGE 5 ===
+
+II. Conway's 99 graph can not be obtained by a generalization of Berlekamp-Van Lint-Seidel's construction
+Now let us return to the construction of Example 1.1 which leads to the following graph.
+Definition 2.1. Let V is the underlying set of a finite additive group G (not necessarily abelian) and A is a subset of V closed
+under taking inverses and not containing the identity element. Let E is defined by
+V{U, U} € Pa(V) : {u, U) E E → U - U € A
+Then T'g,A = (V, E).
+In Definition 2.1, we have to check that E is defined correctly. Suppose {u, v} € E and thus u — v € A. Since A is closed
+under taking inverses, we have - (u - v) = v — u € A and thus fu, u} € E.
+Lemma 2.1. Given |A| = k, [g, is k-regular.
+Proof. Let I'g, = (V, E). Suppose A = {ai: i € [k]} and u € V. The right cancellation makes a1 + u,..., ak + u pairwise
+distinct. Thus it suffices to show that Nu = {ai tu: i € (k]}. For all i € [k], we have u - (ai + u) = -ai € A. Thus
+{ai tu: i e (k]} C Nu. On the other hand, suppose u is adjacent to a vertex v. Of course, v is adjacent to u and we have
+v - U = aj for some j € [k]. Thus v = aj + u e {ai + u: i € [k]}. This gives Nu ≤ {ai tu: i € [k]} ™
+Definition 2.2. A graph is locally linear if all pairs of its adjacent vertices have exactly one common neighbor.
+We see that 6 (n) is locally linear.
+Lemma 2.2. (V, E) is a locally linear graph if and only if for all v € V, (No) is 1-regular.
+Proof. In a graph, the set of common neighbors of adjacent vertices u and v is the set of neighbors of u in (No) ™
+What we want to show is that every graph I'g, is not a 6 (99) graph. For this, we will prove all 99-element groups are
+isomorphic to one of the groups 2/92 x Z/11Z and Z/32 x Z/32 x Z/11Z (or equivalently, all 99-element groups are
+abelian). After that, we will establish that given Gis abelian and I'g, is locally linear, all elements of A must have order 3.
+Thus according to Lemmas 1.1 and 2.1, I'g, is a 6(99) graph only if we can choose 14 elements of order 3 in Z/97 x Z/117
+or Z/37 x Z/3Z x Z/11Z. But we see that these groups contain only 2 and 8 elements of order 3, respectively.
+
+
+=== PAGE 6 ===
+
+Lemma 2-3. All groups of order 99 are isomorphie to one of the groups Z/97 x Z/11Z and Z/37 x Z/37 x Z/11Z.
+Proof. We need the following results from group theory:
+1. The third Sylow theorem
+2. The fundamental theorem of finite abelian groups
+3. Let N, H be normal subgroups of a group G and Nn H = {e}. Then NH is a subgroup of G and NH ~ N x H.
+4. For a prime p, every group of order p? is abelian.
+Suppose G is a group of order 99. Applying 1, we conclude that g has exactly one subgroup N of order 9 and exactly one
+subgroup H of order 11. The uniqueness implies N and H are normal. Since ged(9, 11) = 1, N n H = {e}. Thus by 3, g
+contains a subgroup isomorphic to N x H which implies § ~ N x H. By 4, N is abelian. Thus by 2, G is isomorphic to
+Z./97. x Z/11Z or Z/32 x Z/3Z x Z/112 m
+Lemma 2.4. T'g, is locally linear if and only if A can be partitioned into pairwise disjoint 2-element sets {@1,1, @1,2), ...,
+{am,1, Am,2 } such that:
+1. Vi € [m] : ai,1 - ai,2 € A
+2. Vi, j E [m])V(k, 1 € (2]) : i ‡ j → aiR - aj,1 € A
+Proof
+he if part. Consider an arbitrary vertex of I'g, and a partition of A into pairwise disjoint disjoint sets sets {a 0,2) 0,2)...,
+{am,1, Am,2 } satisfying 1 and 2. As in the proof of Lemma 2.1, we have Ny = {a1,1 + v, a1,2 + U,..., am,1 + U, am,2 + vj. For
+all i, j € (m| and k, l € [2), we have (aik + v) - (a; + v) = aik - Ajj. Thus 1 and 2 imply
+E(N) = {{a1,1 + 0, 01,2 + 0},., {am,1 + 0, am,2 + v}}
+Thus (No) is 1-regular and, by Lemma 2.2, I'g, is locally linear.
+The only if part. Suppose l'g, is locally linear and consider the identity e. Putting v = e above, we get Ne = A. Thus applying
+Lemma 2.2, we have (A) is 1-regular. The required partition is simply E(A) -
+
+
+=== PAGE 7 ===
+
+Lemma 2.5. Let [g,a be locally linear and G is abelian. Then all elements in A have order 3.
+Proof. Suppose A is partitioned as in Lemma 2.4. Consider an element x € A and element y # x from the same 2-element
+set of the partition. We have z = x - y € A. Also, since g is abelian, 2 - x = x - y - x = -y and thus z - x € A. Since
+z, X, 2 - X € A, we have z € {x, y}. If z = x, then x - y = x and y = e which gives a contradiction with Definition 2.1. Thus
+2 = Y, x - Y = yand x = 2y. Similarly, we get y = 2x which gives us x = 4x and 3x = e. We have x ‡ e and 2x = y ‡ e.
+Thus x has order 3 m
+Theorem 2.1. Every graph I'g, is not a 6 (99) graph.
+Proof. If I'g,a is a 6 (99) graph, then G has order 99. Hence by Lemma 2.3, G is isomorphic to one of the groups
+Z/9Z x Z/11Z and Z/37 x Z/3Z x Z/117. Also, by Lemmas 1.1 and 2.1, |A| = /2 - 99 - 2 = 14. On the other hand, we
+have I'g, is locally linear and G is abelian. Hence by Lemma 2.5, all elements in A have order 3. Thus Z./9Z. x Z/11Z or
+Z./37. x Z/3Z x Z/117 must have 14 elements of order 3 but these groups have only 2 and 8 elements of order 3,
+respectively
+
+
+=== PAGE 8 ===
+
+III. Conway's 99-graph is Cartesian indecomposable
+Let us now focus on graph decomposition rather than group decomposition. We will show that a 6(99) graph is not a
+Cartesian product of non-trivial graphs.
+Definition 3.1. The Cartesian product GLIH of graphs G = (V, E) and H = (V', E') is the graph with the vertex set
+V × V' and the edge set & defined by
+Definition 3.2. A diamond is a graph with 4 vertices and 5 edges.
+Since two adjacent vertices in a 6 (n) graph have exactly one common neighbor, a 6 (n) graph contains no diamonds.
+
+
+=== PAGE 9 ===
+
+Lemma 3.1. For graphs G = (V, E) and H = (V', E'), the following statements are true:
+1. For all u E Vand v € V', dega n(u, v) = degc (u) + dega (v).
+2. If GTH is k-regular, then for some r and s satisfying r + s = k, G is r-regular and H is s-regular.
+3. If GTH contains no diamonds, then both G and H contain no diamonds.
+4. If any two non-adjacent vertices have at most two common neighbors in GTH, then so is both for G and H.
+Proof
+1. Let N(ur), Nu and N, be the set of neighbors of (u, v) in GTH, the set of neighbors of u in G and the set of neighbors of u
+in H, respectively. Then we have
+N(4,0) = 1(4, 3) : y € NOS U1(2, 0) : I € NuS
+The sets {(u, y) : y € Nu} and {(x, v) : x € Nuy are disjoint and we have
+degc in (u, v) = IN(4) | = K{(u, y) : y € NoY + K(x, v): x € Nu}| = degc(u) + degu(v)
+2. WLOG, suppose G is not regular and degc(u) # degc(v) for some u, u € V. Consider a vertex w E V'. By 1, we have
+degcun (u, w) = degg (u) + dega (w) # degc(v) + dega (w) = deggna (v, w)
+Thus GLIH is not regular. We conclude that given GUH is k-regular, G is r-regular and H is s-regular for some r and s.
+Moreover, by 1, r + s = k.
+3. WLOG, suppose G contains a diamond with the vertex set U C V. Then for a vertex w € V', the induced graph
+(U × {w})сн (and hence GIH) contains a diamond. We conclude that given GLIH contains no diamonds, both G and
+H contain no diamonds.
+4. WLOG, suppose that in G, non-adjacent vertices u and v have three common friends x, y, z. Then for a vertex w E V',
+non-adjacent vertices (u, w) and (v, w) have three common neighbors (x, w), (y, w), (z, w). We conclude that given any
+two non-adjacent vertices have at most two common neighbors in GIH, so is both for G and H •
+Lemma 3.2. Let G be an n-vertex k-regular graph without diamonds such that all pairs of its non-adjacent vertices have at
+most two common neighbors. Then k ≤ v2n - 2.
+Proof. Let G = (V, E) and v € V. Since G contains no diamonds, in (Nu), each vertex has at most one neighbor. Thus in G,
+each vertex from N, has at least k - 2 neighbors in V \ O,. Thus there are at least k(k - 2) edges between Ny and V \ O,.
+On the other hand, each vertex u € V \ O, has at most two neighbors in No since u and v are non-adjacent and neighbors of u
+k(k - 2)
+in Ny are common neighbors of u and v. This implies
+k(k - 2) - n- k - 1
+≤ 2 which yields k ≤ v2n - 2 m
+(V \Ou|
+
+
+=== PAGE 10 ===
+
+Theorem 3.1 Let G and H be graphs, each containing at least two vertices. Then GTH is not a 6 (99) graph.
+Proof. For the sake of contradiction, suppose GTH is a 6(99) graph. Then by Lemma 3.1, both G and H contain no
+diamonds and each pair of their non-adjacent vertices has at most two common neighbors. Moreover, since 6 (99) graphs are
+14-regular, G is r-regular and H is s-regular for some r and s satisfying r + s = 14. Suppose G and H have m and n vertices,
+respectively. Then applying Lemma 3.2, we get
+14 ≤ v2m - 2 + v2n - 2
+Since mn = 99 and m., n ≥ 2, we may restrict ourselves to the cases m = 3, n = 33 and m = 9, n = 11. Substituting the
+values of m and n in the inequality above, we get a contradiction in both of the cases. Thus we conclude GUH is not a 6 (99)
+graph
+
+
+=== PAGE 11 ===
+
+IV. Conway's 99-graph contains no Hamming graph H(4,3)
+Definition 4.1. Given vectors u and v of the same length k, the Hamming distance du, v) is the number of coordinates by
+which u and u differ. That is, du, v) = Kie k: vi ‡ vi}.
+Definition 4.2. The Hamming graph H(k, n) is the graph with the vertex set V = [n]* and the edge set E defined by
+V{u, V} E P2(V) : {u, v} € E → d(u, v) = 1
+Lemma 4.1. Hk, n) is (n - 1)k-regular.
+Proof. For a vector u E [n]*, there are (n - 1)k vectors in [n]k that differ from u by exactly one coordinate !
+Let us focus on H(k, 3).
+Lemma 4.2. For vectors u, v € [3]k in H(k, 3):
+1. If d(u, v) = 1, then u and v are adjacent and have exactly one common neighbor.
+2. If d(u, v) = 2, then u and v are non-adjacent and have exactly two common neighbors.
+3. Ifd(u, v) ≥ 3, then u and v are non-adjacent and have no common neighbors.
+Proof. The adjacency part follows from Definition 4.2. Let us find the number of common neighbors. Let u = (21, . .., uk)
+and v = (01, ..., vk).
+1. WLOG, suppose U1 ‡ Vj and ui = Vi for all i ≥ 2. Let a be the single vertex of 3] \ {u1, v1}. Consider the vector
+w E [3]k such that w1 = a and Wi = U; for all i ≥ 2. We see that w is a common neighbor of u and v. Now let w' be a
+common neighbor of u and v. The unique coordinate by which w' and u differ is the first one, since otherwise we have
+d(w', v) = 2 and w' can not be a neighbor of v. Thus we conclude w' = w, i. e. u and u have exactly one common
+neighbor.
+2. WLOG, suppose U1 # 01, U2 # U2 and ui = Vi for all i ≥ 3. As in 1, we conclude that a common neighbor w of u and u
+must differ from u by exactly one of the first two coordinates. Moreover, if w1 # u1 (w2 # uz), then w1 = V1 (W2 = Vz).
+This gives us exactly two common neighbors of u and v. The first neighbor is the vector w such that w1 = vi and wi = ui
+for all i ≥ 2. The second neighbor is the vector w' such that w'/ = U1 and w, = vi for all i ≥ 2.
+3. Ifd(u, v) ≥ 3 and d(u, w) = 1, then d(v, w) ≥ 2. Thus each neighbor of u is not a neighbor of v li
+Corollary 4.1. H(k, 3) is locally linear.
+Proof. Follows from the first statement of Lemma 4.2
+
+
+=== PAGE 12 ===
+
+Theorem 4.1. A 6 (9) graph is isomorphic to H(2, 3).
+Proof. Suppose G is a 6 (9) graph. Since two non-adjacent vertices have a common neighbor in G, G contains an edge. Since
+G contains an edge and two adjacent vertices also have a common neighbor, G contains a triangle. WLOG, suppose that the set
+of vertices of our triangle is A = {(1, 1), (1, 2), (1, 3)}:
+(1,2 )
+(1,1))
+1,
+3)
+By Lemma 1.1, G is 4-regular. Thus each vertex in A has exactly two neighbors not in A, i. e. Nd = [Na \ A| = 2 for all a € A
+Since adjacent vertices have exactly one common neighbor, we have Na n Ny = 0 for distinct a, b € A. Further, we consider
+adjacent vertices a € A and b € Na and their common neighbor c. We conclude that c € Na. Thus for all a € A, the vertices
+of Ná are adjacent. WLOG, suppose N(44) = {2, i), (3, 2)} for i € 3). Thus G has the following spanning subgraph:
+(2,2))
+(3,2)
+(1,2)
+,1 )
+(1,1))
+(1,3)
+(2,3))
+(2,1))
+(3,3))
+
+
+=== PAGE 13 ===
+
+Now for distinct a, b, e € Aandu € Na, u has a unique neighbor v € N and a unique neighbor w € N' since both u, b and
+u, c are non-adjacent. Moreover, v and w are adjacent since w must be a common neighbor of u and v. Thus, WLOG, we may
+suppose that our graph coincides with H(2, 3):
+(2,2)
+3,
+2)
+(1,2 ))
+(3
+1)
+(1
+-, 1)
+(1,3)
+2,3))
+(2,1))
+(3,3)
+
+
+=== PAGE 14 ===
+
+In view of Theorem 4.1, we may ask whether H(2, 3) (which is of course just K3 1K3) can be extended to a 6 (99) graph. Or, in
+other words, is there a 6 (99) graph containing H(2, 3)? This question and the same question for H(3, 3) turned out to be very
+difficult. Meanwhile, Theorem 4.2 gives a negative answer to the case H(4, 3).
+Theorem 4. 2 H(4, 3) is not a subgraph of a 6 (99) graph.
+Proof. For the sake of contradiction, suppose G = (V, E) is a 6(99) graph containing H(4, 3). Consider two vertices
+u, v € [3]* that are non-adjacent in H(4, 3) but adjacent in G. By Definition 4.2, d(u, v) ≥ 2. On the other hand, d(u, v) # 2.
+Indeed, by Lemma 4.2, the case d(u, v) = 2 gives us two common neighbors of u and v. This is impossible since u and u are
+adjacent. Let us also show that d (u, v) # 3. WLOG, suppose U1 = U1, 22 # 02, U2 ‡ 03, U4 # v4. Note that
+W = (U1, U2, U3, U4) = (U1, U2, U3, V4) is a neighbor of v in H(4, 3). On the other hand, du, w) = 2 and thus by Lemma 4.2, u
+and w have two common neighbors p and gin H(4, 3). Of course, p # vand g # u since u and v are non-adjacent in H(4, 3).
+Thus p, q and v are three common neighbors of u and w in G. This shows that d(u, v) # 3. We conclude that, given two
+vertices u, v € [3]* are non-adjacent in H(4, 3) but adjacent in G, we have d(2, v) = 4.
+Now let us prove that in G, a vertex v € [3]* may have at most two neighbors from [3]* that are not neighbors of v in H(4, 3).
+To show this, suppose u, w, p are three such neighbors of v. Then, as we have proved, d(v, u) = d(v, w) = d(v, p) = 4. Note
+that u, w, p are pairwise non-adjacent in H(4, 3). Indeed, if two of these vertices are adjacent in H(4, 3), then they have a
+common neighbor q ‡ v. Thus v and q are common neighbors of adjacent vertices which gives a contradiction. In particular,
+we have d(u, w) ≥ 2. We have to exclude the case du, w) = 2, since otherwise u and w have two common neighbors in
+H(4, 3) and three common neighbors in G. Thus we have du, w) ≥ 3. Of course, the same argument gives us du, p) ≥ 3 and
+d(w,p) ≥ 3. Thus, WLOG, suppose 21 # W1, 22 # W2, U3 # W3. Since d(v, u) = d(v, w) = d(v, P) = 4, we have
+P1 E 31 \ 101} = {u1, w1}
+P2 € 3] \ {02} = {u2, w2}
+Рз Є [3] \ {v3} = {u3, w3}
+This implies du, p) ≤ 2 or d(w, p) ≤ 2 which gives a contradiction with the inequalities above. Thus in G, a vertex U € [3]*
+may have at most two neighbors in [31* that are not its neighbors in H(4, 3).
+The final chord is to estimate the number m of edges between [3]* and V \ [3]*
+*. By Lemmas 1.1 and 4.1, G is 14-regular and
+H(4,3) is 8-regular. Thus the result above shows that in G, each vertex v € [3]* has at least 14 - 8 - 2 = 4 neighbors in
+V \ [3]'. Thus m ≥ 81 • 4 = 324. On the other hand, each vertex in V \ [3]* has at most 14 neighbors in (3]* which gives
+m ≤ (99 - 81) - 14 = 252. This contradiction shows that a 6(99) graph can not contain H(4, 3) •
+
+
+=== PAGE 15 ===
+
+V. The independence number of Conway's 99-graph is at least 10
+A computer search of an n-vertex graph G can be simplified if we know that G must contain an m-vertex induced subgraph. In
+this case, when adding edges to (n] in 2(n 1)/2 ways, we skip 27(m 1)/ pairs of vertices of our subgraph. In this view, we may
+first ask about the size of a maximum clique or maximum independent set of G, i. e. the clique number w(G) and the
+independence number a (G). If G is a 6(n) graph and n ≥ 3, we obviously have w(G) = 3. Let us see estimates of a (G)
+when G is a 6 (99) graph.
+Lemma 5.1 (B. Nica, A brief introduction to spectral graph theory). A strongly regular graph srg(n, k, a, c) has three
+distinct eigenvalues k, -
+and a - c+ VD
+-, where D = (a - c)ª + 4(k - c).
+Lemma 5.2 (A. E. Brouwer, W. H. Haemers, Spectra of graphs). Let G be a non-empty k-regular n-vertex graph with
+n (-1)
+the smallest eigenvalue X. Then a (G) ≤
+k - X
+Theorem 5.1. Let G be a C (99) graph. Then a (G) < 22.
+Proof. By Corollary 1.1 and Lemma 5.1, the eigenvalues of G are - 4, 3 and 14. Also, by Lemma 1.1, G is 14-regular. Thus we
+apply Lemma 5.2 for n = 99, k = 14 and 1 = -4 m
+
+
+=== PAGE 16 ===
+
+Theorem 5.2. Let G be a 6 (99) graph. Then a (G) ≥ 10.
+Proof. Let G = (V, E) and v € V. By Lemma 2.2, (No) is 1-regular. Also, by Lemma 1.1, G is 14-regular. Thus, WLOG, we
+may suppose that V = [99], v = 15 and (O,) is the following graph:
+9)
+15
+1
+14
+The set A = {1, 3, 5, 7, 9, 11, 13} is independent, i. e. all vertices in A are pairwise non-adjacent. The pairs of non-adjacent
+vertices 2 and 4, 2 and 6, 2 and 8, 2 and 10, 2 and 12, 2 and 14 have unique common neighbors in {16, .., 99}. Let us denote
+these common neighbors as N2,4, N2,6, N2,8, N2,10, N2,12, N2,14, respectively. Let {N2,4, M2,6, 12,8, M2,10, 72,12, N2,14) = N2. Note
+that our elements are pairwise distinct, since otherwise n2,i = n2j = u implies u and v have three common neighbors 2, i and
+j. Similarly, there are no edges between N' and A. Now, since (N2) is 1-regular and Ny < N2, at least three vertices in Ny are
+pairwise non-adjacent. Let us denote these vertices as X, y and z. Then A U {x, y, zy is a 10-element independent set
