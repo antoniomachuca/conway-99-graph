@@ -68,9 +68,10 @@ flowchart TD
 
 1. **Track 1 (Constructive SAT/SMT Search & Proof Logging):**
    - Prescribe candidate prime-order automorphism actions $\mathrm{Aut}(G) \in \{\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7\}$.
-   - Implement canonical orbit decompositions and algebraic symmetry-breaking constraints (e.g., Crawford lex-leader cuts under quotient multiplier groups $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ and $\mathcal{G}_{\mathbb{Z}_3} \cong S_3 \times \mathbb{Z}_2$).
+   - Implement canonical orbit decompositions and algebraic symmetry-breaking constraints (e.g., Crawford lex-leader cuts under quotient multiplier groups):
+     $$\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6 \quad \text{and} \quad \mathcal{G}_{\mathbb{Z}_3} \cong S_3 \times \mathbb{Z}_2$$
    - Compile into DIMACS CNF formulas.
-   - Execute certified solvers (CaDiCaL 1.9.5) generating non-binary DRAT resolution proof traces, checked via `drat-trim`.
+   - Execute certified solvers (CaDiCaL 3.0.1) generating non-binary DRAT resolution proof traces, checked via `drat-trim`.
 
 2. **Track 2 (Lean 4 Formal Verification & Kernel Reflection):**
    - Maintain a self-contained Lean 4 formalization library (`Conway`).
