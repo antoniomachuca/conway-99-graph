@@ -215,7 +215,7 @@ which combines circulant reflection and the multiplicative unit group $(\mathbb{
 │   └── audit_log.md                     # Chronological audit log of interventions & verdicts
 │
 ├── docs/                                # Technical Documentation & System Specifications
-│   └── memoria_tecnica.md               # Technical project memory, spectral analysis, and architecture
+│   └── technical_report.md              # Comprehensive technical report, spectral analysis, and architecture
 │
 ├── archive/                             # Archived legacy formulations, early solver logs & scratchpads
 │   ├── legacy_docs/                     # Archived intermediate drafts and legacy documentation
