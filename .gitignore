@@ -39,6 +39,14 @@ archive/
 instances/
 cloud_results/
 scratch/
+correspondence/
+
+# Operational Telegram bot, monitor, cloud, and local launcher scripts
+*.sh
+scripts/*.sh
+resume_all.sh
+cloud_monitoring.log
+auto_stop_sunday.log
 
 # Python bytecode & temporary files
 __pycache__/

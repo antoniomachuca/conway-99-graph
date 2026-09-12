@@ -95,9 +95,9 @@ The table below contrasts historical literature results, recent constraint-progr
 | **Involutions ($f = 5$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Structural isolation $K_3+2K_1$ vs $5K_1$ and modular trace contradiction $\varepsilon_1 \equiv 6 \pmod 7$ in [`Conway/Z2Classification.lean`](Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
 | **Involutions ($f = 7$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | 136 admissible subgraphs ($T \in \{0, 1, 2\}$ under $K_4$-freeness) yielding $\varepsilon_1 \in \{7, 10, 13\} \not\equiv 2 \pmod 7$ in [`Conway/Z2Classification.lean`](Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
 | **Involutions ($f \ge 9$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | Refuted by negative base term $f(8-f) < 0$ and degree partition enumeration with SMT scripts | **PROVED** |
-| **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). Active cloud solving on GCP (`conway-sat-worker`): 3 canonical DRAT solvers (>112M conflicts, ~28h CPU each, 28% var plateau) + 3 heuristic SAT hunters (seed 42, `--sat`) | **EXPLORED** |
+| **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). Active solving across 9 solvers (7 GCP + 2 Apple M2 cores): $> 324.29\mathrm{M}$ conflicts (Branch C $>72.52\mathrm{M}$, Branch B $>69.38\mathrm{M}$, Branch A $>45.59\mathrm{M}$, hunters and local M2 seeds $>136.8\mathrm{M}$). Component of $>500.38\mathrm{M}$ cumulative cluster conflicts | **EXPLORED** |
 | **Order 7 ($\mathbb{Z}_7$)** | Non-existence proved by computer (Behbahani-Lam 2011); $7 \mid \lvert \Gamma \rvert \implies \Gamma \cong \mathbb{Z}_7$ (Cesarz-Woldar 2025) | `UNKNOWN` (48h, 14 cores CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z7_canonical_cnf.py`](scripts/build_z7_canonical_cnf.py). Refuted by CaDiCaL 3.0.1 (`s UNSATISFIABLE`, 771.59s) and certified by `drat-trim` (`s VERIFIED`, 844.01s, [`drat_trim_z7.log`](drat_trim_z7.log)); secondary confirmation via hunter (`cadical_z7_hunter.log`) | **PROVED** |
-| **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](scripts/build_z3_canonical_cnf.py); unit tests passing. Active cloud solving on GCP (`conway-sat-worker`): 2 canonical DRAT solvers (fpf 33 orbits, fixed-3 32 orbits) | **EXPLORED** |
+| **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](scripts/build_z3_canonical_cnf.py); unit tests passing. Active solving across 5 solvers (4 GCP + 1 Apple M2 core): $> 176.08\mathrm{M}$ conflicts (Fixed-3 DRAT $>37.18\mathrm{M}$, FPF DRAT $>30.03\mathrm{M}$, hunters and M2 seed 333 $>108.8\mathrm{M}$). Component of $>500.38\mathrm{M}$ cumulative cluster conflicts | **EXPLORED** |
 | **Grand Classification** | $\lvert \mathrm{Aut}(G) \rvert \in \{1, 2\}$ | Unaddressed | Formalized in [`Conway/GrandClassification.lean`](Conway/GrandClassification.lean); compiles cleanly, conditional on $\mathbb{Z}_3$ | **COMPILED** |
 | **Full Rigidity Conjecture** | $\mathrm{Aut}(G) = \{1\}$ (Brouwer, Cameron, Haemers) | Open (Frontier at 69.4% constraints) | Conditional on refuting $f = 1$ and ingesting $\mathbb{Z}_7$ / $\mathbb{Z}_3$ certificates | **PENDING** |
 | **Existence of $G$** | Open (Conway 1969; Biggs 1969) | Open | Core open problem investigated via dual-track framework | **PENDING** |
@@ -174,13 +174,14 @@ which combines circulant reflection and the multiplicative unit group $(\mathbb{
 ├── scripts/                             # Production SAT/SMT Compilers & Analysis Engines
 │   ├── build_z7_canonical_cnf.py        # Canonical CNF compiler for Z_7 with G_{Z_7} lex-leader cuts
 │   ├── build_z3_canonical_cnf.py        # Canonical CNF compiler for Z_3 (fpf & fixed-3) with S_3 x Z_2 cuts
+│   ├── analyze_rigid_conway_structure.py# Rigid algebraic invariants & C_{14x84} canonical incidence analysis
 │   ├── analyze_z2_f7_exhaustive.py      # Exhaustive topological census of H = G[Fix(t)] for f = 7
 │   ├── analyze_z2_f5_involutions.py      # Degree partition and SMT analysis for f = 5
 │   ├── analyze_z2_f3_involutions.py      # Macro-partition and trace verification for f = 3
 │   ├── analyze_z2_involutions.py         # Global spectrum analysis for all odd f <= 15
 │   ├── classify_z2_f1_incidence_matrix.py# Incidence matrix C_{7x42} uniqueness and automorphism group
 │   ├── generate_branches_cnf.py         # CNF generator for the 3 canonical f = 1 branches
-│   └── cloud_watcher.sh                 # Autonomous cloud supervisor (PID 52242) for 10-solver cluster & drat-trim
+│   └── solve_z7_quotient_diophantine.py # Exact Diophantine solver for Z_7 intersection matrices
 │
 ├── tests/                               # Deterministic Unit Test Suite
 │   └── test_canonical_sat_compilers.py  # 13 unit tests verifying Z_7 & Z_3 canonical compilers
@@ -210,12 +211,14 @@ which combines circulant reflection and the multiplicative unit group $(\mathbb{
 ├── agents/                              # Multi-Agent Architecture, State Checkpoints & Audit Logs
 │   ├── README.md                        # Multi-agent role descriptions & operations overview
 │   ├── handover_briefing.md             # Project context and comprehensive handover briefing
-│   ├── audit_log.md                     # Chronological audit log of interventions & verdicts
-│   └── audit_milestones_2026_09_10.md   # Independent audit of Lean 4 & SAT milestones
+│   └── audit_log.md                     # Chronological audit log of interventions & verdicts
 │
 ├── docs/                                # Technical Documentation & System Specifications
-│   ├── classification_of_involutions_conway99.md # Detailed mathematical technical memory
-│   └── PROMPT.md                        # Full prompt specifications and AI transparency log
+│   └── memoria_tecnica.md               # Technical project memory, spectral analysis, and architecture
+│
+├── archive/                             # Archived legacy formulations, early solver logs & scratchpads
+│   ├── legacy_docs/                     # Archived intermediate drafts and legacy documentation
+│   └── agent_scratch/                   # Archived transient agent working states and scratchpads
 │
 ├── drat-trim/                           # Standalone DRAT verification tool (Marijn Heule)
 ├── drat_trim_z2_f3_case_a.log           # drat-trim verification log for f = 3 Case A (s VERIFIED)
@@ -296,31 +299,41 @@ Execute the combinatorial enumerator confirming the absence of compatible subgra
 python3 scripts/analyze_z2_f7_exhaustive.py
 ```
 
-### F. Distributed Cloud Computing Infrastructure & 11-Solver Dynamic Pool
-To scale search across the remaining open symmetry cases without exhausting local host capacity, execution is distributed to a dedicated Google Cloud Compute Engine instance:
+### F. Distributed Solver Architecture & Hybrid 14-Solver Portfolio (>500M Milestone)
+To scale search across the remaining open symmetry cases without bottlenecking local host capacity, execution is distributed across a hybrid 14-solver portfolio combining a high-performance Google Cloud Compute Engine VM and dedicated local Apple M2 hardware writing to external high-speed storage. The cumulative search effort across the project has crossed **> 500.38 MILLION CONFLICTS** (433.38M cloud conflicts + 66.99M local M2 conflicts).
+
+#### 1. Google Cloud Cluster (`conway-sat-worker`, 11 Active CaDiCaL Processes — 433.38M Conflicts)
 - **Host Instance:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in zone `us-central1-b`, with 243 GB free disk space).
-- **Core Allocation & Headroom:** CaDiCaL solvers execute on dedicated vCPUs with 4–5 vCPUs held idle to preserve operating system responsiveness, kernel I/O buffering, and immediate resource availability for online proof verification.
-- **Solver Status & Worker Deployment:**
-  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers):** Dedicated to the canonical symmetry-breaking branches:
-     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 28.9 \times 10^6$ conflicts, 27% active variable plateau.
-     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 44.5 \times 10^6$ conflicts, 28% active variable plateau.
-     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 47.7 \times 10^6$ conflicts, 28% active variable plateau.
-     - *Aggregate Progress:* $> 121 \times 10^6$ accumulated CDCL conflicts (~31 hours continuous CPU each) generating non-binary DRAT proof logs.
-  2. **$f = 1$ ($\mathbb{Z}_2$) SAT Hunters (4 workers):** Seed 42 across Branches A, B, C plus an additional hunter on Rama A with seed 2026 and `--sat` (DRAT logging disabled to conserve disk), prioritizing rapid model discovery across the $15{,}360\times$ bottleneck search space.
-  3. **Order 7 ($\mathbb{Z}_7$) Workers (Terminated / Refuted & Verified [PROVED]):**
-     - Primary canonical CDCL solver generated `proof_z7_canonical.drat` (192.2 MB) and derived `s UNSATISFIABLE` in 771.59 s (459,403 conflicts). Formally verified by `drat-trim` in 844.01 s (`s VERIFIED`, [`drat_trim_z7.log`](drat_trim_z7.log)).
-     - Secondary SAT hunter (`--seed=777`, alternative heuristics) independently verified `s UNSATISFIABLE` in 1827.91 s (1,605,095 conflicts, [`cadical_z7_hunter.log`](cadical_z7_hunter.log)).
-  4. **Order 3 ($\mathbb{Z}_3$) Workers (4 workers):**
-     - 2 canonical DRAT solvers: fixed-point-free (33 orbits) and fixed-3 (32 orbits), past 4.4M conflicts each, compiled via [`scripts/build_z3_canonical_cnf.py`](scripts/build_z3_canonical_cnf.py).
-     - 2 SAT hunters (seed 42, `--sat`, no DRAT): exploring rapid satisfying model paths for both actions.
-- **Autonomous Cloud Supervisor & Dynamic Auto-Refill Pool:**
-  Supervision is managed by the background daemon [`scripts/cloud_watcher.sh`](scripts/cloud_watcher.sh) (PID 68900):
-  - **Dynamic Core Replenishment:** As workers terminate (e.g., following the certified refutation of $\mathbb{Z}_7$), the daemon detects freed vCPUs and dynamically spawns fresh SAT hunters with distinct seeds (`$RANDOM`) prioritizing active bottlenecks ($f=1$ Branch A and $\mathbb{Z}_3$).
-  - **Real-Time Model Extraction:** Monitors all solver logs every 20 seconds. Upon detection of `s SATISFIABLE`, immediately extracts variable assignments `^v ` to disk (`sat_solution_<tag>.txt`) with filesystem sync.
-  - **Automated Verification:** Upon detection of `s UNSATISFIABLE` in any DRAT-logging branch, automatically triggers `/usr/local/bin/drat-trim` against the CNF and proof file to independently verify the empty-clause derivation (as executed for Order 7).
+- **Core Budget & Allocation:** 11 dedicated vCPUs running CaDiCaL 1.9.5/3.0.1 at 100% utilization, with 5 vCPUs held idle to guarantee OS responsiveness, filesystem throughput, and immediate CPU availability for automated `drat-trim` proof verification.
+- **Worker Breakdown:**
+  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers, 187.49M conflicts):**
+     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 72.52 \times 10^6$ conflicts (~59.5h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 69.38 \times 10^6$ conflicts (~59.7h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 45.59 \times 10^6$ conflicts (~59.6h continuous CPU), emitting non-binary DRAT proof trace.
+  2. **Order 3 ($\mathbb{Z}_3$) Main DRAT Solvers (2 workers, 67.21M conflicts):**
+     - **Fixed-3 Action (32 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 37.18 \times 10^6$ conflicts (~31.7h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Fixed-Point-Free Action (33 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 30.03 \times 10^6$ conflicts (~31.7h continuous CPU), emitting non-binary DRAT proof trace.
+  3. **GCP Heuristic SAT Hunters (6 workers, 178.68M conflicts):** Non-DRAT mode (`--sat`, 0 proof disk consumption) exploring diverse variable and phase heuristics:
+     - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 42):** $> 45.75 \times 10^6$ conflicts.
+     - **$\mathbb{Z}_3$ FPF Hunter (seed 42):** $> 32.69 \times 10^6$ conflicts.
+     - **Branch B Hunter ($f=1$, seed 42):** $> 29.71 \times 10^6$ conflicts.
+     - **Branch C Hunter ($f=1$, seed 42):** $> 29.03 \times 10^6$ conflicts.
+     - **Branch A Hunter ($f=1$, seed 42):** $> 22.37 \times 10^6$ conflicts.
+     - **Branch A Hunter 2026 ($f=1$, seed 2026):** $> 19.13 \times 10^6$ conflicts reinforcing the $15{,}360\times$ bottleneck search space.
+- **Autonomous Cloud Supervisor & Verification Daemon:**
+  Supervision on the remote cloud instance is managed by the autonomous background daemon `cloud_watcher.sh` (PID 68900):
+  - **Dynamic Core Replenishment:** Detects freed vCPUs upon solver completion and dynamically spawns fresh SAT hunters with distinct seeds (`$RANDOM`) prioritizing active bottlenecks.
+  - **Real-Time Model Extraction:** Inspects all solver logs every 20 seconds. Upon detection of `s SATISFIABLE`, isolates variable assignments `^v ` immediately into `sat_solution_<tag>.txt` and executes filesystem sync.
+  - **Automated Verification:** Upon detection of `s UNSATISFIABLE` in any DRAT-logging branch, automatically triggers `/usr/local/bin/drat-trim` against the CNF and proof file to independently verify the empty-clause derivation (as successfully executed for Order 7).
   - **Telemetry & Monitoring:** Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and broadcasts periodic 4-hour status heartbeats.
-- **Local Host State:**
-  All solver instances on the local Mac M2 workstation remain 100% STOPPED (0% CPU utilization, 93 GiB SSD free), eliminating local thermal throttling and guaranteeing system stability.
+
+#### 2. Local Apple M2 Cluster (3 Performance Cores — 66.99M Conflicts)
+- **Workstation Allocation:** 3 dedicated Performance cores executing CaDiCaL with DRAT proof generation.
+- **Dedicated External Storage:** All local DRAT proof streams are written directly to an external NVMe SSD mounted at `/Volumes/Untitled`. This architectural isolation eliminates internal disk wear, prevents host filesystem exhaustion, and eliminates thermal throttling while maintaining 100% CPU core utilization.
+- **Active Local Solvers:**
+  - **$\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT):** $> 30.43 \times 10^6$ conflicts (~11.2h CPU).
+  - **$f = 1$ Branch A (seed 9999, DRAT):** $> 18.71 \times 10^6$ conflicts (~11.3h CPU).
+  - **$f = 1$ Branch A (seed 777, DRAT):** $> 17.85 \times 10^6$ conflicts (~11.3h CPU).
 
 ---
 

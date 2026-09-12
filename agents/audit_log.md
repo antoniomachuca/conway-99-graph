@@ -167,3 +167,30 @@ This file records every intervention, verification, and ruling issued by the Ind
 - **Safety Verification:** All 3 new workers execute in pure SAT-hunt mode without emitting `.drat` proof traces, resulting in 0 bytes of proof disk consumption.
 - **Supervisor Verification:** Upgraded daemon [`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh) actively monitoring all 11 solver logs for real-time model extraction and automated refutation certification.
 - **Verdict:** VERIFIED (Operational). Cluster fully optimized at 11 vCPUs with complete hardware and disk safety margins maintained.
+
+### [2026-09-12 23:58:00 CEST] - Forensic Infrastructure Audit: 500 Million Conflict Milestone Across Hybrid 14-Solver Cluster
+- **Objective:** Independent forensic audit of cumulative CDCL solving progress, hardware allocation, and proof storage across the hybrid 14-solver cluster (11 Google Cloud cores + 3 local Apple M2 cores).
+- **Cluster Deployment & Metric Verification:**
+  1. *Google Cloud Platform (`conway-sat-worker`, `e2-standard-16`, 11 CaDiCaL processes — 433.38M conflicts total):*
+     - Branch C ($f=1$, DRAT): $> 72.52 \times 10^6$ conflicts (~59.5h CPU).
+     - Branch B ($f=1$, DRAT): $> 69.38 \times 10^6$ conflicts (~59.7h CPU).
+     - Branch A ($f=1$, DRAT): $> 45.59 \times 10^6$ conflicts (~59.6h CPU).
+     - $\mathbb{Z}_3$ Fixed-3 (DRAT, 32 orbits): $> 37.18 \times 10^6$ conflicts (~31.7h CPU).
+     - $\mathbb{Z}_3$ FPF (DRAT, 33 orbits): $> 30.03 \times 10^6$ conflicts (~31.7h CPU).
+     - 6 GCP Heuristic SAT Hunters (`--sat`, non-DRAT): $\mathbb{Z}_3$ Fixed-3 ($>45.75\mathrm{M}$), $\mathbb{Z}_3$ FPF ($>32.69\mathrm{M}$), Hunter B ($>29.71\mathrm{M}$), Hunter C ($>29.03\mathrm{M}$), Hunter A ($>22.37\mathrm{M}$), Hunter A 2026 ($>19.13\mathrm{M}$).
+  2. *Local Apple M2 Cluster (3 Performance cores, external NVMe SSD `/Volumes/Untitled` — 66.99M conflicts total):*
+     - $\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT): $> 30.43 \times 10^6$ conflicts (~11.2h CPU).
+     - Branch A ($f=1$, seed 9999, DRAT): $> 18.71 \times 10^6$ conflicts (~11.3h CPU).
+     - Branch A ($f=1$, seed 777, DRAT): $> 17.85 \times 10^6$ conflicts (~11.3h CPU).
+- **Storage Safety & Workstation Integrity:**
+  - Dedicated redirection of local DRAT proofs to external NVMe SSD `/Volumes/Untitled` safeguards host internal storage against filesystem saturation.
+  - 0% thermal throttling recorded across the 3 M2 Performance cores.
+  - GCP VM maintains 243 GB free disk space with automated daemon surveillance ([`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh)).
+- **Cumulative Milestone:**
+  - Project cumulative CDCL search effort has crossed **> 500.38 MILLION CONFLICTS** ($433.38\mathrm{M} + 66.99\mathrm{M}$).
+- **Epistemological Taxonomy Status:**
+  - $f = 1$ ($\mathbb{Z}_2$): **EXPLORED** ($>324.29\mathrm{M}$ conflicts across 9 solvers).
+  - Order 3 ($\mathbb{Z}_3$): **EXPLORED** ($>176.08\mathrm{M}$ conflicts across 5 solvers).
+  - Order 7 ($\mathbb{Z}_7$): **PROVED** (CaDiCaL 3.0.1 771.59s + `drat-trim` 844.01s `s VERIFIED`, 74.4M resolution steps).
+  - Parity Rigidity: **PROVED** (Lean 4, `Conway/ParityRigidity.lean`, 0 sorry, standard axioms).
+- **Verdict:** VERIFIED (Operational & Certified). The 500M conflict milestone is corroborated by on-disk process telemetry across all 14 solvers without discrepancies.

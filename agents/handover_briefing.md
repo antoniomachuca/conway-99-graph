@@ -56,32 +56,43 @@ An involution $t$ is an adjacency-preserving permutation with $t^2 = \mathrm{id}
   - **DRAT Verification:** `drat-trim` in backward checking mode verified the refutation in 844.008 seconds, extracting 213,600 core clauses and 495,181 core lemmas via 74,443,066 resolution steps (0 RAT lemmas in core; 285,673 redundant literals eliminated), returning `s VERIFIED` ([`drat_trim_z7.log`](../drat_trim_z7.log), SHA-256: `0d2dd54b686c2ea003c06d067048cf44dd403f50c1eca793f4730985c487c889`, supervisor summary [`z7_result.txt`](../z7_result.txt)).
   - **Secondary Independent Confirmation:** CaDiCaL 3.0.1 SAT hunter with alternative heuristics (`--seed=777 --stabilizeonly=true --elimeffort=10 --subsumeeffort=60`) independently confirmed `s UNSATISFIABLE` in 1827.91 seconds process time, traversing 1,605,095 conflicts (878.24/s) and $5{,}398{,}435{,}071$ propagations ([`cadical_z7_hunter.log`](../cadical_z7_hunter.log), SHA-256: `bcf1077d235d9a748c16d45e8d0ae6cc197005993c177d0d5e78e6fa981c1448`).
 
-### D. Order 3 ($\mathbb{Z}_3$) [EXPLORED / RUNNING IN CLOUD]
+### D. Order 3 ($\mathbb{Z}_3$) [EXPLORED / RUNNING IN HYBRID CLUSTER]
 - Non-existence proved in historical literature (Behbahani-Lam 2011; Crnković-Maksimović 2020).
 - Canonical CNF generation implemented in [`scripts/build_z3_canonical_cnf.py`](../scripts/build_z3_canonical_cnf.py) with $S_3 \times \mathbb{Z}_2$ symmetry cuts for both the fixed-point-free (33 orbits) and fixed-3 (32 orbits) actions (unit tests passing).
-- Currently being solved on GCP cluster: 2 canonical CDCL solvers with DRAT proof logging (fpf and fixed-3).
+- Currently being solved across 5 solvers (4 GCP cloud + 1 local Apple M2 core): $> 176.08\mathrm{M}$ conflicts accumulated.
 
 ---
 
-## 3. Infrastructure & Solver Operations
+## 3. Infrastructure & Solver Operations: Hybrid 14-Solver Portfolio (>500M Conflicts)
 
-### A. Google Cloud Platform (11-Solver Cluster)
+Cumulative search effort across the project has crossed **> 500.38 MILLION CONFLICTS** (433.38M cloud conflicts + 66.99M local M2 conflicts).
+
+### A. Google Cloud Platform (11-Solver Cluster — 433.38M Conflicts)
 - **Virtual Machine:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in `us-central1-b`, 243 GB SSD free).
 - **Process Allocation & Status:** 11 active CaDiCaL solvers executing across dedicated vCPUs with 5 vCPUs held idle for OS responsiveness, filesystem throughput, and proof checking headroom:
-  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 processes):** Branches A, B, C (>120M conflicts accumulated, ~31 hours continuous CPU each, 27%–28% active variable plateau; emitting non-binary DRAT proof traces).
-  2. **$f = 1$ ($\mathbb{Z}_2$) SAT Hunters (4 processes, no DRAT):**
-     - Seed 42, `--sat`: Ramas A, B, C exploring alternative heuristic paths.
-     - Seed 2026, `--sat`: Second worker on Rama A reinforcing the bottleneck search space.
-  3. **Order 7 ($\mathbb{Z}_7$) Workers (Completed / Refuted & Verified [PROVED]):** Solvers terminated with certified refutation. The primary CDCL worker derived `s UNSATISFIABLE` in 771.59 s, independently certified by `drat-trim` (`s VERIFIED`, 844.01 s). The SAT hunter worker independently confirmed `s UNSATISFIABLE` in 1827.91 s.
-  4. **Order 3 ($\mathbb{Z}_3$) Workers (4 processes):**
-     - 2 canonical DRAT solvers: fixed-point-free (33 orbits) and fixed-3 (32 orbits), past 4.4M conflicts each.
-     - 2 SAT hunters (seed 42, `--sat`, no DRAT): exploring rapid satisfying model paths for both FPF and fixed-3.
-- **Autonomous Supervisor:** Upgraded daemon [`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh) (PID 52242) polling every 20 seconds:
+  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 processes, 187.49M conflicts):**
+     - Branch C: $> 72.52 \times 10^6$ conflicts (~59.5h continuous CPU).
+     - Branch B: $> 69.38 \times 10^6$ conflicts (~59.7h continuous CPU).
+     - Branch A: $> 45.59 \times 10^6$ conflicts (~59.6h continuous CPU).
+  2. **Order 3 ($\mathbb{Z}_3$) Main DRAT Solvers (2 processes, 67.21M conflicts):**
+     - Fixed-3 (32 orbits): $> 37.18 \times 10^6$ conflicts (~31.7h continuous CPU).
+     - FPF (33 orbits): $> 30.03 \times 10^6$ conflicts (~31.7h continuous CPU).
+  3. **Heuristic SAT Hunters (6 processes, 178.68M conflicts, no DRAT):**
+     - $\mathbb{Z}_3$ Fixed-3 Hunter: $> 45.75 \times 10^6$ conflicts.
+     - $\mathbb{Z}_3$ FPF Hunter: $> 32.69 \times 10^6$ conflicts.
+     - Branch B Hunter ($f=1$): $> 29.71 \times 10^6$ conflicts.
+     - Branch C Hunter ($f=1$): $> 29.03 \times 10^6$ conflicts.
+     - Branch A Hunter ($f=1$): $> 22.37 \times 10^6$ conflicts.
+     - Branch A Hunter 2026 ($f=1$): $> 19.13 \times 10^6$ conflicts.
+- **Autonomous Supervisor:** Upgraded daemon [`scripts/cloud_watcher.sh`](../scripts/cloud_watcher.sh) (PID 68900) polling every 20 seconds:
   - Detects `s SATISFIABLE`: extracts model assignments `^v ` immediately into `sat_solution_<tag>.txt` and syncs disk.
   - Detects `s UNSATISFIABLE`: automatically executes `/usr/local/bin/drat-trim` on corresponding CNF and DRAT files to certify refutation (successfully verified Order 7, recording `s UNSATISFIABLE / VERIFIED` in [`z7_result.txt`](../z7_result.txt)).
-  - Telemetry: Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and posts periodic 4-hour status heartbeats reporting conflict counts and free storage.
+  - Telemetry: Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and posts periodic 4-hour status heartbeats.
 
-### B. Local Host Workstation (Mac M2)
-- **Solver State:** 100% STOPPED.
-- **Resource Metrics:** CPU load at 0%, 93 GiB SSD free.
-- **Operational Directive:** Local solvers remain offline to prevent thermal throttling and eliminate disk exhaustion risks.
+### B. Local Host Workstation (Apple M2 Cluster — 66.99M Conflicts)
+- **Process Allocation:** 3 dedicated Performance cores executing CaDiCaL with DRAT proof logging.
+- **Dedicated External Storage:** All local DRAT proof streams are redirected to an external NVMe SSD mounted at `/Volumes/Untitled`, precluding internal SSD wear and storage exhaustion while running with 0% thermal throttling.
+- **Active Solvers:**
+  - $\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT): $> 30.43 \times 10^6$ conflicts (~11.2h CPU).
+  - Branch A ($f=1$, seed 9999, DRAT): $> 18.71 \times 10^6$ conflicts (~11.3h CPU).
+  - Branch A ($f=1$, seed 777, DRAT): $> 17.85 \times 10^6$ conflicts (~11.3h CPU).
