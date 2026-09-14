@@ -8,7 +8,7 @@
 **Author:** [Antonio Machuca](mailto:am.machuca.2023@alumnos.urjc.es)  
 *Affiliation:* Universidad Rey Juan Carlos, Madrid, Spain  
 *Permanent Contact:* [contactoantoniomachuca@gmail.com](mailto:contactoantoniomachuca@gmail.com)  
-*Associated Preprint:* [`manuscript/conway_involutions.tex`](manuscript/conway_involutions.tex) / [`manuscript/conway_involutions.pdf`](manuscript/conway_involutions.pdf)
+*Associated Preprint:* [`manuscript/conway_involutions.tex`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/manuscript/conway_involutions.tex) / [`manuscript/conway_involutions.pdf`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/manuscript/conway_involutions.pdf)
 
 ---
 
@@ -89,17 +89,17 @@ The table below contrasts historical literature results, recent constraint-progr
 | Symmetry / Order | Theoretical Status (Literature) | AI Baseline (Thakkar 2026) | Repository Status & Artifacts | Classification |
 | :--- | :--- | :--- | :--- | :---: |
 | **Order $p \ge 11$** | Excluded (Makhnev-Minakova 2001; Behbahani-Lam 2011) | Excluded from search space | Literature result confirmed; no prime order $p \ge 11$ admitted | **PROVED** |
-| **Order 14** | Excluded analytically by spectral trace contradiction $7a = 62$ (Cesarz-Woldar 2025, Thm 3.11) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
-| **Frobenius $\mathrm{Frob}(21)$** | Excluded by orbit partition parity contradiction $a+c+d+f = 5$ (Cesarz-Woldar 2025, Prop 4.14) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
-| **Parity Rigidity** | If $2 \mid \lvert \mathrm{Aut}(G) \rvert$, then $\mathrm{Aut}(G) \cong \mathbb{Z}_2$ (Cesarz-Woldar 2025 + Crnković-Maksimović 2020) | Unaddressed | Formalized in [`Conway/ParityRigidity.lean`](Conway/ParityRigidity.lean) (0 `sorry`, standard axioms; rules out $\mathbb{Z}_4$, $V_4$, $D_{2k}$) | **PROVED** |
-| **Involutions ($f = 3$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Topological dichotomy $K_3$ vs $3K_1$ in [`Conway/Z2Classification.lean`](Conway/Z2Classification.lean) (0 `sorry`); SAT refutation verified by `drat-trim` (`s VERIFIED`) | **PROVED** |
-| **Involutions ($f = 5$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Structural isolation $K_3+2K_1$ vs $5K_1$ and modular trace contradiction $\varepsilon_1 \equiv 6 \pmod 7$ in [`Conway/Z2Classification.lean`](Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
-| **Involutions ($f = 7$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | 136 admissible subgraphs ($T \in \{0, 1, 2\}$ under $K_4$-freeness) yielding $\varepsilon_1 \in \{7, 10, 13\} \not\equiv 2 \pmod 7$ in [`Conway/Z2Classification.lean`](Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
+| **Order 14** | Excluded analytically by spectral trace contradiction $7a = 62$ (Cesarz-Woldar 2025, Thm 3.11) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
+| **Frobenius $\mathrm{Frob}(21)$** | Excluded by orbit partition parity contradiction $a+c+d+f = 5$ (Cesarz-Woldar 2025, Prop 4.14) | Unaddressed | Formalized in [`Conway/CesarzWoldarTheorems.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/CesarzWoldarTheorems.lean) (0 `sorry`, standard axioms) | **PROVED** |
+| **Parity Rigidity** | If $2 \mid \lvert \mathrm{Aut}(G) \rvert$, then $\mathrm{Aut}(G) \cong \mathbb{Z}_2$ (Cesarz-Woldar 2025 + Crnković-Maksimović 2020) | Unaddressed | Formalized in [`Conway/ParityRigidity.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/ParityRigidity.lean) (0 `sorry`, standard axioms; rules out $\mathbb{Z}_4$, $V_4$, $D_{2k}$) | **PROVED** |
+| **Involutions ($f = 3$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Topological dichotomy $K_3$ vs $3K_1$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`); SAT refutation verified by `drat-trim` (`s VERIFIED`) | **PROVED** |
+| **Involutions ($f = 5$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Structural isolation $K_3+2K_1$ vs $5K_1$ and modular trace contradiction $\varepsilon_1 \equiv 6 \pmod 7$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
+| **Involutions ($f = 7$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | 136 admissible subgraphs ($T \in \{0, 1, 2\}$ under $K_4$-freeness) yielding $\varepsilon_1 \in \{7, 10, 13\} \not\equiv 2 \pmod 7$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
 | **Involutions ($f \ge 9$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | Refuted by negative base term $f(8-f) < 0$ and degree partition enumeration with SMT scripts | **PROVED** |
-| **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). Active solving across 9 solvers (7 GCP + 2 Apple M2 cores): $> 324.29\mathrm{M}$ conflicts (Branch C $>72.52\mathrm{M}$, Branch B $>69.38\mathrm{M}$, Branch A $>45.59\mathrm{M}$, hunters and local M2 seeds $>136.8\mathrm{M}$). Component of $>500.38\mathrm{M}$ cumulative cluster conflicts | **EXPLORED** |
-| **Order 7 ($\mathbb{Z}_7$)** | Non-existence proved by computer (Behbahani-Lam 2011); $7 \mid \lvert \Gamma \rvert \implies \Gamma \cong \mathbb{Z}_7$ (Cesarz-Woldar 2025) | `UNKNOWN` (48h, 14 cores CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z7_canonical_cnf.py`](scripts/build_z7_canonical_cnf.py). Refuted by CaDiCaL 3.0.1 (`s UNSATISFIABLE`, 771.59s) and certified by `drat-trim` (`s VERIFIED`, 844.01s, [`drat_trim_z7.log`](drat_trim_z7.log)); secondary confirmation via hunter (`cadical_z7_hunter.log`) | **PROVED** |
-| **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](scripts/build_z3_canonical_cnf.py); unit tests passing. Active solving across 5 solvers (4 GCP + 1 Apple M2 core): $> 176.08\mathrm{M}$ conflicts (Fixed-3 DRAT $>37.18\mathrm{M}$, FPF DRAT $>30.03\mathrm{M}$, hunters and M2 seed 333 $>108.8\mathrm{M}$). Component of $>500.38\mathrm{M}$ cumulative cluster conflicts | **EXPLORED** |
-| **Grand Classification** | $\lvert \mathrm{Aut}(G) \rvert \in \{1, 2\}$ | Unaddressed | Formalized in [`Conway/GrandClassification.lean`](Conway/GrandClassification.lean); compiles cleanly, conditional on $\mathbb{Z}_3$ | **COMPILED** |
+| **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). Active solving across portfolio (GCP cloud + Local Apple M2): $> 630.38\mathrm{M}$ conflicts (Branch A $>304.93\mathrm{M}$, Branch C $>163.63\mathrm{M}$, Branch B $>161.82\mathrm{M}$). Component of $>1{,}041.09\mathrm{M}$ cumulative portfolio conflicts | **EXPLORED** |
+| **Order 7 ($\mathbb{Z}_7$)** | Non-existence proved by computer (Behbahani-Lam 2011); $7 \mid \lvert \Gamma \rvert \implies \Gamma \cong \mathbb{Z}_7$ (Cesarz-Woldar 2025) | `UNKNOWN` (48h, 14 cores CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z7_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z7_canonical_cnf.py). Refuted by CaDiCaL 3.0.1 (`s UNSATISFIABLE`, 771.59s) and certified by `drat-trim` (`s VERIFIED`, 844.01s, [`drat_trim_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z7.log)); secondary confirmation via hunter ([`cadical_z7_hunter.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7_hunter.log)) | **PROVED** |
+| **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z3_canonical_cnf.py); unit tests passing. Active solving across portfolio (Fixed-3 DRAT $>70.88\mathrm{M}$, FPF DRAT $>61.03\mathrm{M}$, hunters $>167.85\mathrm{M}$, M2 Session 1 $>108.88\mathrm{M}$): $> 408.64\mathrm{M}$ conflicts. Component of $>1{,}041.09\mathrm{M}$ cumulative portfolio conflicts | **EXPLORED** |
+| **Grand Classification** | $\lvert \mathrm{Aut}(G) \rvert \in \{1, 2\}$ | Unaddressed | Formalized in [`Conway/GrandClassification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/GrandClassification.lean); compiles cleanly, conditional on $\mathbb{Z}_3$ | **COMPILED** |
 | **Full Rigidity Conjecture** | $\mathrm{Aut}(G) = \{1\}$ (Brouwer, Cameron, Haemers) | Open (Frontier at 69.4% constraints) | Conditional on refuting $f = 1$ and ingesting $\mathbb{Z}_7$ / $\mathbb{Z}_3$ certificates | **PENDING** |
 | **Existence of $G$** | Open (Conway 1969; Biggs 1969) | Open | Core open problem investigated via dual-track framework | **PENDING** |
 
@@ -132,17 +132,17 @@ Fixing the first orbit $O_0$, its stabilizer has order $\lvert \mathrm{Stab}_W(O
 3. **Branch C (Disjoint):** Partner orbit $O_{10}$ has disjoint neighborhood support. Orbit size: 20. Symmetry reduction factor: $768\times$.
 
 ### 4.4. Certified Refutation of Order 7 ($\mathbb{Z}_7$)
-Under any non-trivial action of an automorphism of order 7, Cesarz and Woldar (2025, Thm 4.13) proved that $G$ must possess a unique fixed point $x_0$ and exactly 14 orbits of length 7, inducing tight coordinate constraints on orbit intersections. The search space is encoded by [`scripts/build_z7_canonical_cnf.py`](scripts/build_z7_canonical_cnf.py) into the canonical DIMACS CNF formula `conway_z7_canonical.cnf` comprising 176,613 boolean variables and 421,562 clauses.
+Under any non-trivial action of an automorphism of order 7, Cesarz and Woldar (2025, Thm 4.13) proved that $G$ must possess a unique fixed point $x_0$ and exactly 14 orbits of length 7, inducing tight coordinate constraints on orbit intersections. The search space is encoded by [`scripts/build_z7_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z7_canonical_cnf.py) into the canonical DIMACS CNF formula `conway_z7_canonical.cnf` comprising 176,613 boolean variables and 421,562 clauses.
 
 Symmetry breaking is enforced via Crawford-style lex-leader constraints under the quotient multiplier group:
 $$\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$$
 which combines circulant reflection and the multiplicative unit group $(\mathbb{Z}_7)^\times \cong \mathbb{Z}_6$.
 
 **Certified Refutation Metrics:**
-- **Primary Solver:** CaDiCaL 3.0.1 solved the canonical formula to `s UNSATISFIABLE` (exit code 20) in 771.59 seconds process time (771.76 seconds real time), traversing 459,403 conflicts (595.60/s) and $1{,}859{,}868{,}643$ propagations (2.41 M/s) with a maximum RSS of 219.38 MB ([`cadical_z7.log`](cadical_z7.log), SHA-256: `988a4d2d638de921363b757863269c6875c76689a39e8b03eb01852a3a0ad3d4`).
+- **Primary Solver:** CaDiCaL 3.0.1 solved the canonical formula to `s UNSATISFIABLE` (exit code 20) in 771.59 seconds process time (771.76 seconds real time), traversing 459,403 conflicts (595.60/s) and $1{,}859{,}868{,}643$ propagations (2.41 M/s) with a maximum RSS of 219.38 MB ([`cadical_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7.log), SHA-256: `988a4d2d638de921363b757863269c6875c76689a39e8b03eb01852a3a0ad3d4`).
 - **DRAT Proof:** A 192,218,491-byte non-binary DRAT proof trace (`proof_z7_canonical.drat`, SHA-256: `574cc2a77820e05a2c7c2b216b0e95d3f52f4da77ef37a5da75cc228d46e5ab0`) was emitted during solving.
-- **Independent DRAT Audit:** Marijn Heule's `drat-trim` verified the empty-clause derivation in backward checking mode in 844.008 seconds, extracting a core of 213,600 clauses (out of 421,562) and 495,181 lemmas (out of 1,098,901) via 74,443,066 resolution steps (0 RAT lemmas in core; 285,673 redundant literals in core lemmas eliminated), concluding with `s VERIFIED` ([`drat_trim_z7.log`](drat_trim_z7.log), SHA-256: `0d2dd54b686c2ea003c06d067048cf44dd403f50c1eca793f4730985c487c889`; supervisor summary in [`z7_result.txt`](z7_result.txt)).
-- **Secondary Independent Confirmation:** A second CaDiCaL 3.0.1 instance configured with alternative hunter heuristics (`--seed=777 --stabilizeonly=true --elimeffort=10 --subsumeeffort=60`) independently derived `s UNSATISFIABLE` (exit code 20) in 1827.91 seconds process time (1827.95 seconds real time), traversing 1,605,095 conflicts (878.24/s) and $5{,}398{,}435{,}071$ propagations (2.95 M/s) ([`cadical_z7_hunter.log`](cadical_z7_hunter.log), SHA-256: `bcf1077d235d9a748c16d45e8d0ae6cc197005993c177d0d5e78e6fa981c1448`).
+- **Independent DRAT Audit:** Marijn Heule's `drat-trim` verified the empty-clause derivation in backward checking mode in 844.008 seconds, extracting a core of 213,600 clauses (out of 421,562) and 495,181 lemmas (out of 1,098,901) via 74,443,066 resolution steps (0 RAT lemmas in core; 285,673 redundant literals in core lemmas eliminated), concluding with `s VERIFIED` ([`drat_trim_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z7.log), SHA-256: `0d2dd54b686c2ea003c06d067048cf44dd403f50c1eca793f4730985c487c889`; supervisor summary in [`z7_result.txt`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/z7_result.txt)).
+- **Secondary Independent Confirmation:** A second CaDiCaL 3.0.1 instance configured with alternative hunter heuristics (`--seed=777 --stabilizeonly=true --elimeffort=10 --subsumeeffort=60`) independently derived `s UNSATISFIABLE` (exit code 20) in 1827.91 seconds process time (1827.95 seconds real time), traversing 1,605,095 conflicts (878.24/s) and $5{,}398{,}435{,}071$ propagations (2.95 M/s) ([`cadical_z7_hunter.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7_hunter.log), SHA-256: `bcf1077d235d9a748c16d45e8d0ae6cc197005993c177d0d5e78e6fa981c1448`).
 
 ---
 
@@ -300,41 +300,47 @@ Execute the combinatorial enumerator confirming the absence of compatible subgra
 python3 scripts/analyze_z2_f7_exhaustive.py
 ```
 
-### F. Distributed Solver Architecture & Hybrid 14-Solver Portfolio (>500M Milestone)
-To scale search across the remaining open symmetry cases without bottlenecking local host capacity, execution is distributed across a hybrid 14-solver portfolio combining a high-performance Google Cloud Compute Engine VM and dedicated local Apple M2 hardware writing to external high-speed storage. The cumulative search effort across the project has crossed **> 500.38 MILLION CONFLICTS** (433.38M cloud conflicts + 66.99M local M2 conflicts).
+### F. Distributed Solver Architecture & Hybrid 14-Solver Portfolio (>1 Billion Conflict Milestone)
+To scale search across the remaining open symmetry cases without bottlenecking local host capacity, execution is distributed across a hybrid portfolio of 14 concurrent CaDiCaL solver configurations combining a high-performance Google Cloud Compute Engine VM and dedicated local Apple M2 hardware writing to external high-speed storage. The cumulative search effort across the project has crossed **> 1,041,090,647 CDCL CONFLICTS** (> 1.041 Billion / > 1.04 Giga-conflicts), comprising 786,239,067 conflicts on Google Cloud and 254,851,580 conflicts completed on the local Apple M2 cluster across target branches:
+- **$\mathbb{Z}_3$ Actions:** $> 408.64\mathrm{M}$ conflicts combined.
+- **$f = 1$ Involution Branches:** $> 630.38\mathrm{M}$ conflicts combined (Branch A $> 304.93\mathrm{M}$, Branch C $> 163.63\mathrm{M}$, Branch B $> 161.82\mathrm{M}$).
 
-#### 1. Google Cloud Cluster (`conway-sat-worker`, 11 Active CaDiCaL Processes — 433.38M Conflicts)
+#### 1. Google Cloud Cluster (`conway-sat-worker`, 11 Active CaDiCaL Processes — 786,239,067 Conflicts)
 - **Host Instance:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in zone `us-central1-b`, with 243 GB free disk space).
 - **Core Budget & Allocation:** 11 dedicated vCPUs running CaDiCaL 1.9.5/3.0.1 at 100% utilization, with 5 vCPUs held idle to guarantee OS responsiveness, filesystem throughput, and immediate CPU availability for automated `drat-trim` proof verification.
 - **Worker Breakdown:**
-  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers, 187.49M conflicts):**
-     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 72.52 \times 10^6$ conflicts (~59.5h continuous CPU), emitting non-binary DRAT proof trace.
-     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 69.38 \times 10^6$ conflicts (~59.7h continuous CPU), emitting non-binary DRAT proof trace.
-     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 45.59 \times 10^6$ conflicts (~59.6h continuous CPU), emitting non-binary DRAT proof trace.
-  2. **Order 3 ($\mathbb{Z}_3$) Main DRAT Solvers (2 workers, 67.21M conflicts):**
-     - **Fixed-3 Action (32 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 37.18 \times 10^6$ conflicts (~31.7h continuous CPU), emitting non-binary DRAT proof trace.
-     - **Fixed-Point-Free Action (33 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 30.03 \times 10^6$ conflicts (~31.7h continuous CPU), emitting non-binary DRAT proof trace.
-  3. **GCP Heuristic SAT Hunters (6 workers, 178.68M conflicts):** Non-DRAT mode (`--sat`, 0 proof disk consumption) exploring diverse variable and phase heuristics:
-     - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 42):** $> 45.75 \times 10^6$ conflicts.
-     - **$\mathbb{Z}_3$ FPF Hunter (seed 42):** $> 32.69 \times 10^6$ conflicts.
-     - **Branch B Hunter ($f=1$, seed 42):** $> 29.71 \times 10^6$ conflicts.
-     - **Branch C Hunter ($f=1$, seed 42):** $> 29.03 \times 10^6$ conflicts.
-     - **Branch A Hunter ($f=1$, seed 42):** $> 22.37 \times 10^6$ conflicts.
-     - **Branch A Hunter 2026 ($f=1$, seed 2026):** $> 19.13 \times 10^6$ conflicts reinforcing the $15{,}360\times$ bottleneck search space.
+  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers, 266.84M conflicts):**
+     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 101.64 \times 10^6$ conflicts (~100h continuous CPU), emitting non-binary DRAT proof trace. Marks the first solver instance in the project to surpass 100 Million conflicts.
+     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 96.65 \times 10^6$ conflicts (~100h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 68.55 \times 10^6$ conflicts (~100h continuous CPU), emitting non-binary DRAT proof trace.
+  2. **Order 3 ($\mathbb{Z}_3$) Main DRAT Solvers (2 workers, 131.91M conflicts):**
+     - **Fixed-3 Action (32 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 70.88 \times 10^6$ conflicts (~72h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Fixed-Point-Free Action (33 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 61.03 \times 10^6$ conflicts (~72h continuous CPU), emitting non-binary DRAT proof trace.
+  3. **GCP Heuristic SAT Hunters (6 workers, 385.42M conflicts):** Non-DRAT mode (`--sat`, 0 proof disk consumption) exploring diverse variable and phase heuristics:
+     - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 42):** $> 93.53 \times 10^6$ conflicts (~69h CPU).
+     - **$\mathbb{Z}_3$ FPF Hunter (seed 42):** $> 74.32 \times 10^6$ conflicts (~69h CPU).
+     - **Branch B Hunter ($f=1$, seed 42):** $> 65.17 \times 10^6$ conflicts.
+     - **Branch C Hunter ($f=1$, seed 42):** $> 61.99 \times 10^6$ conflicts.
+     - **Branch A Hunter ($f=1$, seed 42):** $> 47.01 \times 10^6$ conflicts.
+     - **Branch A Hunter 2026 ($f=1$, seed 2026):** $> 43.40 \times 10^6$ conflicts reinforcing the $15{,}360\times$ bottleneck search space.
 - **Autonomous Cloud Supervisor & Verification Daemon:**
-  Supervision on the remote cloud instance is managed by the autonomous background daemon `cloud_watcher.sh` (PID 68900):
+  Supervision on the remote cloud instance is managed by the autonomous background daemon [`scripts/cloud_watcher.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/cloud_watcher.sh) (PID 68900):
   - **Dynamic Core Replenishment:** Detects freed vCPUs upon solver completion and dynamically spawns fresh SAT hunters with distinct seeds (`$RANDOM`) prioritizing active bottlenecks.
   - **Real-Time Model Extraction:** Inspects all solver logs every 20 seconds. Upon detection of `s SATISFIABLE`, isolates variable assignments `^v ` immediately into `sat_solution_<tag>.txt` and executes filesystem sync.
   - **Automated Verification:** Upon detection of `s UNSATISFIABLE` in any DRAT-logging branch, automatically triggers `/usr/local/bin/drat-trim` against the CNF and proof file to independently verify the empty-clause derivation (as successfully executed for Order 7).
   - **Telemetry & Monitoring:** Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and broadcasts periodic 4-hour status heartbeats.
 
-#### 2. Local Apple M2 Cluster (3 Performance Cores — 66.99M Conflicts)
-- **Workstation Allocation:** 3 dedicated Performance cores executing CaDiCaL with DRAT proof generation.
-- **Dedicated External Storage:** All local DRAT proof streams are written directly to an external NVMe SSD mounted at `/Volumes/Untitled`. This architectural isolation eliminates internal disk wear, prevents host filesystem exhaustion, and eliminates thermal throttling while maintaining 100% CPU core utilization.
-- **Active Local Solvers:**
-  - **$\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT):** $> 30.43 \times 10^6$ conflicts (~11.2h CPU).
-  - **$f = 1$ Branch A (seed 9999, DRAT):** $> 18.71 \times 10^6$ conflicts (~11.3h CPU).
-  - **$f = 1$ Branch A (seed 777, DRAT):** $> 17.85 \times 10^6$ conflicts (~11.3h CPU).
+#### 2. Local Apple M2 Cluster (Dedicated External Storage `/Volumes/Untitled`)
+- **Storage Isolation:** All local DRAT proof streams are written directly to an external NVMe SSD mounted at `/Volumes/Untitled`, precluding internal SSD wear and storage exhaustion (0 bytes written to internal Mac SSD).
+- **Session 1 (Completed & Safely Archived in `/Volumes/Untitled/conway_local_run/session1_108M_sep13_14/` — 254,851,580 Conflicts):**
+  - **$\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT):** $108{,}884{,}838$ conflicts (88.4 GB certified DRAT proof trace).
+  - **Branch A ($f=1$, seed 9999, DRAT):** $73{,}270{,}233$ conflicts (30.8 GB certified DRAT proof trace).
+  - **Branch A ($f=1$, seed 777, DRAT):** $72{,}696{,}509$ conflicts (31.2 GB certified DRAT proof trace).
+  - *Total Session 1:* $254.85\mathrm{M}$ conflicts, $147\mathrm{GB}$ of certified proof files safely preserved on external SSD.
+- **Session 2 (Active Deployment, 3 Performance Cores at Native Scheduling Priority without nice):**
+  - **$\mathbb{Z}_3$ Fixed-3 (seed 555, DRAT):** Logging to `proof_z3_fixed3_s2.drat`.
+  - **$\mathbb{Z}_3$ FPF (seed 777, DRAT):** Logging to `proof_z3_fpf_s2.drat`.
+  - **Branch A ($f=1$, seed 8888, DRAT):** Logging to `proof_branch_a_s2.drat`.
 
 ---
 

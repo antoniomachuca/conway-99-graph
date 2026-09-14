@@ -66,13 +66,13 @@
 \maketitle
 
 \begin{abstract}
-Conway's 99-graph problem asks for the existence of a strongly regular graph with parameters $\mathrm{srg}(99, 14, 1, 2)$. A long-standing conjecture in algebraic combinatorics asserts that if such a graph exists, its automorphism group is trivial ($\Aut(G) = \{1\}$). In this paper, we systematically investigate the existence of automorphisms of order~2 (involutions). By parity, any involution $t \in \Aut(G)$ must have an odd number of fixed points $f = |\Fix(t)| \in \{1, 3, 5, 7, \dots, 15\}$. We prove that no involution can have $f \ge 3$ fixed points through a combination of spectral graph theory, interactive theorem proving in Lean~4, and certified propositional satisfiability (SAT):
+Conway's 99-graph problem asks for the existence of a strongly regular graph with parameters $\mathrm{srg}(99, 14, 1, 2)$. A long-standing conjecture in algebraic combinatorics asserts that if such a graph exists, its automorphism group is trivial ($\Aut(G) = \{1\}$). In this paper, I systematically investigate the existence of automorphisms of order~2 (involutions). By parity, any involution $t \in \Aut(G)$ must have an odd number of fixed points $f = |\Fix(t)| \in \{1, 3, 5, 7, \dots, 15\}$. It is proved that no involution can have $f \ge 3$ fixed points through a combination of spectral graph theory, interactive theorem proving in Lean~4, and certified propositional satisfiability (SAT):
 \begin{enumerate}
-    \item For $f = 5$ and $f = 7$, we derive modular trace incongruences $\varepsilon_1 \equiv 5(f-1) \pmod 7$ and formalize in Lean~4 the induced subgraph dichotomies and arithmetic spectral contradictions with standard axioms only.
-    \item For $f = 3$, we formalize the topological dichotomy $\Fix(t) \cong K_3$ versus $\Fix(t) \cong 3K_1$ in Lean~4, and complete the unconditional refutation via propositional satisfiability solvers with formally checked DRAT proof certificates (\texttt{s VERIFIED}).
+    \item For $f = 5$ and $f = 7$, modular trace incongruences $\varepsilon_1 \equiv 5(f-1) \pmod 7$ are derived, and the induced subgraph dichotomies and arithmetic spectral contradictions are formalized in Lean~4 with standard axioms only.
+    \item For $f = 3$, the topological dichotomy $\Fix(t) \cong K_3$ versus $\Fix(t) \cong 3K_1$ is formalized in Lean~4, and an unconditional refutation is completed via propositional satisfiability solvers with formally checked DRAT proof certificates (\texttt{s VERIFIED}).
     \item For higher orders $f \in \{9, 11, 13, 15\}$, all admissible degree partitions are eliminated through modular arithmetic constraints and bounded model checkers.
 \end{enumerate}
-Finally, for the central open case $f = 1$, we establish the algebraic uniqueness of the neighbor orbit incidence matrix $C_{7 \times 42}$ ($|W| = 645{,}120$) and show that the remaining search space partitions into exactly three canonical symmetry-breaking branches. We describe the distributed SAT framework currently executing on these three branches and report the exact computational pruning metrics.
+Finally, for the central open case $f = 1$, the algebraic uniqueness of the neighbor orbit incidence matrix $C_{7 \times 42}$ ($|W| = 645{,}120$) is established, and the remaining search space is shown to partition into exactly three canonical symmetry-breaking branches. The distributed SAT framework executing across these three branches is documented alongside computational pruning metrics reflecting $>1.041 \times 10^9$ cumulative conflicts across the portfolio.
 \end{abstract}
 
 \keywords{Conway 99-graph \and strongly regular graph \and automorphism group \and involution \and spectral graph theory \and Lean 4 \and SAT solving \and DRAT certification}
@@ -146,11 +146,11 @@ Furthermore, Theorem~\ref{thm:cesarz_woldar} asserts that the only admissible gr
 
 Recently, in August 2026, Thakkar~\cite{thakkar2026forced} investigated Conway's 99-graph within the CAISc 2026 benchmark using an autonomous AI research agent integrating constraint solvers (Google OR-Tools CP-SAT and Z3). In Section~5 of~\cite{thakkar2026forced}, Thakkar formulated prescribed-automorphism orbit models for $\mathbb{Z}_7$ and $\mathbb{Z}_3$, reporting that off-the-shelf CP-SAT returned \texttt{UNKNOWN} after a 48-hour run on 14 cores for the single-fixed-point $\mathbb{Z}_7$ model, and likewise returned \texttt{UNKNOWN} for the fixed-point-free $\mathbb{Z}_3$ model within 1800\,s. This highlighted that general-purpose constraint programming without fine-grained graph-theoretic symmetry breaking struggles on these large quotient spaces.
 
-In the present study, our focus is directed squarely at \emph{order-2 automorphisms} (involutions), while also resolving the open single-fixed-point action of $\mathbb{Z}_7$. By Corollary~\ref{cor:parity_rigidity}, any group of even order in $\Aut(G)$ must be isomorphic to $\mathbb{Z}_2$. Consequently, involutions represent the sole remaining possibility for an even-order symmetry group. We systematically investigate the involution spectrum $f \in \{1, 3, 5, \dots, 15\}$, providing certified refutations for $f = 3$ via CaDiCaL and \texttt{drat-trim} (\texttt{s VERIFIED}), formalizing structural dichotomies and modular spectral incongruences for $f \ge 5$, and establishing a canonical 3-branch symmetry-breaking partition for the open case $f = 1$. Furthermore, by injecting canonical Crawford lex-leader symmetry cuts over the quotient multiplier group $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ alongside Cesarz-Woldar coordinate constraints, our framework decisively refutes the open $\mathbb{Z}_7$ action via CaDiCaL in 771\,s, certified by \texttt{drat-trim} (\texttt{s VERIFIED} in 844\,s with 74.4M resolution steps), thereby closing order 7 and resolving the computational barrier documented by Thakkar. The remaining odd-order action $\mathbb{Z}_3$ is also encoded and actively being solved across the distributed solver cluster.
+In the present study, the focus is directed squarely at \emph{order-2 automorphisms} (involutions), while also resolving the open single-fixed-point action of $\mathbb{Z}_7$. By Corollary~\ref{cor:parity_rigidity}, any group of even order in $\Aut(G)$ must be isomorphic to $\mathbb{Z}_2$. Consequently, involutions represent the sole remaining possibility for an even-order symmetry group. The involution spectrum $f \in \{1, 3, 5, \dots, 15\}$ is systematically investigated, providing certified refutations for $f = 3$ via CaDiCaL and \texttt{drat-trim} (\texttt{s VERIFIED}), formalizing structural dichotomies and modular spectral incongruences for $f \ge 5$, and establishing a canonical 3-branch symmetry-breaking partition for the open case $f = 1$. Furthermore, by injecting canonical Crawford lex-leader symmetry cuts over the quotient multiplier group $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$ alongside Cesarz-Woldar coordinate constraints, the framework decisively refutes the open $\mathbb{Z}_7$ action via CaDiCaL in 771\,s, certified by \texttt{drat-trim} (\texttt{s VERIFIED} in 844\,s with 74.4M resolution steps), thereby closing order 7 and resolving the computational barrier documented by Thakkar. The remaining odd-order action $\mathbb{Z}_3$ is also encoded and actively being solved across the distributed solver portfolio.
 
 \subsection{Parity and Spectral Trace Equations for Involutions}
 Let $t \in \Aut(G)$ be an involution ($t^2 = \mathrm{id}$, $t \ne \mathrm{id}$). Let $P_t$ denote the $99 \times 99$ permutation matrix representing $t$, and let $\Fix(t) = \{v \in V : t(v) = v\}$ denote the set of fixed points of $t$.
-Because $t^2 = \mathrm{id}$, $V$ decomposes into $f = |\Fix(t)|$ fixed points and $(99 - f)/2$ transpositions (orbits of length~2). Since $v = 99$ is odd, we have:
+Because $t^2 = \mathrm{id}$, $V$ decomposes into $f = |\Fix(t)|$ fixed points and $(99 - f)/2$ transpositions (orbits of length~2). Since $v = 99$ is odd, the following holds:
 \begin{lemma}[Parity of Fixed Points]
 Every involution $t \in \Aut(G)$ has an odd number of fixed points:
 \begin{equation}
@@ -204,10 +204,10 @@ For any involution $t \in \Aut(G)$ with $f$ fixed points, the number of exchange
 
 \section{Spectral Trace Incompatibilities for \texorpdfstring{$f = 5$}{f = 5} and \texorpdfstring{$f = 7$}{f = 7}}
 
-We now address the cases $f = 5$ and $f = 7$. Our method combines analytic spectrum analysis with formal verification in the Lean~4 interactive theorem prover~\cite{moura2021lean4}.
+The cases $f = 5$ and $f = 7$ are addressed next. The method combines analytic spectrum analysis with formal verification in the Lean~4 interactive theorem prover~\cite{moura2021lean4}.
 
 \subsection{Proof Architecture and Epistemological Scope}
-To maintain strict epistemological clarity, we distinguish between:
+To maintain strict epistemological clarity, a rigorous distinction is maintained between:
 \begin{enumerate}
     \item \emph{Analytic derivation:} The modular trace formula and global eigenvalue bounds are proved algebraically on paper.
     \item \emph{Combinatorial census:} The generation of candidate graphs on $\Fix(t)$ is established by exhaustive combinatorial classification.
@@ -216,7 +216,7 @@ To maintain strict epistemological clarity, we distinguish between:
 
 \subsection{Topological Induced Subgraphs and Trace Evaluation for \texorpdfstring{$f = 5$}{f = 5}}
 For an involution $t \in \Aut(G)$ with $f$ fixed points, the number of exchanged edges $\varepsilon_1 = m_{\mathrm{transp}}$ is governed by the incidence between the 2-cycles of $t$ and the fixed-point set $\Fix(t)$.
-For $f = 5$, let $H = G[\Fix(t)]$ denote the induced subgraph on the 5 fixed points. Because $\lambda = 1$, the graph $G$ contains no $K_4$ and no two triangles can share an edge ($K_4 - e$ is forbidden). In Lean~4, we formalize this structural rigidity without axioms:
+For $f = 5$, let $H = G[\Fix(t)]$ denote the induced subgraph on the 5 fixed points. Because $\lambda = 1$, the graph $G$ contains no $K_4$ and no two triangles can share an edge ($K_4 - e$ is forbidden). In Lean~4, this structural rigidity is formalized without axioms:
 
 \begin{lemma}[Lean 4: \texttt{conway\_z2\_f5\_k3\_012\_isolates\_remaining}]
 \label{lem:f5_isolation}
@@ -269,7 +269,7 @@ Hence, no involution of the Conway 99-graph can have $f = 7$ fixed points.
 The case $f = 3$ represents an involution with 3 fixed points $\{x_1, x_2, x_3\}$ and 48 orbits of length~2.
 
 \subsection{Lean 4 Topological Dichotomy}
-In Lean~4, we establish without assumptions that the induced subgraph on three fixed points admits only two configurations:
+In Lean~4, the induced subgraph on three fixed points is established without assumptions to admit only two configurations:
 \begin{lemma}[Lean 4: \texttt{conway\_z2\_f3\_fixed\_points\_dichotomy}]
 Let $t$ be an involution with $\Fix(t) = \{x_1, x_2, x_3\}$. Then either $G[\Fix(t)] \cong K_3$ (Case~A, a triangle) or $G[\Fix(t)] \cong 3 K_1$ (Case~B, an independent set).
 \end{lemma}
@@ -310,11 +310,11 @@ Every involution with $f = 3$ is refuted. All branches of both Case~A and Case~B
 For $f \in \{9, 11, 13, 15\}$, the number of fixed points is large enough that the induced subgraph $G[\Fix(t)]$ dominates the degree sum.
 By the $\lambda = 1$ condition, the maximum degree inside $G[\Fix(t)]$ cannot exceed 2 (since any degree $\ge 3$ would require common neighbors inside $N(u)$, violating $\lambda = 1$ or forcing $\mu > 2$).
 Thus, $G[\Fix(t)]$ is a collection of disjoint cycles of length $\ge 5$ and paths.
-Applying the trace formula~\eqref{eq:eps1_exact} combined with SMT-based bounded degree enumeration eliminates all possible integer trace assignments for $f = 9, 11, 13, 15$. We note for epistemological precision that these cases are certified computationally via Python/Z3 scripts, without DRAT certificates or Lean~4 formal proofs in the current repository.
+Applying the trace formula~\eqref{eq:eps1_exact} combined with SMT-based bounded degree enumeration eliminates all possible integer trace assignments for $f = 9, 11, 13, 15$. For epistemological precision, it is noted that these cases are certified computationally via Python/Z3 scripts, without DRAT certificates or Lean~4 formal proofs in the current repository.
 
 \section{The \texorpdfstring{$f = 1$}{f = 1} Obstruction: Neighbor Incidence and Canonical Branching}
 
-We now arrive at the core challenge: an involution $t$ with a unique fixed point $x_0 \in V$ ($f = 1$). The remaining 98 vertices partition into 49 length-2 orbits.
+The core open challenge is an involution $t$ with a unique fixed point $x_0 \in V$ ($f = 1$). The remaining 98 vertices partition into 49 length-2 orbits.
 
 \subsection{Neighborhood Decomposition}
 Let $N(x_0) = \{1, \dots, 14\}$ denote the neighborhood of $x_0$, and $\Gamma_2(x_0) = \{15, \dots, 98\}$ the second subconstituent ($|\Gamma_2(x_0)| = 84$).
@@ -362,7 +362,7 @@ The automorphism group of this incidence structure is the wreath product
 \end{equation}
 
 \subsection{Canonical Symmetry-Breaking Orbit Partition}
-To eliminate the massive isomorphic search space, we fix the first orbit $O_0 = \{u_0, u'_0\}$. Its stabilizer subgroup in $W$ has order
+To eliminate the massive isomorphic search space, the first orbit $O_0 = \{u_0, u'_0\}$ is fixed. Its stabilizer subgroup in $W$ has order
 \begin{equation}
     |\Stab_W(O_0)| = \frac{645{,}120}{42} = 15{,}360.
 \end{equation}
@@ -384,12 +384,16 @@ This partition is exhaustive: $1 + 20 + 20 = 41$.
 The three canonical branches of Theorem~\ref{thm:canonical_branches} completely partition the search space for $f = 1$. Each branch is compiled into a CNF instance containing $27{,}778{,}903$ clauses and $666{,}309$ variables.
 
 \subsubsection{Distributed Solving Architecture and Hybrid Portfolio}
-The search is conducted across a hybrid portfolio of 14 concurrent CaDiCaL solvers distributing workload across cloud and local resources:
+The search is conducted across a hybrid portfolio of 14 concurrent CaDiCaL solver configurations distributing workload across cloud and local resources:
 \begin{enumerate}
-    \item \textbf{Google Cloud Platform (\texttt{conway-sat-worker}):} An \texttt{e2-standard-16} virtual machine (16 vCPUs, 64~GB RAM, 300~GB SSD in zone \texttt{us-central1-b}) hosting 11 active CaDiCaL processes ($433.38 \times 10^6$ conflicts accumulated). Five dedicated workers log non-binary DRAT proof traces: the three canonical $f = 1$ branches (Branch~C with $>72.52\text{M}$ conflicts, Branch~B with $>69.38\text{M}$ conflicts, and Branch~A with $>45.59\text{M}$ conflicts, each averaging $\sim 59.6$\,h CPU time) and two $\mathbb{Z}_3$ actions ($>37.18\text{M}$ conflicts for Fixed-3 and $>30.03\text{M}$ conflicts for FPF, each averaging $\sim 31.7$\,h CPU time). Six concurrent SAT hunters execute with randomized seeds under \texttt{--sat} without DRAT logging ($>178.68\text{M}$ conflicts combined), exploring alternative variable and phase selection heuristics to detect prospective satisfying assignments.
-    \item \textbf{Local Apple M2 Cluster:} Three dedicated Performance cores executing CaDiCaL with DRAT proof logging redirected directly to an external NVMe SSD (\texttt{/Volumes/Untitled}) to prevent internal disk exhaustion and thermal throttling. These local processes explore the $\mathbb{Z}_3$ Fixed-3 action (seed~333, $>30.43\text{M}$ conflicts in $\sim 11.2$\,h) and two independent heuristic runs on Branch~A of $f = 1$ (seed~9999 with $>18.71\text{M}$ conflicts and seed~777 with $>17.85\text{M}$ conflicts in $\sim 11.3$\,h), contributing $66.99 \times 10^6$ conflicts.
+    \item \textbf{Google Cloud Platform (\texttt{conway-sat-worker}):} An \texttt{e2-standard-16} virtual machine (16 vCPUs, 64~GB RAM, 300~GB SSD in zone \texttt{us-central1-b}) hosting 11 active CaDiCaL processes ($786{,}239{,}067$ conflicts accumulated). Five dedicated workers log non-binary DRAT proof traces: the three canonical $f = 1$ branches (Branch~C with $>101.64\text{M}$ conflicts in $\sim 100$\,h CPU, marking the first solver instance in the project to surpass the 100-million conflict milestone; Branch~B with $>96.65\text{M}$ conflicts in $\sim 100$\,h CPU; and Branch~A with $>68.55\text{M}$ conflicts in $\sim 100$\,h CPU) and two $\mathbb{Z}_3$ actions ($>70.88\text{M}$ conflicts for Fixed-3 in $\sim 72$\,h CPU and $>61.03\text{M}$ conflicts for FPF in $\sim 72$\,h CPU). Six concurrent SAT hunters execute with randomized seeds under \texttt{--sat} without DRAT logging ($385.42\text{M}$ conflicts combined), exploring alternative variable and phase selection heuristics: $\mathbb{Z}_3$ Hunter Fixed-3 ($>93.53\text{M}$ conflicts in $\sim 69$\,h CPU), $\mathbb{Z}_3$ Hunter FPF ($>74.32\text{M}$ conflicts in $\sim 69$\,h CPU), Branch~B Hunter ($>65.17\text{M}$ conflicts), Branch~C Hunter ($>61.99\text{M}$ conflicts), Branch~A Hunter ($>47.01\text{M}$ conflicts), and Branch~A Hunter 2026 ($>43.40\text{M}$ conflicts).
+    \item \textbf{Local Apple M2 Cluster:} Dedicated Performance cores executing CaDiCaL with DRAT proof logging redirected directly to an external NVMe SSD (\texttt{/Volumes/Untitled}) to prevent internal disk wear and thermal throttling.
+    \begin{itemize}
+        \item \emph{Session 1 (Completed \& Archived):} Preserved in \texttt{session1\_108M\_sep13\_14/}, completing $254{,}851{,}580$ conflicts and writing $147$\,GB of certified proof traces to external storage (0 bytes on internal storage): $\mathbb{Z}_3$ Fixed-3 (seed~333, $108{,}884{,}838$ conflicts, $88.4$\,GB DRAT trace), Branch~A (seed~9999, $73{,}270{,}233$ conflicts, $30.8$\,GB DRAT trace), and Branch~A (seed~777, $72{,}696{,}509$ conflicts, $31.2$\,GB DRAT trace).
+        \item \emph{Session 2 (Active Deployment):} Three Performance cores operating at native scheduling priority without nice constraints: $\mathbb{Z}_3$ Fixed-3 (seed~555, \texttt{proof\_z3\_fixed3\_s2.drat}), $\mathbb{Z}_3$ FPF (seed~777, \texttt{proof\_z3\_fpf\_s2.drat}), and Branch~A (seed~8888, \texttt{proof\_branch\_a\_s2.drat}).
+    \end{itemize}
 \end{enumerate}
-In total, cumulative search effort across the 14-solver cluster has crossed $> 500.38 \times 10^6$ conflicts (Table~\ref{tab:f1_status}).
+In total, cumulative search effort across the hybrid portfolio has surpassed the milestone of one billion conflicts, reaching $> 1{,}041{,}090{,}647$ CDCL conflicts ($> 1.041 \times 10^9$; Table~\ref{tab:f1_status}). Across target branches, $\mathbb{Z}_3$ actions account for $> 408.64\text{M}$ conflicts, while $f = 1$ involution branches account for $> 630.38\text{M}$ conflicts (Branch~A $> 304.93\text{M}$, Branch~C $> 163.63\text{M}$, Branch~B $> 161.82\text{M}$).
 
 \begin{table}[ht]
 \centering
@@ -401,25 +405,30 @@ In total, cumulative search effort across the 14-solver cluster has crossed $> 5
 \toprule
 \textbf{Cluster} & \textbf{Instance / Target} & \textbf{Engine Mode / Seed} & \textbf{CPU Time} & \textbf{Conflicts} \\
 \midrule
-\multicolumn{5}{@{}l}{\textit{Google Cloud Cluster (\texttt{conway-sat-worker}, e2-standard-16, 11 active CaDiCaL processes, 433.38M conflicts)}} \\
-GCP & Branch C ($f=1$) & Disjoint ($768\times$), DRAT & $\sim 59.5$\,h & $> 72.52 \times 10^6$ \\
-GCP & Branch B ($f=1$) & Secant ($768\times$), DRAT & $\sim 59.7$\,h & $> 69.38 \times 10^6$ \\
-GCP & Branch A ($f=1$) & Twin ($15{,}360\times$), DRAT & $\sim 59.6$\,h & $> 45.59 \times 10^6$ \\
-GCP & $\mathbb{Z}_3$ Fixed-3 & 32 orbits ($S_3 \times \mathbb{Z}_2$), DRAT & $\sim 31.7$\,h & $> 37.18 \times 10^6$ \\
-GCP & $\mathbb{Z}_3$ FPF & 33 orbits ($S_3 \times \mathbb{Z}_2$), DRAT & $\sim 31.7$\,h & $> 30.03 \times 10^6$ \\
-GCP & $\mathbb{Z}_3$ Fixed-3 Hunter & Seed 42, \texttt{--sat} & -- & $> 45.75 \times 10^6$ \\
-GCP & $\mathbb{Z}_3$ FPF Hunter & Seed 42, \texttt{--sat} & -- & $> 32.69 \times 10^6$ \\
-GCP & Branch B Hunter ($f=1$) & Seed 42, \texttt{--sat} & -- & $> 29.71 \times 10^6$ \\
-GCP & Branch C Hunter ($f=1$) & Seed 42, \texttt{--sat} & -- & $> 29.03 \times 10^6$ \\
-GCP & Branch A Hunter ($f=1$) & Seed 42, \texttt{--sat} & -- & $> 22.37 \times 10^6$ \\
-GCP & Branch A Hunter ($f=1$) & Seed 2026, \texttt{--sat} & -- & $> 19.13 \times 10^6$ \\
+\multicolumn{5}{@{}l}{\textit{Google Cloud Cluster (\texttt{conway-sat-worker}, e2-standard-16, 11 active CaDiCaL processes, 786.24M conflicts)}} \\
+GCP & Branch C ($f=1$) & Disjoint ($768\times$), DRAT & $\sim 100$\,h & $> 101.64 \times 10^6$ \\
+GCP & Branch B ($f=1$) & Secant ($768\times$), DRAT & $\sim 100$\,h & $> 96.65 \times 10^6$ \\
+GCP & $\mathbb{Z}_3$ Fixed-3 Hunter & Seed 42, \texttt{--sat} & $\sim 69$\,h & $> 93.53 \times 10^6$ \\
+GCP & $\mathbb{Z}_3$ FPF Hunter & Seed 42, \texttt{--sat} & $\sim 69$\,h & $> 74.32 \times 10^6$ \\
+GCP & $\mathbb{Z}_3$ Fixed-3 & 32 orbits ($S_3 \times \mathbb{Z}_2$), DRAT & $\sim 72$\,h & $> 70.88 \times 10^6$ \\
+GCP & Branch A ($f=1$) & Twin ($15{,}360\times$), DRAT & $\sim 100$\,h & $> 68.55 \times 10^6$ \\
+GCP & Branch B Hunter ($f=1$) & Seed 42, \texttt{--sat} & -- & $> 65.17 \times 10^6$ \\
+GCP & Branch C Hunter ($f=1$) & Seed 42, \texttt{--sat} & -- & $> 61.99 \times 10^6$ \\
+GCP & $\mathbb{Z}_3$ FPF & 33 orbits ($S_3 \times \mathbb{Z}_2$), DRAT & $\sim 72$\,h & $> 61.03 \times 10^6$ \\
+GCP & Branch A Hunter ($f=1$) & Seed 42, \texttt{--sat} & -- & $> 47.01 \times 10^6$ \\
+GCP & Branch A Hunter 2026 ($f=1$) & Seed 2026, \texttt{--sat} & -- & $> 43.40 \times 10^6$ \\
 \midrule
-\multicolumn{5}{@{}l}{\textit{Local Apple M2 Cluster (3 Performance cores, external SSD \texttt{/Volumes/Untitled}, 66.99M conflicts)}} \\
-Local M2 & $\mathbb{Z}_3$ Fixed-3 & Seed 333, DRAT & $\sim 11.2$\,h & $> 30.43 \times 10^6$ \\
-Local M2 & Branch A ($f=1$) & Seed 9999, DRAT & $\sim 11.3$\,h & $> 18.71 \times 10^6$ \\
-Local M2 & Branch A ($f=1$) & Seed 777, DRAT & $\sim 11.3$\,h & $> 17.85 \times 10^6$ \\
+\multicolumn{5}{@{}l}{\textit{Local Apple M2 Cluster: Session 1 (Completed \& Safely Archived, 254.85M conflicts, 147 GB proofs)}} \\
+Local M2 (S1) & $\mathbb{Z}_3$ Fixed-3 & Seed 333, DRAT (88.4 GB) & Final & $108{,}884{,}838$ \\
+Local M2 (S1) & Branch A ($f=1$) & Seed 9999, DRAT (30.8 GB) & Final & $73{,}270{,}233$ \\
+Local M2 (S1) & Branch A ($f=1$) & Seed 777, DRAT (31.2 GB) & Final & $72{,}696{,}509$ \\
 \midrule
-\textbf{Total} & \multicolumn{2}{l}{\textbf{Cumulative Hybrid Search Effort (14 solvers)}} & \multicolumn{2}{r}{\textbf{$> 500.38 \times 10^6$ conflicts}} \\
+\multicolumn{5}{@{}l}{\textit{Local Apple M2 Cluster: Session 2 (Active Deployment, 3 Performance cores, native priority)}} \\
+Local M2 (S2) & $\mathbb{Z}_3$ Fixed-3 & Seed 555, DRAT & Active & In progress \\
+Local M2 (S2) & $\mathbb{Z}_3$ FPF & Seed 777, DRAT & Active & In progress \\
+Local M2 (S2) & Branch A ($f=1$) & Seed 8888, DRAT & Active & In progress \\
+\midrule
+\textbf{Total} & \multicolumn{2}{l}{\textbf{Cumulative Hybrid Search Effort}} & \multicolumn{2}{r}{\textbf{$> 1{,}041{,}090{,}647$ conflicts}} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -433,7 +442,7 @@ An autonomous monitoring supervisor (\texttt{cloud\_watcher.sh}) executes on the
 \end{enumerate}
 
 \begin{remark}[Epistemological Status]
-The cases $f = 1$ and $\mathbb{Z}_3$ remain strictly \textbf{EXPLORED / OPEN}. While $>500.38$ million cumulative conflicts across 14 solvers have substantially pruned the active search space, no branch has derived an empty clause or satisfying assignment at the time of writing.
+The cases $f = 1$ and $\mathbb{Z}_3$ remain strictly \textbf{EXPLORED / OPEN}. While $>1{,}041.09$ million cumulative conflicts across the 14-solver portfolio have substantially pruned the active search space, no branch has derived an empty clause or satisfying assignment at the time of writing.
 \end{remark}
 
 \section{The Global Rigidity Landscape of Conway's 99-Graph}
@@ -451,9 +460,9 @@ Table~\ref{tab:global_landscape} summarizes the complete classification landscap
 \midrule
 $p \ge 11$ & Ruled out~\cite{behbahani2011strongly, makhnev2001automorphisms} & Excluded from search & Confirmed by literature & \textbf{PROVED} \\
 $p = 7$ & $7 \mid |\Gamma| \implies \Gamma \cong \mathbb{Z}_7$~\cite{cesarz2025automorphisms} & \texttt{UNKNOWN} (48h, 14 cores)~\cite{thakkar2026forced} & CaDiCaL (771\,s) + \texttt{drat-trim} (\texttt{s VERIFIED}) & \textbf{PROVED} \\
-$p = 3$ & $|G| \ne 6, 9$~\cite{crnkovic2014strongly} & \texttt{UNKNOWN} (1800s CP-SAT)~\cite{thakkar2026forced} & Canonical CNFs, $>176.0\text{M}$ conflicts (5 solvers) & \textbf{EXPLORED} \\
+$p = 3$ & $|G| \ne 6, 9$~\cite{crnkovic2014strongly} & \texttt{UNKNOWN} (1800s CP-SAT)~\cite{thakkar2026forced} & Canonical CNFs, $>408.64\text{M}$ conflicts & \textbf{EXPLORED} \\
 $p = 2$ ($f \ge 3$) & Odd $f \le 15$~\cite{behbahani2011strongly} & Unaddressed & Lean~4 (0 sorry) + \texttt{drat-trim} ($f=3$) & \textbf{PROVED} \\
-$p = 2$ ($f = 1$) & $2 \mid |\Gamma| \implies \Gamma \cong \mathbb{Z}_2$~\cite{cesarz2025automorphisms} & Unaddressed & 3 Canonical Branches, $>324.2\text{M}$ conflicts (9 solvers) & \textbf{EXPLORED} \\
+$p = 2$ ($f = 1$) & $2 \mid |\Gamma| \implies \Gamma \cong \mathbb{Z}_2$~\cite{cesarz2025automorphisms} & Unaddressed & 3 Canonical Branches, $>630.38\text{M}$ conflicts & \textbf{EXPLORED} \\
 \midrule
 $\Aut(G)$ & Conjecture: $\Aut(G) = \{1\}$ & Frontier at 69.4\% constraints & Rigidity conditional on $f=1$ and $\mathbb{Z}_3$ & \textbf{PENDING} \\
 \bottomrule
@@ -462,9 +471,9 @@ $\Aut(G)$ & Conjecture: $\Aut(G) = \{1\}$ & Frontier at 69.4\% constraints & Rig
 \end{table}
 
 \section{Conclusion and Next Directions}
-We have systematically investigated the automorphism group of the putative Conway 99-graph, focusing on the classification of involutions ($t^2 = \mathrm{id}$) and the elimination of admissible odd-order actions. Combining the computer-free reductions of Cesarz and Woldar~\cite{cesarz2025automorphisms} and Crnkovi{\'c} and Maksimovi{\'c}~\cite{crnkovic2014strongly} with verified interactive theorem proving in Lean~4 and certified SAT solving, we have established that the graph admits no involutions with $f \ge 3$ fixed points. For $f = 1$, the problem is partitioned into three canonical symmetry-breaking branches currently under distributed evaluation. Resolving these three branches represents the critical path toward settling whether any non-trivial involution can exist in $\Aut(G)$.
+The automorphism group of the putative Conway 99-graph has been systematically investigated, focusing on the classification of involutions ($t^2 = \mathrm{id}$) and the elimination of admissible odd-order actions. Combining the computer-free reductions of Cesarz and Woldar~\cite{cesarz2025automorphisms} and Crnkovi{\'c} and Maksimovi{\'c}~\cite{crnkovic2014strongly} with verified interactive theorem proving in Lean~4 and certified SAT solving, it is established that the graph admits no involutions with $f \ge 3$ fixed points. For $f = 1$, the problem is partitioned into three canonical symmetry-breaking branches currently under distributed evaluation, with cumulative search effort across the hybrid portfolio crossing the milestone of one billion conflicts ($> 1{,}041.09\text{M}$ conflicts). Resolving these three branches represents the critical path toward settling whether any non-trivial involution can exist in $\Aut(G)$.
 
-Beyond the even-order sector, our framework has resolved the open prime-order action $\mathbb{Z}_7$. As evidenced by the orbit incidence audit and the computational limitations of off-the-shelf constraint programming reported by Thakkar~\cite{thakkar2026forced}, resolving this action required extending the canonical symmetry-breaking methodology developed here to the quotient multiplier group $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$, which enabled an unconditional DRAT-certified refutation (\texttt{s VERIFIED} in 844\,s). By Theorem~\ref{thm:cesarz_woldar}, any non-trivial automorphism group of odd order must be isomorphic to either $\mathbb{Z}_7$ or $\mathbb{Z}_3$; with $\mathbb{Z}_7$ now eliminated, $\mathbb{Z}_3$ stands as the sole surviving odd-order candidate. Following the resolution of the remaining $f = 1$ branches and $\mathbb{Z}_3$, this algebraic and CDCL framework provides the exact foundation to systematically decide the full rigidity conjecture.
+Beyond the even-order sector, the framework has resolved the open prime-order action $\mathbb{Z}_7$. As evidenced by the orbit incidence audit and the computational limitations of off-the-shelf constraint programming reported by Thakkar~\cite{thakkar2026forced}, resolving this action required extending the canonical symmetry-breaking methodology developed here to the quotient multiplier group $\mathcal{G}_{\mathbb{Z}_7} \cong \mathbb{Z}_2 \times \mathbb{Z}_6$, which enabled an unconditional DRAT-certified refutation (\texttt{s VERIFIED} in 844\,s). By Theorem~\ref{thm:cesarz_woldar}, any non-trivial automorphism group of odd order must be isomorphic to either $\mathbb{Z}_7$ or $\mathbb{Z}_3$; with $\mathbb{Z}_7$ now eliminated, $\mathbb{Z}_3$ stands as the sole surviving odd-order candidate. Following the resolution of the remaining $f = 1$ branches and $\mathbb{Z}_3$, this algebraic and CDCL framework provides the exact foundation to systematically decide the full rigidity conjecture.
 
 
 \section*{Declarations}
