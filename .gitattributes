@@ -1,0 +1,5 @@
+# GitHub Linguist Overrides
+# Exclude external reference documents, papers, and HTML files from repository language statistics
+*.html linguist-detectable=false
+references/** linguist-detectable=false
+references/** linguist-documentation
