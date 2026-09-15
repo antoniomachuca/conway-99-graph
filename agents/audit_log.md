@@ -273,3 +273,32 @@ This file records every intervention, verification, and ruling issued by the Ind
   - Parity Rigidity: **PROVED** (Lean 4, `Conway/ParityRigidity.lean`, 0 sorry, standard axioms `[propext, Quot.sound]`).
 - **Verdict:** VERIFIED (Operational & Certified). Full audit documented and committed to [`docs/solver_strategy_and_probability_report.md`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/docs/solver_strategy_and_probability_report.md).
 
+### [2026-09-15 17:45:00 CEST] - Local Session 2 Archival, Grand Conflict Milestone (> 1.342B), and Session 3 Deployment
+- **Objective:** Archival of completed local Session 2 on external storage, accounting of project-wide cumulative conflicts (> 1.342 Billion), and initialization of Session 3 across 3 Apple M2 performance cores with fresh seeds.
+- **Local Session 2 Closure & Forensic Audit:**
+  - Automated stop daemon (`scripts/auto_stop_tuesday_morning.sh`) executed cleanly at 09:15:01 CEST on Tuesday, September 15.
+  - Process runtimes: 58,422s to 58,573s (~16.27 hours per solver).
+  - Conflict metrics harvested:
+    * Branch A ($f=1$, seed 8888): $31{,}396{,}273$ conflicts ($536.02\text{ conf/s}$, $11\text{ GB}$ DRAT).
+    * $\mathbb{Z}_3$ Fixed-3 (seed 555): $52{,}204{,}101$ conflicts ($893.57\text{ conf/s}$, $48\text{ GB}$ DRAT).
+    * $\mathbb{Z}_3$ FPF (seed 777): $37{,}869{,}387$ conflicts ($647.92\text{ conf/s}$, $38\text{ GB}$ DRAT).
+  - Session 2 Total: **$121{,}469{,}761$ conflicts** ($97\text{ GB}$ DRAT proof traces).
+  - Archival destination: Safely consolidated in [`/Volumes/Untitled/conway_local_run/session2_121M_sep14_15/`](file:///Volumes/Untitled/conway_local_run/session2_121M_sep14_15/).
+  - Cumulative Local M2 Conflict Footprint (Sessions 1 & 2): **$376{,}321{,}341$ conflicts** ($254.82\text{ GB}$ DRAT).
+- **Session 3 Deployment (Apple M2):**
+  - Drive reconnected at 17:34 CEST with $140\text{ GiB}$ free space.
+  - Deployed via [`scripts/launch_session3_local.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/launch_session3_local.sh) on 3 dedicated Performance cores with `caffeinate -s`:
+    * Solver 1: $\mathbb{Z}_3$ Fixed-3 (`--seed=1010`, PID 2654) -> `proof_z3_fixed3_s3.drat`
+    * Solver 2: $\mathbb{Z}_3$ FPF (`--seed=2026`, PID 2658) -> `proof_z3_fpf_s3.drat`
+    * Solver 3: Branch A ($f=1$, `--seed=12345`, PID 2664) -> `proof_branch_a_s3.drat`
+  - Monitor daemon: [`scripts/local_solver_monitor.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/local_solver_monitor.sh) running under PID 2892, reporting to Telegram hourly.
+- **Grand Cumulative Conflict Accounting:**
+  - Total cumulative CDCL conflicts traversed across all active and completed runs: **$1{,}342{,}191{,}290$ conflicts** ($> 1.342\text{ Billion / } 1.34\text{ Giga-conflicts}$).
+  - GCP Active (11 solvers): $965{,}410{,}546$ conflicts ($163\text{ GB}$ free on root disk).
+  - GCP Completed ($\mathbb{Z}_7$): $459{,}403$ conflicts (`s VERIFIED`).
+  - Local Session 1: $254{,}851{,}580$ conflicts.
+  - Local Session 2: $121{,}469{,}761$ conflicts.
+  - Local Session 3: active in progress.
+- **Verdict:** VERIFIED (Operational & Certified).
+
+

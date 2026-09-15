@@ -92,12 +92,19 @@ Cumulative search effort across the 14-solver portfolio has officially passed th
 
 ### B. Local Apple M2 Cluster (Dedicated External Storage `/Volumes/Untitled`)
 - **Storage Isolation:** All local DRAT proof streams are written directly to an external NVMe SSD mounted at `/Volumes/Untitled`, precluding internal SSD wear and storage exhaustion (0 bytes written to internal Mac SSD).
-- **Session 1 (Completed & Safely Archived in `/Volumes/Untitled/conway_local_run/session1_108M_sep13_14/` — 254,851,580 Conflicts):**
+- **Session 1 (Completed & Safely Archived in `session1_108M_sep13_14/` — 254,851,580 Conflicts):**
   - $\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT): $108{,}884{,}838$ conflicts (88.4 GB certified DRAT proof trace).
   - Branch A ($f=1$, seed 9999, DRAT): $73{,}270{,}233$ conflicts (30.8 GB certified DRAT proof trace).
   - Branch A ($f=1$, seed 777, DRAT): $72{,}696{,}509$ conflicts (31.2 GB certified DRAT proof trace).
   - *Total Session 1:* $254.85\mathrm{M}$ conflicts, $147\mathrm{GB}$ of proof files safely preserved on external SSD.
-- **Session 2 (Active Deployment, 3 Performance Cores at Native Scheduling Priority without nice):**
-  - $\mathbb{Z}_3$ Fixed-3 (seed 555, DRAT): Logging to `proof_z3_fixed3_s2.drat`.
-  - $\mathbb{Z}_3$ FPF (seed 777, DRAT): Logging to `proof_z3_fpf_s2.drat`.
-  - Branch A ($f=1$, seed 8888, DRAT): Logging to `proof_branch_a_s2.drat`.
+- **Session 2 (Completed & Safely Archived in `session2_121M_sep14_15/` — 121,469,761 Conflicts):**
+  - $\mathbb{Z}_3$ Fixed-3 (seed 555, DRAT): $52{,}204{,}101$ conflicts (48 GB DRAT trace).
+  - $\mathbb{Z}_3$ FPF (seed 777, DRAT): $37{,}869{,}387$ conflicts (38 GB DRAT trace).
+  - Branch A ($f=1$, seed 8888, DRAT): $31{,}396{,}273$ conflicts (11 GB DRAT trace).
+  - *Total Session 2:* $121.47\mathrm{M}$ conflicts, $97\mathrm{GB}$ of proof files cleanly archived.
+  - *Cumulative Local Footprint (Sessions 1 & 2):* **$376{,}321{,}341$ conflicts**.
+- **Session 3 (Active Deployment, 3 Performance Cores at Native Scheduling Priority):**
+  - $\mathbb{Z}_3$ Fixed-3 (seed 1010, DRAT, PID 2654): Logging to `proof_z3_fixed3_s3.drat`.
+  - $\mathbb{Z}_3$ FPF (seed 2026, DRAT, PID 2658): Logging to `proof_z3_fpf_s3.drat`.
+  - Branch A ($f=1$, seed 12345, DRAT, PID 2664): Logging to `proof_branch_a_s3.drat`.
+  - Supervisor: `local_solver_monitor.sh` (PID 2892) reporting hourly to Telegram. Available disk: $140\text{ GiB}$.
