@@ -313,21 +313,27 @@ This file records every intervention, verification, and ruling issued by the Ind
   - Total Session 3: **$141{,}706{,}896$ conflicts** ($120\text{ GB}$ DRAT traces).
   - Storage: Consolidated safely in [`/Volumes/Untitled/conway_local_run/session3_141M_sep15_16/`](file:///Volumes/Untitled/conway_local_run/session3_141M_sep15_16/).
   - Cumulative Local M2 Conflict Footprint (Sessions 1, 2, 3): **$518{,}028{,}237$ conflicts** ($> 518\text{ Million conflicts}$, officially surpassing Half a Billion locally).
-- **Zstandard Storage Optimization Pipeline:**
+- **Zstandard Storage Optimization Pipeline (Completed at 21:50:17 CEST):**
   - Prior free disk space on `/Volumes/Untitled` had dropped to $21\text{ GiB}$ due to $365\text{ GB}$ of raw DRAT traces.
   - Deployed `zstd --rm -1 -T2` sequential compression pipeline ([`scripts/compress_historical_sessions.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/compress_historical_sessions.sh)) with mathematical scheduling (smaller files first, guaranteeing `headroom > 0.65 * file_size`).
-  - Completed compressions:
+  - Completed 100% of historical compressions across Sessions 1, 2, and 3:
     * `session1_108M_sep13_14/proof_branch_a_local.drat` ($30.5\text{ GB} \to 18.8\text{ GB}$).
     * `session1_108M_sep13_14/proof_branch_a_seed9999_local.drat` ($30.1\text{ GB} \to 18.2\text{ GB}$).
+    * `session1_108M_sep13_14/proof_z3_fixed3_local.drat` ($86.4\text{ GB} \to 39.0\text{ GB}$).
     * `session2_121M_sep14_15/proof_branch_a_s2.drat` ($11.4\text{ GB} \to 7.12\text{ GB}$).
-    * `session3_141M_sep15_16/proof_branch_a_s3.drat` ($13.3\text{ GB} \to 8.1\text{ GB}$).
-  - Free disk space recovered from $21\text{ GiB}$ to **$54\text{ GiB}$**, with background compression continuing on remaining files to reach $>160\text{ GiB}$ free space.
+    * `session2_121M_sep14_15/proof_z3_fpf_s2.drat` ($37.9\text{ GB} \to 13.1\text{ GB}$).
+    * `session2_121M_sep14_15/proof_z3_fixed3_s2.drat` ($48.4\text{ GB} \to 18.8\text{ GB}`).
+    * `session3_141M_sep15_16/proof_branch_a_s3.drat` ($13.3\text{ GB} \to 8.1\text{ GB}`).
+    * `session3_141M_sep15_16/proof_z3_fpf_s3.drat` ($47.5\text{ GB} \to 16.6\text{ GB}`).
+    * `session3_141M_sep15_16/proof_z3_fixed3_s3.drat` ($58.7\text{ GB} \to 22.8\text{ GB}`).
+  - Final Storage Footprint: Free disk space expanded from $21\text{ GiB}$ to **$217\text{ GiB}$** ($>10\times$ expansion), permanently securing storage headroom.
 - **Local Session 4 Marathon Deployment (Apple M2):**
   - Deployed via [`scripts/launch_session4_local.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/launch_session4_local.sh) on 3 dedicated Performance cores with `nohup caffeinate -s`:
-    * Solver 1: $\mathbb{Z}_3$ Fixed-3 (`--seed=4444`, PID 4608) $\to$ `proof_z3_fixed3_s4.drat`
-    * Solver 2: $\mathbb{Z}_3$ FPF (`--seed=9999`, PID 4613) $\to$ `proof_z3_fpf_s4.drat`
-    * Solver 3: Branch A ($f=1$, `--seed=77777`, PID 4617) $\to$ `proof_branch_a_s4.drat`
-  - Monitor daemon: [`scripts/local_solver_monitor.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/local_solver_monitor.sh) (PID 4620), reporting to Telegram hourly.
+    * Solver 1: $\mathbb{Z}_3$ Fixed-3 (`--seed=4444`, PID 4608) $\to$ `proof_z3_fixed3_s4.drat` ($> 7.9\times 10^6$ conflicts).
+    * Solver 2: $\mathbb{Z}_3$ FPF (`--seed=9999`, PID 4613) $\to$ `proof_z3_fpf_s4.drat` ($> 7.1\times 10^6$ conflicts).
+    * Solver 3: Branch A ($f=1$, `--seed=77777`, PID 4617) $\to$ `proof_branch_a_s4.drat` ($> 5.4\times 10^6$ conflicts).
+    * Session 4 Total: $> 20.4\times 10^6$ conflicts accumulated in 3.4 hours.
+  - Monitor daemon: [`scripts/local_solver_monitor.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/local_solver_monitor.sh) (PID 10702), reporting to Telegram hourly.
   - Automated stop daemon: [`scripts/auto_stop_friday.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/auto_stop_friday.sh) (PID 4220), armed for Friday, September 18 at 12:00 CEST (Target Epoch 1789725600, ~40 continuous core-hours per solver).
 - **Google Cloud Platform VM Telemetry (`conway-sat-worker`):**
   - 11 active solvers: **$1{,}221{,}892{,}664$ active conflicts** ($> 1.221\text{ Billion}$) + $459{,}403$ on $\mathbb{Z}_7$ (**PROVED**).
@@ -341,9 +347,9 @@ This file records every intervention, verification, and ruling issued by the Ind
 - **Objective:** Deploy 5 new heuristic SAT hunters on Google Cloud Platform (`conway-sat-worker`, `e2-standard-16`) utilizing user-selected intuitive seeds (`1503`, `1010`, `1892`, `2101`, `1306`) across all remaining idle vCPUs, reaching 100% CPU capacity (16 active solvers on 16 vCPUs).
 - **Algorithmic Allocation Rationale:**
   - Seeds were distributed to maximize the probability of earliest contradiction or model discovery:
-    * **Rama A ($f=1$, Gemela):** Seed `1503` (PID 892481) and Seed `1892` (PID 892483). Target: highest probability branch (73% variables pre-eliminated, $15{,}360\times$ symmetry factor).
-    * **$\mathbb{Z}_3$ Fixed-3 (32 órbitas):** Seed `1010` (PID 892482) and Seed `2101` (PID 892484). Target: 3 fixed-point invariants, highest-depth branch in order-3.
-    * **$\mathbb{Z}_3$ FPF (33 órbitas):** Seed `1306` (PID 892485). Target: complete coverage of the second $\mathbb{Z}_3$ model to accelerate full group refutation.
+    * **Branch A ($f=1$, Twin):** Seed `1503` (PID 892481) and Seed `1892` (PID 892483). Target: highest probability branch (73% variables pre-eliminated, $15{,}360\times$ symmetry factor).
+    * **$\mathbb{Z}_3$ Fixed-3 (32 orbits):** Seed `1010` (PID 892482) and Seed `2101` (PID 892484). Target: 3 fixed-point invariants, highest-depth branch in order-3.
+    * **$\mathbb{Z}_3$ FPF (33 orbits):** Seed `1306` (PID 892485). Target: complete coverage of the second $\mathbb{Z}_3$ model to accelerate full group refutation.
 - **Supervisor Upgrade:**
   - Upgraded [`scripts/cloud_watcher.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/cloud_watcher.sh) (PID 893164) with immediate UNSAT alert detection across all hunter processes (`cadical_hunter_*.log`, `cadical_z3_hunter_*.log`) and raised active rebalance target to 16 solvers.
 - **Global Computational Portfolio Status:**

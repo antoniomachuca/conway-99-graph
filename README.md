@@ -96,9 +96,9 @@ The table below contrasts historical literature results, recent constraint-progr
 | **Involutions ($f = 5$)** | Odd $f \le 15$ (Behbahani-Lam 2011; Makhnev 2010) | Unaddressed | Structural isolation $K_3+2K_1$ vs $5K_1$ and modular trace contradiction $\varepsilon_1 \equiv 6 \pmod 7$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
 | **Involutions ($f = 7$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | 136 admissible subgraphs ($T \in \{0, 1, 2\}$ under $K_4$-freeness) yielding $\varepsilon_1 \in \{7, 10, 13\} \not\equiv 2 \pmod 7$ in [`Conway/Z2Classification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/Z2Classification.lean) (0 `sorry`) | **PROVED** |
 | **Involutions ($f \ge 9$)** | Odd $f \le 15$ (Behbahani-Lam 2011) | Unaddressed | Refuted by negative base term $f(8-f) < 0$ and degree partition enumeration with SMT scripts | **PROVED** |
-| **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). Active solving across portfolio (GCP cloud + Local Apple M2): $> 630.38\mathrm{M}$ conflicts (Branch A $>304.93\mathrm{M}$, Branch C $>163.63\mathrm{M}$, Branch B $>161.82\mathrm{M}$). Component of $>1{,}041.09\mathrm{M}$ cumulative portfolio conflicts | **EXPLORED** |
+| **Involutions ($f = 1$)** | Unique surviving involution case; $N(x_0) \cong 7K_2$, $\Gamma_2(x_0)$ in 42 pairs | Unaddressed | Incidence matrix $C_{7 \times 42}$ unique ($|W| = 645{,}120$). Active solving across portfolio (GCP cloud + Local Apple M2): $> 947\mathrm{M}$ conflicts (Branch A $>463\mathrm{M}$, Branch B $>242\mathrm{M}$, Branch C $>237\mathrm{M}$). Component of $>1{,}740.38\mathrm{M}$ cumulative portfolio conflicts | **EXPLORED** |
 | **Order 7 ($\mathbb{Z}_7$)** | Non-existence proved by computer (Behbahani-Lam 2011); $7 \mid \lvert \Gamma \rvert \implies \Gamma \cong \mathbb{Z}_7$ (Cesarz-Woldar 2025) | `UNKNOWN` (48h, 14 cores CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z7_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z7_canonical_cnf.py). Refuted by CaDiCaL 3.0.1 (`s UNSATISFIABLE`, 771.59s) and certified by `drat-trim` (`s VERIFIED`, 844.01s, [`drat_trim_z7.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/drat_trim_z7.log)); secondary confirmation via hunter ([`cadical_z7_hunter.log`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/cadical_z7_hunter.log)) | **PROVED** |
-| **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z3_canonical_cnf.py); unit tests passing. Active solving across portfolio (Fixed-3 DRAT $>70.88\mathrm{M}$, FPF DRAT $>61.03\mathrm{M}$, hunters $>167.85\mathrm{M}$, M2 Session 1 $>108.88\mathrm{M}$): $> 408.64\mathrm{M}$ conflicts. Component of $>1{,}041.09\mathrm{M}$ cumulative portfolio conflicts | **EXPLORED** |
+| **Order 3 ($\mathbb{Z}_3$)** | Non-existence proved by computer (Behbahani-Lam 2011; Crnković-Maksimović 2020) | `UNKNOWN` (1800s CP-SAT, Thakkar 2026) | Canonical compiler in [`scripts/build_z3_canonical_cnf.py`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/build_z3_canonical_cnf.py); unit tests passing. Active solving across portfolio (Fixed-3 action $>498\mathrm{M}$, FPF action $>314\mathrm{M}$ across DRAT and hunters on GCP + M2 Sessions 1--4): $> 812\mathrm{M}$ conflicts. Component of $>1{,}740.38\mathrm{M}$ cumulative portfolio conflicts | **EXPLORED** |
 | **Grand Classification** | $\lvert \mathrm{Aut}(G) \rvert \in \{1, 2\}$ | Unaddressed | Formalized in [`Conway/GrandClassification.lean`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/Conway/GrandClassification.lean); compiles cleanly, conditional on $\mathbb{Z}_3$ | **COMPILED** |
 | **Full Rigidity Conjecture** | $\mathrm{Aut}(G) = \{1\}$ (Brouwer, Cameron, Haemers) | Open (Frontier at 69.4% constraints) | Conditional on refuting $f = 1$ and ingesting $\mathbb{Z}_7$ / $\mathbb{Z}_3$ certificates | **PENDING** |
 | **Existence of $G$** | Open (Conway 1969; Biggs 1969) | Open | Core open problem investigated via dual-track framework | **PENDING** |
@@ -300,47 +300,72 @@ Execute the combinatorial enumerator confirming the absence of compatible subgra
 python3 scripts/analyze_z2_f7_exhaustive.py
 ```
 
-### F. Distributed Solver Architecture & Hybrid 14-Solver Portfolio (>1 Billion Conflict Milestone)
-To scale search across the remaining open symmetry cases without bottlenecking local host capacity, execution is distributed across a hybrid portfolio of 14 concurrent CaDiCaL solver configurations combining a high-performance Google Cloud Compute Engine VM and dedicated local Apple M2 hardware writing to external high-speed storage. The cumulative search effort across the project has crossed **> 1,041,090,647 CDCL CONFLICTS** (> 1.041 Billion / > 1.04 Giga-conflicts), comprising 786,239,067 conflicts on Google Cloud and 254,851,580 conflicts completed on the local Apple M2 cluster across target branches:
-- **$\mathbb{Z}_3$ Actions:** $> 408.64\mathrm{M}$ conflicts combined.
-- **$f = 1$ Involution Branches:** $> 630.38\mathrm{M}$ conflicts combined (Branch A $> 304.93\mathrm{M}$, Branch C $> 163.63\mathrm{M}$, Branch B $> 161.82\mathrm{M}$).
+### F. Distributed Solver Architecture & Saturated 19-Solver Portfolio (>1.74 Billion Conflict Milestone)
+To scale search across the remaining open symmetry cases without bottlenecking local host capacity, execution is distributed across a hybrid portfolio of 19 concurrent CaDiCaL solver configurations combining a high-performance Google Cloud Compute Engine VM (saturated at 16 active solvers on 16 vCPUs) and dedicated local Apple M2 hardware writing to external high-speed storage. The cumulative search effort across the project has crossed **> 1,740,380,304 CDCL CONFLICTS** (> 1.74 Billion / > 1.74 Giga-conflicts), comprising 1,222,352,067 conflicts on Google Cloud ($1{,}221{,}892{,}664$ active + $459{,}403$ $\mathbb{Z}_7$ proved) and 518,028,237 conflicts completed on the local Apple M2 cluster across Sessions 1--3 (plus the active Session 4 marathon running across 3 Performance cores):
+- **$f = 1$ Involution Branches:** $> 947\mathrm{M}$ conflicts combined (Branch A $> 463\mathrm{M}$, Branch B $> 242\mathrm{M}$, Branch C $> 237\mathrm{M}$).
+- **$\mathbb{Z}_3$ Actions:** $> 812\mathrm{M}$ conflicts combined (Fixed-3 action $> 498\mathrm{M}$, Fixed-Point-Free action $> 314\mathrm{M}$).
 
-#### 1. Google Cloud Cluster (`conway-sat-worker`, 11 Active CaDiCaL Processes — 786,239,067 Conflicts)
-- **Host Instance:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 300 GB SSD in zone `us-central1-b`, with 243 GB free disk space).
-- **Core Budget & Allocation:** 11 dedicated vCPUs running CaDiCaL 1.9.5/3.0.1 at 100% utilization, with 5 vCPUs held idle to guarantee OS responsiveness, filesystem throughput, and immediate CPU availability for automated `drat-trim` proof verification.
-- **Worker Breakdown:**
-  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers, 266.84M conflicts):**
-     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 101.64 \times 10^6$ conflicts (~100h continuous CPU), emitting non-binary DRAT proof trace. Marks the first solver instance in the project to surpass 100 Million conflicts.
-     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 96.65 \times 10^6$ conflicts (~100h continuous CPU), emitting non-binary DRAT proof trace.
-     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 68.55 \times 10^6$ conflicts (~100h continuous CPU), emitting non-binary DRAT proof trace.
-  2. **Order 3 ($\mathbb{Z}_3$) Main DRAT Solvers (2 workers, 131.91M conflicts):**
-     - **Fixed-3 Action (32 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 70.88 \times 10^6$ conflicts (~72h continuous CPU), emitting non-binary DRAT proof trace.
-     - **Fixed-Point-Free Action (33 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 61.03 \times 10^6$ conflicts (~72h continuous CPU), emitting non-binary DRAT proof trace.
-  3. **GCP Heuristic SAT Hunters (6 workers, 385.42M conflicts):** Non-DRAT mode (`--sat`, 0 proof disk consumption) exploring diverse variable and phase heuristics:
-     - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 42):** $> 93.53 \times 10^6$ conflicts (~69h CPU).
-     - **$\mathbb{Z}_3$ FPF Hunter (seed 42):** $> 74.32 \times 10^6$ conflicts (~69h CPU).
-     - **Branch B Hunter ($f=1$, seed 42):** $> 65.17 \times 10^6$ conflicts.
-     - **Branch C Hunter ($f=1$, seed 42):** $> 61.99 \times 10^6$ conflicts.
-     - **Branch A Hunter ($f=1$, seed 42):** $> 47.01 \times 10^6$ conflicts.
-     - **Branch A Hunter 2026 ($f=1$, seed 2026):** $> 43.40 \times 10^6$ conflicts reinforcing the $15{,}360\times$ bottleneck search space.
+#### 1. Google Cloud Cluster (`conway-sat-worker`, 16 Active CaDiCaL Solvers on 16 vCPUs — 100% Saturation)
+- **Host Instance:** `conway-sat-worker` (`e2-standard-16`, 16 vCPUs, 64 GB RAM, 450 GB SSD in zone `us-central1-b`, with 87 GB free SSD disk space).
+- **Core Budget & Allocation:** 16 active solvers fully saturating all 16 vCPUs (100% CPU utilization, load average 16.00).
+- **Worker Breakdown (16 Active Processes):**
+  1. **$f = 1$ ($\mathbb{Z}_2$) Main DRAT Solvers (3 workers, >362.5M conflicts):**
+     - **Branch B (Secant $O_1$):** $768\times$ reduction, $> 133.2 \times 10^6$ conflicts (~151h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Branch C (Disjoint $O_{10}$):** $768\times$ reduction, $> 132.9 \times 10^6$ conflicts (~151h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Branch A (Twin $O_{21}$):** $15{,}360\times$ reduction, $> 96.3 \times 10^6$ conflicts (~151h continuous CPU), emitting non-binary DRAT proof trace.
+  2. **Order 3 ($\mathbb{Z}_3$) Main DRAT Solvers (2 workers, >216.3M conflicts):**
+     - **Fixed-3 Action (32 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 114.7 \times 10^6$ conflicts (~123h continuous CPU), emitting non-binary DRAT proof trace.
+     - **Fixed-Point-Free Action (33 orbits, $S_3 \times \mathbb{Z}_2$ cuts):** $> 101.6 \times 10^6$ conflicts (~123h continuous CPU), emitting non-binary DRAT proof trace.
+  3. **GCP Heuristic SAT Hunters (11 workers, non-DRAT mode `--sat`):**
+     - *Baseline Hunters (6 workers, >643.0M conflicts):*
+       - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 42):** $> 153.3 \times 10^6$ conflicts (~120h CPU).
+       - **$\mathbb{Z}_3$ FPF Hunter (seed 42):** $> 123.7 \times 10^6$ conflicts (~120h CPU).
+       - **Branch B Hunter ($f=1$, seed 42):** $> 108.8 \times 10^6$ conflicts.
+       - **Branch C Hunter ($f=1$, seed 42):** $> 104.8 \times 10^6$ conflicts.
+       - **Branch A Hunter ($f=1$, seed 42):** $> 79.0 \times 10^6$ conflicts.
+       - **Branch A Hunter 2026 ($f=1$, seed 2026):** $> 73.1 \times 10^6$ conflicts.
+     - *Newly Deployed Hunters (5 workers deployed September 17, 2026):*
+       - **Branch A Hunter (seed 1503, PID 892481):** Reinforcing the $15{,}360\times$ symmetry-reduced bottleneck.
+       - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 1010, PID 892482):** Exploring alternative variable activity orderings.
+       - **Branch A Hunter (seed 1892, PID 892483):** Second stochastic hunter on Branch A.
+       - **$\mathbb{Z}_3$ Fixed-3 Hunter (seed 2101, PID 892484):** Accelerating fixed-3 action refutation.
+       - **$\mathbb{Z}_3$ FPF Hunter (seed 1306, PID 892485):** Dedicated hunter on 33-orbit fixed-point-free action.
 - **Autonomous Cloud Supervisor & Verification Daemon:**
-  Supervision on the remote cloud instance is managed by the autonomous background daemon [`scripts/cloud_watcher.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/cloud_watcher.sh) (PID 68900):
-  - **Dynamic Core Replenishment:** Detects freed vCPUs upon solver completion and dynamically spawns fresh SAT hunters with distinct seeds (`$RANDOM`) prioritizing active bottlenecks.
+  Supervision on the remote cloud instance is managed by the upgraded autonomous background daemon [`scripts/cloud_watcher.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/cloud_watcher.sh) (PID 893164):
+  - **Dynamic Core Replenishment & 16-Core Saturation:** Maintains full saturation of 16 solvers across all 16 vCPUs. Upon any solver completion, immediately detects freed capacity and spawns fresh hunters.
+  - **Comprehensive UNSAT Detection:** Upgraded with automated `s UNSATISFIABLE` alert detection across all 11 hunter logs (`cadical_hunter_*.log`, `cadical_z3_hunter_*.log`) as well as main DRAT logs.
+  - **Automated Verification:** Triggers `/usr/local/bin/drat-trim` against CNF and DRAT proof traces to independently certify empty-clause derivations (as demonstrated by the certified refutation of Order 7).
   - **Real-Time Model Extraction:** Inspects all solver logs every 20 seconds. Upon detection of `s SATISFIABLE`, isolates variable assignments `^v ` immediately into `sat_solution_<tag>.txt` and executes filesystem sync.
-  - **Automated Verification:** Upon detection of `s UNSATISFIABLE` in any DRAT-logging branch, automatically triggers `/usr/local/bin/drat-trim` against the CNF and proof file to independently verify the empty-clause derivation (as successfully executed for Order 7).
-  - **Telemetry & Monitoring:** Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and broadcasts periodic 4-hour status heartbeats.
+  - **Telemetry & Monitoring:** Emits real-time priority alerts to `@Conway_Demon_Bot` via Telegram Bot API and broadcasts hourly status heartbeats.
 
 #### 2. Local Apple M2 Cluster (Dedicated External Storage `/Volumes/Untitled`)
-- **Storage Isolation:** All local DRAT proof streams are written directly to an external NVMe SSD mounted at `/Volumes/Untitled`, precluding internal SSD wear and storage exhaustion (0 bytes written to internal Mac SSD).
-- **Session 1 (Completed & Safely Archived in `/Volumes/Untitled/conway_local_run/session1_108M_sep13_14/` — 254,851,580 Conflicts):**
-  - **$\mathbb{Z}_3$ Fixed-3 (seed 333, DRAT):** $108{,}884{,}838$ conflicts (88.4 GB certified DRAT proof trace).
-  - **Branch A ($f=1$, seed 9999, DRAT):** $73{,}270{,}233$ conflicts (30.8 GB certified DRAT proof trace).
-  - **Branch A ($f=1$, seed 777, DRAT):** $72{,}696{,}509$ conflicts (31.2 GB certified DRAT proof trace).
-  - *Total Session 1:* $254.85\mathrm{M}$ conflicts, $147\mathrm{GB}$ of certified proof files safely preserved on external SSD.
-- **Session 2 (Active Deployment, 3 Performance Cores at Native Scheduling Priority without nice):**
-  - **$\mathbb{Z}_3$ Fixed-3 (seed 555, DRAT):** Logging to `proof_z3_fixed3_s2.drat`.
-  - **$\mathbb{Z}_3$ FPF (seed 777, DRAT):** Logging to `proof_z3_fpf_s2.drat`.
-  - **Branch A ($f=1$, seed 8888, DRAT):** Logging to `proof_branch_a_s2.drat`.
+- **Storage Architecture & Isolation:** All local DRAT proof streams are written directly to an external NVMe SSD mounted at `/Volumes/Untitled`, precluding internal SSD wear and storage exhaustion (0 bytes written to internal Mac SSD).
+- **Completed Footprint across Sessions 1, 2, and 3 (518,028,237 Conflicts):**
+  - **Session 1 Archive (`session1_108M_sep13_14/` — 254,851,580 conflicts):**
+    - $\mathbb{Z}_3$ Fixed-3 (seed 333): $108{,}884{,}838$ conflicts ($86.4\text{ GB}$ raw $\to 39.0\text{ GB}$ `.zst`).
+    - Branch A ($f=1$, seed 9999): $73{,}270{,}233$ conflicts ($30.1\text{ GB}$ raw $\to 18.2\text{ GB}$ `.zst`).
+    - Branch A ($f=1$, seed 777): $72{,}696{,}509$ conflicts ($30.5\text{ GB}$ raw $\to 18.8\text{ GB}$ `.zst`).
+  - **Session 2 Archive (`session2_121M_sep14_15/` — 121,469,761 conflicts):**
+    - $\mathbb{Z}_3$ Fixed-3 (seed 555): $52{,}204{,}101$ conflicts ($48.4\text{ GB}$ raw $\to 18.8\text{ GB}$ `.zst`).
+    - $\mathbb{Z}_3$ FPF (seed 777): $37{,}869{,}387$ conflicts ($37.9\text{ GB}$ raw $\to 13.1\text{ GB}$ `.zst`).
+    - Branch A ($f=1$, seed 8888): $31{,}396{,}273$ conflicts ($11.4\text{ GB}$ raw $\to 7.12\text{ GB}$ `.zst`).
+  - **Session 3 Archive (`session3_141M_sep15_16/` — 141,706,896 conflicts):**
+    - Stopped cleanly Wednesday noon (12:15 CEST) via [`scripts/auto_stop_wednesday.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/auto_stop_wednesday.sh).
+    - $\mathbb{Z}_3$ Fixed-3 (seed 1010): $61{,}071{,}983$ conflicts ($58.7\text{ GB}$ raw $\to 22.8\text{ GB}$ `.zst`).
+    - $\mathbb{Z}_3$ FPF (seed 2026): $44{,}382{,}048$ conflicts ($47.5\text{ GB}$ raw $\to 16.6\text{ GB}$ `.zst`).
+    - Branch A ($f=1$, seed 12345): $36{,}252{,}865$ conflicts ($13.3\text{ GB}$ raw $\to 8.1\text{ GB}$ `.zst`).
+  - *Cumulative Local Completed Footprint (Sessions 1--3):* **$518{,}028{,}237$ conflicts** ($> 518\text{ Million conflicts}$ completed locally).
+- **Completed Storage Optimization Pipeline (Zstandard):**
+  - All historical DRAT proof archives across Sessions 1, 2, and 3 have been 100% compressed into `.zst` format using `zstd --rm -1 -T2` via [`scripts/compress_historical_sessions.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/compress_historical_sessions.sh).
+  - Available free space on `/Volumes/Untitled` expanded from $21\text{ GiB}$ to **$217\text{ GiB}$** ($>10\times$ expansion), fully securing external storage for active and future runs.
+- **Session 4 Active Marathon Deployment (Wednesday Sep 16, 20:07 CEST to Friday Sep 18, 12:00 CEST, ~40h):**
+  - Three Performance cores operating at native scheduling priority without nice constraints:
+    - **$\mathbb{Z}_3$ Fixed-3 (seed 4444, PID 4608):** Logging to `proof_z3_fixed3_s4.drat` ($> 7.9\times 10^6$ conflicts).
+    - **$\mathbb{Z}_3$ FPF (seed 9999, PID 4613):** Logging to `proof_z3_fpf_s4.drat` ($> 7.1\times 10^6$ conflicts).
+    - **Branch A ($f=1$, seed 77777, PID 4617):** Logging to `proof_branch_a_s4.drat` ($> 5.4\times 10^6$ conflicts).
+    - *Session 4 Total:* $> 20.4\times 10^6$ conflicts accumulated in 3.4 hours.
+  - **Local Supervisor:** Autonomous monitor daemon [`scripts/local_solver_monitor.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/local_solver_monitor.sh) (PID 10702) polling solvers and dispatching hourly Telegram heartbeats.
+  - **Automated Shutdown Daemon:** [`scripts/auto_stop_friday.sh`](file:///Users/antoniomachuca/Documents/Conway's%2099-Graph%20Problem/scripts/auto_stop_friday.sh) (PID 4220) armed for clean SIGTERM shutdown, disk sync, volume unmount, and Telegram alert on Friday, September 18 at 12:00 CEST (~40h continuous execution per solver).
 
 ---
 
