@@ -356,6 +356,15 @@ This file records every intervention, verification, and ruling issued by the Ind
   - **19 Concurrent Solvers Active:** 16 solvers on Google Cloud (100% saturation of 16 vCPUs) + 3 solvers on Apple M2 Silicon.
 - **Verdict:** VERIFIED (Operational & Certified). All 16 cores on GCP executing at 100% load average.
 
-
-
-
+### [2026-09-17 18:08:35 CEST] - Online Storage Expansion on GCP Worker (`conway-sat-worker`)
+- **Objective:** Prevent storage saturation on Google Cloud VM `conway-sat-worker` due to rapid DRAT proof generation from active $\mathbb{Z}_3$ solvers (`proof_z3_fpf.drat` at $145\text{ GB}$, `proof_z3_fixed3.drat` at $121\text{ GB}$).
+- **Observed Empirical Write Rate:** Disk usage grew from $387\text{ GB}$ to $394\text{ GB}$ in $4.3\text{ hours}$ ($\approx 1.6\text{ GB/hour}$), leaving $43\text{ GB}$ available on the $450\text{ GB}$ root disk.
+- **Action Taken (0 Downtime Live Resize):**
+  1. Expanded persistent disk (`pd-standard`) from $450\text{ GB}$ to $550\text{ GB}$ via `gcloud compute disks resize conway-sat-worker --size=550 --zone=us-central1-b`.
+  2. Partition resized live via `sudo growpart /dev/sda 1`.
+  3. Ext4 filesystem extended live via `sudo resize2fs /dev/root`.
+- **Forensic Verification:**
+  - Filesystem: `/dev/root` expanded to $533\text{ GB}$ total, $394\text{ GB}$ used, **$140\text{ GB}$ available** ($74\%$ utilization).
+  - Solvers: All 16 CaDiCaL instances and supervisor `cloud_watcher.sh` (PID 896329) remained running without interruption (load average 16.06).
+  - Economic impact: $+0.12\text{ €/day}$ ($+0.96\text{ €}$ across the remaining 8 days of GCP runway).
+- **Verdict:** VERIFIED (Operational & Complete). Available storage expanded by $+97\text{ GB}$, guaranteeing operational headroom through the weekend hot window.
