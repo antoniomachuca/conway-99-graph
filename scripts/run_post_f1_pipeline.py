@@ -23,8 +23,8 @@ import re
 import urllib.request
 import urllib.parse
 
-TG_TOKEN = "8946638886:AAHhgeJUL9Sk0P4hrzaAC4Oxf6CsJdcmgHY"
-TG_CHAT_ID = "8235898145"
+TG_TOKEN = os.getenv("TG_TOKEN", "")
+TG_CHAT_ID = os.getenv("TG_CHAT_ID", "")
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def send_telegram(msg: str):
