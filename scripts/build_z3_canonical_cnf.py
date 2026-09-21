@@ -100,10 +100,6 @@ class ConwayZ3FPFCanonicalCompiler:
     def get_and_lit(self, l1: int, l2: int) -> int:
         if l1 == 0 or l2 == 0:
             return 0
-        if l1 == 1:
-            return l2
-        if l2 == 1:
-            return l1
         if l1 == l2:
             return l1
         if l1 == -l2:
@@ -121,14 +117,8 @@ class ConwayZ3FPFCanonicalCompiler:
         return self.aux_and[k]
 
     def add_card_equals(self, lits: List[int], bound: int):
-        c = 0
-        var_lits = []
-        for l in lits:
-            if l == 1:
-                c += 1
-            elif l != 0:
-                var_lits.append(l)
-        target = bound - c
+        var_lits = [l for l in lits if l != 0]
+        target = bound
         if target < 0:
             self.cnf.append([])
             return
@@ -380,24 +370,22 @@ class ConwayZ3Fixed3CanonicalCompiler:
             return 0 # no internal edges in any orbit
         elif p1 < p2:
             d = (t2 - t1) % 3
-            if (p1, p2, d) in self.fixed_edges:
-                return self.fixed_edges[(p1, p2, d)]
+            if (p1, p2, d) in self.fixed_edges and self.fixed_edges[(p1, p2, d)] == 0:
+                return 0
             return self.edge_vars[(p1, p2, d)]
         else: # p1 > p2
             d = (t1 - t2) % 3
-            if (p2, p1, d) in self.fixed_edges:
-                return self.fixed_edges[(p2, p1, d)]
+            if (p2, p1, d) in self.fixed_edges and self.fixed_edges[(p2, p1, d)] == 0:
+                return 0
             return self.edge_vars[(p2, p1, d)]
 
     def get_and_lit(self, lit1: int, lit2: int) -> int:
         if lit1 == 0 or lit2 == 0:
             return 0
-        if lit1 == 1:
-            return lit2
-        if lit2 == 1:
-            return lit1
         if lit1 == lit2:
             return lit1
+        if lit1 == -lit2:
+            return 0
         if lit1 > lit2:
             lit1, lit2 = lit2, lit1
         k = (lit1, lit2)
@@ -411,14 +399,8 @@ class ConwayZ3Fixed3CanonicalCompiler:
         return self.aux_and[k]
 
     def add_card_equals(self, lits: List[int], bound: int):
-        c = 0
-        var_lits = []
-        for l in lits:
-            if l == 1:
-                c += 1
-            elif l != 0:
-                var_lits.append(l)
-        target = bound - c
+        var_lits = [l for l in lits if l != 0]
+        target = bound
         if target < 0:
             self.cnf.append([])
             return

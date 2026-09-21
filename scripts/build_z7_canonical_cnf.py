@@ -126,14 +126,10 @@ class ConwayZ7CanonicalCompiler:
     def get_and_lit(self, a: int, b: int) -> int:
         """
         Tseitin encoding for conjunction: y <=> a AND b.
-        Includes constant propagation and deduplication.
+        Includes constant propagation for 0 (no edge / False) and deduplication.
         """
         if a == 0 or b == 0:
             return 0
-        if a == 1:
-            return b
-        if b == 1:
-            return a
         if a == b:
             return a
         if a == -b:
@@ -152,16 +148,10 @@ class ConwayZ7CanonicalCompiler:
 
     def add_card_equals(self, lits: List[int], bound: int):
         """
-        Encodes sum(lits) == bound with sequential counter and constant pruning.
+        Encodes sum(lits) == bound with sequential counter and 0-pruning.
         """
-        c = 0
-        var_lits = []
-        for l in lits:
-            if l == 1:
-                c += 1
-            elif l != 0:
-                var_lits.append(l)
-        target = bound - c
+        var_lits = [l for l in lits if l != 0]
+        target = bound
         if target < 0:
             self.cnf.append([])
             return

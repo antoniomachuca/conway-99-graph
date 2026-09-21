@@ -1,0 +1,8 @@
+[Unit]
+Description=Finalize and export Conway search
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/antoniomachuca/conway/cloud_finalize_export.sh finalize

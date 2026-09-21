@@ -196,5 +196,85 @@ class TestCanonicalZ3Fixed3Compiler(unittest.TestCase):
         self.assertGreater(len(cnf.clauses), 1500000, "Z_3 Fixed-3 CNF must contain >1.5M clauses")
         self.assertGreater(self.compiler.top_id, 700000, "Z_3 Fixed-3 CNF must contain >700k variables")
 
+class TestCompilerHelperSemantics(unittest.TestCase):
+    """Regression test ensuring variable ID 1 is not conflated with boolean True."""
+
+    def test_z7_variable_1_and_helper_semantic_correctness(self):
+        compiler = ConwayZ7CanonicalCompiler()
+        top_before = compiler.top_id
+        y = compiler.get_and_lit(1, 2)
+        self.assertEqual(y, top_before + 1, "get_and_lit(1, 2) must allocate a fresh Tseitin variable")
+
+        # Verify truth table of y <=> (x1 AND x2)
+        for x1 in (0, 1):
+            for x2 in (0, 1):
+                expected = x1 and x2
+                solver = Cadical195(bootstrap_with=compiler.cnf.clauses)
+                solver.add_clause([1 if x1 else -1])
+                solver.add_clause([2 if x2 else -2])
+                solver.add_clause([y if expected else -y])
+                self.assertTrue(solver.solve(), f"Z7 get_and_lit failed on ({x1}, {x2}) expecting y={expected}")
+
+                solver_neg = Cadical195(bootstrap_with=compiler.cnf.clauses)
+                solver_neg.add_clause([1 if x1 else -1])
+                solver_neg.add_clause([2 if x2 else -2])
+                solver_neg.add_clause([-y if expected else y])
+                self.assertFalse(solver_neg.solve(), f"Z7 get_and_lit opposite must be UNSAT on ({x1}, {x2})")
+
+    def test_z7_variable_1_cardinality_semantic_correctness(self):
+        compiler = ConwayZ7CanonicalCompiler()
+        compiler.add_card_equals([1, 2], 1)
+        solver = Cadical195(bootstrap_with=compiler.cnf.clauses)
+        models = []
+        while solver.solve():
+            m = solver.get_model()
+            v1 = 1 if 1 in m else 0
+            v2 = 1 if 2 in m else 0
+            models.append((v1, v2))
+            solver.add_clause([-1 if v1 else 1, -2 if v2 else 2])
+        self.assertEqual(sorted(models), [(0, 1), (1, 0)], "add_card_equals([1, 2], 1) must yield exactly [(0, 1), (1, 0)]")
+
+    def test_z3_fpf_variable_1_and_helper_semantic_correctness(self):
+        compiler = ConwayZ3FPFCanonicalCompiler()
+        top_before = compiler.top_id
+        y = compiler.get_and_lit(1, 2)
+        self.assertEqual(y, top_before + 1)
+        # Verify truth table
+        for x1 in (0, 1):
+            for x2 in (0, 1):
+                expected = x1 and x2
+                solver = Cadical195(bootstrap_with=compiler.cnf.clauses)
+                solver.add_clause([1 if x1 else -1])
+                solver.add_clause([2 if x2 else -2])
+                solver.add_clause([y if expected else -y])
+                self.assertTrue(solver.solve())
+
+    def test_z3_fixed3_variable_1_and_helper_semantic_correctness(self):
+        compiler = ConwayZ3Fixed3CanonicalCompiler()
+        top_before = compiler.top_id
+
+        # In fixed3, variable 1 has unit clause [1]. get_and_lit(1, 500) must allocate a fresh variable, NOT return 500.
+        y_unit = compiler.get_and_lit(1, 500)
+        self.assertEqual(y_unit, top_before + 1, "get_and_lit(1, 500) must allocate a fresh Tseitin variable")
+
+        for x2 in (0, 1):
+            solver = Cadical195(bootstrap_with=compiler.cnf.clauses)
+            solver.add_clause([500 if x2 else -500])
+            solver.add_clause([y_unit if x2 else -y_unit])
+            self.assertTrue(solver.solve())
+
+        # For unconstrained variables (e.g. 500 and 501), verify full 4-state truth table
+        y_free = compiler.get_and_lit(500, 501)
+        self.assertEqual(y_free, top_before + 2)
+        for x1 in (0, 1):
+            for x2 in (0, 1):
+                expected = x1 and x2
+                solver = Cadical195(bootstrap_with=compiler.cnf.clauses)
+                solver.add_clause([500 if x1 else -500])
+                solver.add_clause([501 if x2 else -501])
+                solver.add_clause([y_free if expected else -y_free])
+                self.assertTrue(solver.solve())
+
+
 if __name__ == "__main__":
     unittest.main()

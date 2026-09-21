@@ -1,27 +1,21 @@
-# Multi-Agent Architecture & Operations Archive
+# Agent Records and Current Handover
 
-This directory contains the operational states, handover briefings, and adversarial audit logs produced by the multi-agent collaborative framework investigating Conway's 99-Graph Problem.
+This directory contains historical operational reports and the corrected handover for work on Conway's 99-graph problem. It is not evidence that an agent, solver, or cloud process is currently running.
 
----
+## Current documents
 
-## 1. Multi-Agent Roles
+| File | Purpose |
+|---|---|
+| [handover_briefing.md](handover_briefing.md) | Current verification boundaries, known defects, prior-work attribution, and pending obligations. |
+| [audit_log.md](audit_log.md) | Historical entries preserved under a superseding September 21, 2026 correction notice. Earlier verdicts must not be treated as current certification. |
 
-The project coordinates specialized subagents operating under strict epistemological protocols:
-1. **Agent A (Algebraic Orbit Reduction Specialist):** Prescribes automorphism groups ($\mathbb{Z}_2, \mathbb{Z}_7, \mathbb{Z}_3$), identifies orbit decompositions, and computes incidence matrices.
-2. **Agent B (Canonical SAT Compiler):** Encodes orbit equations, Crawford lex-leader symmetry cuts, and clique constraints into DIMACS CNF.
-3. **Agent C (Adversarial Auditor):** Independently audits mathematical proofs, verifies DIMACS clauses against orbit definitions, detects bugs, and ensures zero AI-hype.
-4. **Agent D (Lean 4 Formalizer):** Implements machine-checked kernel proofs in Lean 4 (0 `sorry`, standard axioms `[propext, Quot.sound]`).
-5. **Cloud Solver Operator:** Supervises remote high-performance SAT solving on Google Cloud Platform (`conway-sat-worker`, e2-standard-16).
-6. **DevOps & Git Specialist:** Manages repository integrity, size bounds, and GitHub version control.
+The project has used separate roles for orbit reduction, CNF compilation, auditing, formalization, and solver operations. Role names and assertions of independent auditing are not substitutes for inspecting theorem statements, executable code, and retained evidence.
 
----
+## Status interpretation
 
-## 2. Active Operational Index
+- **PROVED:** only the specific audited Lean propositions and recorded checked formula refutations, within their stated scope.
+- **COMPILED:** the library with unfinished or externally conditional declarations, and the limited passing compiler suite despite its known semantic gap.
+- **EXPLORED:** reproducible Python calculations and inconclusive or uncertified searches.
+- **PENDING:** complete graph-to-encoding validation, missing formal interfaces, originality, rigidity, and existence.
 
-| File | Description | Language |
-| :--- | :--- | :---: |
-| [`handover_briefing.md`](handover_briefing.md) | Comprehensive master state and briefing for incoming agents and researchers | English |
-| [`audit_log.md`](audit_log.md) | Master chronological audit log of mathematical verifications, commits, and benchmarks | English |
-
-> [!NOTE]
-> Transient task-specific subagent scratchpads and interim checkpoint notes have been consolidated into `audit_log.md` and archived under `archive/agent_scratch/` to maintain repository clarity and cleanliness.
+See the [README](../README.md), [technical audit](../docs/technical_report.md), and [project rules](../AGENTS.md). Historical material in `archive/` and `correspondence/` may repeat superseded mathematical or operational claims. This revision neither rewrites raw solver logs nor certifies all earlier reports.
