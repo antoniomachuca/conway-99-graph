@@ -10,18 +10,25 @@
 - La exclusión de orden 7 ya era conocida por Behbahani–Lam (2011). Los logs locales de UNSAT/VERIFIED son evidencia sobre la fórmula registrada, no una prueba de la corrección de su traducción desde grafos.
 - El caso de orden 3 sin puntos fijos no debe darse por excluido por confusión con el caso que tiene puntos fijos.
 - Las declaraciones finales de Lean para $f=5$ y $f=7$ incorporan hipótesis aritméticas incompatibles. La afirmación de que son exclusiones incondicionales formalizadas de extremo a extremo es incorrecta: **The claim is false according to the current state of the repository.**
-- El compilador canónico actual de orden 7 confunde la variable SAT `1` con la constante verdadera. Se ha reproducido el error sin lanzar una búsqueda del grafo. La revisión documental no lo corrige.
+- **COMPILED:** se ha reparado el defecto del literal `1` en los compiladores canónicos y en la ruta antigua `build_z3_fpf_cnf.py`. Pasan 20 tests de compiladores, 11 de auditoría de entradas y 8 del supervisor.
+- **COMPILED:** la C local antigua usaba O10, soporte `{1,6}`, y repetía la clase secante. La C disjunta corregida usa O11, soporte `{2,3}`. Se conservan los archivos anteriores y se generan entradas nuevas; esto no es una nueva exclusión matemática.
 
 ## 2. Taxonomía vigente
 
 | Estado | Alcance |
 |---|---|
 | **PROVED** | Equivalencia del comprobador, lemas estructurales seleccionados y contradicciones aritméticas auditadas con axiomas estándar. Registros históricos de refutaciones SAT: únicamente al nivel de sus fórmulas. |
-| **COMPILED** | Compilación Lean de 32 jobs con tres advertencias `sorry`; wrappers condicionales; 13 tests del compilador que pasan pese al defecto semántico. La clasificación agregada depende de `sorryAx`. |
+| **COMPILED** | Compilación Lean anterior de 32 jobs con tres advertencias `sorry`; wrappers condicionales; 39 tests Python seleccionados pasan (20 compiladores, 11 auditoría, 8 supervisor). La clasificación agregada sigue dependiendo de `sorryAx`. |
 | **EXPLORED** | Cálculo reproducible de órbitas y búsquedas sin resolución certificada. No se infiere una probabilidad ni porcentaje de avance de los conflictos. |
 | **PENDING** | Reparar y validar codificaciones, recuperar la procedencia exacta de entradas, verificar cobertura, completar interfaces formales, acreditar novedad y resolver las cuestiones abiertas. |
 
 La entrada `conway_z7_canonical.cnf` nombrada en el log no está en la raíz local auditada; el DRAT y los logs sí están. No se ha vuelto a ejecutar `drat-trim` en esta auditoría. La presencia de esos archivos no completa las obligaciones de traducción grafo–CNF.
+
+## Sesión posterior autorizada — EXPLORED
+
+El 21 de septiembre a las 15:32:09 CEST se inició una sola búsqueda de **C disjunta corregida (O11)**: PID 12384, supervisor 12329, `nice 10`, semilla 20260921 y DRAT binario. La parada máxima configurada es el **22 de septiembre a las 03:32:09 CEST**, o antes por 50 GiB de DRAT o menos de 50 GiB libres. El supervisor conserva los artefactos parciales y solo detiene su propio proceso.
+
+La carpeta es `/Volumes/Untitled/conway_local_run/f1_c_drat_20260921T132559366256Z`. Incluye entrada, hashes, copia de fuentes, manifiesto, logs y `status.json`. Esta anotación registra el arranque; hay que consultar procesos y estado para confirmar actividad posterior. La comprobación DRAT sigue **PENDING**. No se modificó GCP ni se enviaron notificaciones.
 
 ## 3. Registro histórico del 20 de septiembre — no es telemetría actual
 
@@ -42,7 +49,7 @@ El documento anterior, fechado el **20 de septiembre de 2026 a las 21:49 CEST**,
 | Mac | Reinicio comunicado a las 10:03 y 79 GiB libres. |
 | DRAT de orden 7 | Descarga local comunicada de aproximadamente 183 MB; los archivos locales se inspeccionaron en la auditoría posterior. |
 
-**PENDING:** verificar cualquier estado operativo actual consultando evidencia nueva. Esta revisión no accedió a la VM, no verificó los procesos de las unidades externas y no inició, detuvo ni reconfiguró solvers.
+**PENDING:** verificar el estado remoto con evidencia nueva. La revisión documental inicial no accedió a la VM ni lanzó búsquedas. El seguimiento local autorizado y su registro de arranque se describen arriba; los datos históricos del día 20 no son telemetría actual.
 
 ## 4. Interpretación y siguientes pasos
 

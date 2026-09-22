@@ -105,10 +105,6 @@ class ConwayZ3FPFCompiler:
         """
         if l1 == 0 or l2 == 0:
             return 0
-        if l1 == 1:
-            return l2
-        if l2 == 1:
-            return l1
         if l1 == l2:
             return l1
         if l1 == -l2:
@@ -129,14 +125,8 @@ class ConwayZ3FPFCompiler:
         """
         Encodes sum(lits) == bound with constant pruning and sequential counter.
         """
-        c = 0
-        var_lits = []
-        for l in lits:
-            if l == 1:
-                c += 1
-            elif l != 0:
-                var_lits.append(l)
-        target = bound - c
+        var_lits = [lit for lit in lits if lit != 0]
+        target = bound
         if target < 0:
             self.cnf.append([])
             return

@@ -67,7 +67,7 @@
 \maketitle
 
 \begin{abstract}
-Conway's 99-graph problem asks whether a strongly regular graph with parameters $(99,14,1,2)$ exists. This technical note inventories a repository containing a partial Lean~4 formalization, symmetry-restricted SAT encoders, structural calculations, and historical solver records. It corrects earlier claims about novelty and certification. In particular, the restriction that an involution fixes exactly one vertex is prior work of Makhnev--Minakova, explicitly recalled by Makhnev in 2009, and the exclusion of order~7 predates this project. The repository contains checked candidate-verification and structural lemmas, but several advertised graph-level exclusions assume additional arithmetic or group-theoretic premises, and an aggregate classification depends on \texttt{sorryAx}. Retained logs record checked refutations of specific CNF formulas; they do not certify the graph-to-CNF translation. A reproduced variable/constant collision in the current canonical order-7 encoder illustrates this distinction despite a passing regression suite. Incidence and stabilizer calculations for the one-fixed-vertex case are retained as reproducible exploratory work. No new graph-theoretic restriction, complete rigidity proof, or resolution of existence is claimed.
+Conway's 99-graph problem asks whether a strongly regular graph with parameters $(99,14,1,2)$ exists. This technical note inventories a repository containing a partial Lean~4 formalization, symmetry-restricted SAT encoders, structural calculations, and historical solver records. It corrects earlier claims about novelty and certification. In particular, the restriction that an involution fixes exactly one vertex is prior work of Makhnev--Minakova, explicitly recalled by Makhnev in 2009, and the exclusion of order~7 predates this project. The repository contains checked candidate-verification and structural lemmas, but several advertised graph-level exclusions assume additional arithmetic or group-theoretic premises, and an aggregate classification depends on \texttt{sorryAx}. Retained logs record checked refutations of specific CNF formulas; they do not certify the graph-to-CNF translation. A reproduced variable/constant collision in the initially audited canonical order-7 encoder illustrates this distinction despite a passing regression suite. Incidence and stabilizer calculations for the one-fixed-vertex case are retained as reproducible exploratory work. No new graph-theoretic restriction, complete rigidity proof, or resolution of existence is claimed.
 \end{abstract}
 
 \keywords{Conway 99-graph \and strongly regular graphs \and partial formalization \and Lean 4 \and SAT encoding \and proof checking \and reproducibility}
@@ -113,7 +113,10 @@ A recent constraint-programming preprint~\cite{thakkar2026forced} is relevant me
 
 \subsection{What this revision does and does not certify}
 
-The September 21, 2026 audit inspected repository source and retained logs, ran the Lean build, the canonical compiler test suite, targeted axiom checks, a small encoding counterexample, and the incidence/stabilizer calculation. It did not rerun the historical DRAT checks, launch new graph searches, inspect remote process state, or repair the encoders.
+The initial September 21, 2026 documentation audit inspected source and retained logs, ran the Lean build, the then-existing tests, targeted axiom checks, an encoding counterexample, and the incidence/stabilizer calculation. That initial audit did not rerun historical DRAT checks, launch searches, inspect remote processes, or repair encoders.
+
+\paragraph{Subsequent implementation follow-up, September 21.}
+The canonical and legacy Z3-FPF helper defects were subsequently repaired. Selected suites now pass 39 tests: 20 compiler-helper tests, 11 local input-audit tests, and 8 bounded-runner tests. A new audit compares 2,394 cardinality expressions symbolically with adjacency equations in the coordinate model and reproduces the local historical CNF hashes. It also detects an indexing error: historical C selects $O_{10}$, with intersecting support $\{1,6\}$, whereas a disjoint representative is $O_{11}$, with support $\{2,3\}$. Corrected representatives are A=21, B=1, C=11. Old inputs remain preserved. One bounded local run of corrected C was initiated with user authorization; its status is \textbf{EXPLORED}, not a mathematical conclusion. These changes are \textbf{COMPILED} implementation work, not new kernel-certified graph exclusions.
 
 Earlier versions claimed unconditional end-to-end formal certification of graph-level exclusions that are actually conditional in the code. For that claim, the required correction is explicit: \emph{The claim is false according to the current state of the repository.} This concerns the scope of the local certification, not the truth of the cited prior mathematical results.
 
@@ -260,9 +263,9 @@ This requires correct constraints, justified symmetry cuts, and exhaustive branc
 
 \subsection{COMPILED: passing tests with a reproduced semantic failure}
 
-The 13 tests in \path{tests/test_canonical_sat_compilers.py} pass. However, the current \path{scripts/build_z7_canonical_cnf.py} allocates primary variable ID 1 and also interprets integer \texttt{1} as true in its conjunction and cardinality helpers.
+At the initial audit, 13 tests in \path{tests/test_canonical_sat_compilers.py} passed despite a defect: the unpatched \path{scripts/build_z7_canonical_cnf.py} allocated primary variable ID 1 and also interpreted integer \texttt{1} as true in its conjunction and cardinality helpers.
 
-The following small reproduction requires no graph search:
+The following small reproduction was run on that unpatched revision and required no graph search:
 \begin{lstlisting}[language=Python]
 from scripts.build_z7_canonical_cnf import ConwayZ7CanonicalCompiler
 
@@ -271,11 +274,11 @@ assert compiler.var_map[(0, 0, 1)] == 1
 compiler.add_card_equals([1, 2], 1)
 print(compiler.cnf.clauses)
 \end{lstlisting}
-It prints \texttt{[[-2]]}, representing only $\neg x_2$, not the intended constraint $x_1+x_2=1$. In particular, it accepts $(x_1,x_2)=(0,0)$ and rejects $(0,1)$, both incorrectly. Similarly, \texttt{get\_and\_lit(1, 2)} returns \texttt{2} rather than a conjunction of two variable literals.
+The unpatched code printed \texttt{[[-2]]}, representing only $\neg x_2$, not $x_1+x_2=1$. It incorrectly accepted $(0,0)$ and rejected $(0,1)$. Likewise, \texttt{get\_and\_lit(1, 2)} returned \texttt{2} rather than a conjunction of two variable literals. The repaired helper now encodes the exactly-one constraint correctly in this regression example.
 
-The canonical order-3 helper methods use the same variable/constant convention. Its effective impact depends on the model and its fixed assignments, so each encoder needs a separate audit. The observation does not identify every historical CNF or the separate $f=1$ compiler as affected.
+The unpatched canonical order-3 helpers and the separate legacy \path{build_z3_fpf_cnf.py} used the same convention. They have subsequently been repaired and regression-tested. Effective impact on historical inputs still requires model-specific provenance checks; the separate $f=1$ compiler did not use the constant-1 shortcut.
 
-This defect concerns the current generator, not the correctness of the historical proof checker. The link between current source and historical input bytes remains to be established. \textbf{PENDING} work includes separating constants from variable literals, adding exhaustive small truth-table tests, validating positive graph examples and symmetry cuts, and regenerating and checking affected inputs where appropriate. This documentation revision performs none of those repairs.
+The defect concerned encoders, not the correctness of the historical DRAT checker. Existing CNFs do not change when source is repaired. A regenerated legacy Z3-FPF input was preserved in a new directory without launching it. Remaining \textbf{PENDING} work includes complete formal graph-to-encoding interfaces and verification of any eventual terminal search result. Passing the added tests is classified as \textbf{COMPILED}, not as a kernel proof of the full translation.
 
 \section{Incidence structure and stabilizer calculations for one fixed vertex}
 
@@ -336,11 +339,11 @@ The audit ran the following commands from the repository root:
 lake build
 python3 -m unittest discover -s tests -p test_canonical_sat_compilers.py -v
 \end{lstlisting}
-The results were a successful 32-job build with three \texttt{sorry} warnings and 13 passing tests. Targeted axiom checks and the small counterexample establish the more limited interpretation described above. The README supplies the axiom-audit commands and commands for independently checking the retained $f=3$ formula/proof pairs. Those DRAT checks were not rerun for this revision.
+The initial results were a successful 32-job build with three \texttt{sorry} warnings and 13 passing tests; the subsequent implementation follow-up passes the 39 selected tests described above. Targeted axiom checks and the small counterexample establish the more limited interpretation described above. The README supplies the axiom-audit commands and commands for independently checking the retained $f=3$ formula/proof pairs. Those DRAT checks were not rerun for this revision.
 
 A reproducible future experiment should retain the generator revision and options, exact CNF and hash, solver version and command, resource limits, full terminal log, proof or decoded candidate, and independent verification output. Encoding validity and branch coverage are additional mathematical obligations. Merely matching descriptive filenames is insufficient.
 
-Historical audit entries are preserved with a superseding correction notice. This revision changes documentation and the generated PDF only; it does not change Lean proofs, encoders, CNFs, proof traces, or graph-search processes.
+Historical audit entries are preserved with a superseding correction notice. The initial revision changed documentation only; the subsequent authorized implementation follow-up repaired encoders and branch indices, generated new inputs, and started one bounded local run of corrected C. Historical inputs and proofs were preserved, and no Lean proof or remote process was changed. Run-specific manifests, source snapshots, and status records are identified in the README.
 
 \section{Conclusion}
 

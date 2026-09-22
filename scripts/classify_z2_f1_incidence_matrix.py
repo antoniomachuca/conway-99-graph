@@ -363,13 +363,13 @@ def derive_symmetry_breaking_branches() -> Dict:
     3 non-trivial orbits:
       - Orbit of size 1: Orbit 21 (Twin orbit: same support {0, 1}, phase -)
       - Orbit of size 20: Intersecting support (e.g. Orbit 1: support {0, 2}, phase +)
-      - Orbit of size 20: Disjoint support (e.g. Orbit 10: support {2, 3}, phase +)
+      - Orbit of size 20: Disjoint support (e.g. Orbit 11: support {2, 3}, phase +)
       
     Consequently, any valid Conway-99 graph under f = 1 must fall into at least
     one of these 3 canonical branches for the partner of Orbit 0:
       - Branch A: partner(O_0) = O_21 (Twin)
       - Branch B: partner(O_0) = O_1  (Intersecting)
-      - Branch C: partner(O_0) = O_10 (Disjoint)
+      - Branch C: partner(O_0) = O_11 (Disjoint)
     """
     branches = {
         "Branch_A": {
@@ -400,16 +400,16 @@ def derive_symmetry_breaking_branches() -> Dict:
         },
         "Branch_C": {
             "name": "Disjoint K_{2,2} Partner",
-            "partner_orbit_idx": 10,
+            "partner_orbit_idx": 11,
             "partner_info": {"support": [2, 3], "phase": "+"},
             "orbit_size_under_stab": 20,
             "primary_cuts": [
-                "M[0, 10] = 1",
-                "M[10, 0] = 1",
-                "For all q not in {10}: not (M[0, q] and M[q, 0])"
+                "M[0, 11] = 1",
+                "M[11, 0] = 1",
+                "For all q not in {11}: not (M[0, q] and M[q, 0])"
             ],
             "residual_symmetry_order": 768,
-            "residual_group": "Stab_W(O_0, O_10)"
+            "residual_group": "Stab_W(O_0, O_11)"
         }
     }
     return branches
@@ -424,6 +424,7 @@ def main():
     )
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     parser.add_argument("--export-cuts", type=str, default=None, help="Export CNF unit clauses for a specific branch (A, B, C)")
+    parser.add_argument("--output", type=str, help="New cut filename; existing files are never overwritten")
     args = parser.parse_args()
 
     t0 = time.time()
@@ -477,8 +478,8 @@ def main():
             vq1 = 1 + 0 * 42 + q
             vq2 = 1 + q * 42 + 0
             clauses.append([-vq1, -vq2])
-        out_file = f"cuts_branch_{args.export_cuts.lower()}.cnf"
-        with open(out_file, "w") as f:
+        out_file = args.output or f"cuts_branch_{args.export_cuts.lower()}.cnf"
+        with open(out_file, "x") as f:
             f.write(f"c Symmetry-breaking cuts for {branch_key} (partner of O_0 is O_{q_target})\n")
             f.write(f"c Total clauses: {len(clauses)}\n")
             for cl in clauses:
@@ -519,7 +520,7 @@ def main():
     print(f"    - Under Stab_W(O_0) (|Stab| = 15,360), K_{2,2} partners branch into 3 cases:")
     print(f"        * Branch A (Twin): Partner is O_21 (size 1). Residual sym: 15,360.")
     print(f"        * Branch B (Intersecting): Partner is O_1 (size 20). Residual sym: 768.")
-    print(f"        * Branch C (Disjoint): Partner is O_10 (size 20). Residual sym: 768.")
+    print(f"        * Branch C (Disjoint): Partner is O_11 (size 20). Residual sym: 768.")
     print(f"    - This 3-way branching is COMPLETE, EXHAUSTIVE, and breaks maximum symmetry.")
     print("=" * 80)
 

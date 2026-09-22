@@ -276,5 +276,45 @@ class TestCompilerHelperSemantics(unittest.TestCase):
                 self.assertTrue(solver.solve())
 
 
+class TestLegacyZ3FPFHelpers(unittest.TestCase):
+    def test_variable_one_conjunction_truth_table(self):
+        from build_z3_fpf_cnf import ConwayZ3FPFCompiler
+
+        compiler = ConwayZ3FPFCompiler()
+        top_before = compiler.top_id
+        result = compiler.get_and_lit(1, 2)
+        self.assertEqual(result, top_before + 1)
+        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+            for x1 in (False, True):
+                for x2 in (False, True):
+                    for value in (False, True):
+                        assumptions = [1 if x1 else -1, 2 if x2 else -2, result if value else -result]
+                        self.assertEqual(solver.solve(assumptions=assumptions), value == (x1 and x2))
+
+    def test_variable_one_cardinality_truth_tables(self):
+        from build_z3_fpf_cnf import ConwayZ3FPFCompiler
+
+        for literals, bound in [([1, 2], 1), ([0, 1, 1, 2], 2), ([1, -2], 1), ([1, 2], -1), ([], 0), ([], 1)]:
+            with self.subTest(literals=literals, bound=bound):
+                compiler = ConwayZ3FPFCompiler()
+                compiler.add_card_equals(literals, bound)
+                with Cadical195() as solver:
+                    for clause in compiler.cnf.clauses:
+                        solver.add_clause(clause)
+                    for x1 in (False, True):
+                        for x2 in (False, True):
+                            values = {1: x1, 2: x2}
+                            expected = sum(values[abs(lit)] if lit > 0 else not values[abs(lit)] for lit in literals if lit) == bound
+                            self.assertEqual(solver.solve(assumptions=[1 if x1 else -1, 2 if x2 else -2]), expected)
+
+    def test_zero_and_complement_literals(self):
+        from build_z3_fpf_cnf import ConwayZ3FPFCompiler
+
+        compiler = ConwayZ3FPFCompiler()
+        self.assertEqual(compiler.get_and_lit(0, 1), 0)
+        self.assertEqual(compiler.get_and_lit(1, -1), 0)
+        self.assertEqual(compiler.get_and_lit(1, 1), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

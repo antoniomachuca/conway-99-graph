@@ -1,32 +1,49 @@
-import os
+import argparse
+import json
+from pathlib import Path
+import sys
 
-base_cnf = "conway_z2_f1.cnf"
-branches = [
-    ("A", "cuts_branch_a.cnf", "instances/conway_z2_f1_branch_a.cnf"),
-    ("B", "cuts_branch_b.cnf", "instances/conway_z2_f1_branch_b.cnf"),
-    ("C", "cuts_branch_c.cnf", "instances/conway_z2_f1_branch_c.cnf"),
-]
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-os.makedirs("instances", exist_ok=True)
+from scripts.validate_z2_f1_inputs import PARTNERS, expected_cuts, require, sha256_file
 
-with open(base_cnf, "r") as f:
-    header = f.readline()
-    assert header.startswith("p cnf"), f"Unexpected header: {header}"
-    parts = header.strip().split()
-    n_vars = int(parts[2])
-    n_clauses = int(parts[3])
-    base_body = f.read()
 
-for branch_name, cut_file, out_file in branches:
-    with open(cut_file, "r") as cf:
-        cut_lines = [l for l in cf if not l.startswith("c") and l.strip()]
-    n_cuts = len(cut_lines)
-    new_clauses = n_clauses + n_cuts
-    new_header = f"p cnf {n_vars} {new_clauses}\n"
-    with open(out_file, "w") as out:
-        out.write(new_header)
-        out.write(base_body)
-        out.write("".join(cut_lines))
-    print(f"[+] Created {out_file}: {n_vars} vars, {new_clauses} clauses (+{n_cuts} cuts)")
+def generate_branches(base, output):
+    base = base.resolve(strict=True)
+    with base.open("rb") as stream:
+        fields = stream.readline().split()
+        require(len(fields) == 4 and fields[:2] == [b"p", b"cnf"], "Invalid base CNF header")
+        variables, clauses = map(int, fields[2:])
+        require(variables >= 1764, "Base CNF has too few variables for this model")
+        body = stream.read()
+    require(body.endswith(b"\n"), "Base CNF must end in a newline")
+    output.mkdir()
+    records = {}
+    for branch, partner in PARTNERS.items():
+        cuts = expected_cuts(partner)
+        path = output / f"conway_z2_f1_branch_{branch.lower()}.cnf"
+        with path.open("xb") as stream:
+            stream.write(f"p cnf {variables} {clauses + len(cuts)}\n".encode("ascii"))
+            stream.write(body)
+            for clause in cuts:
+                stream.write((" ".join(map(str, clause)) + " 0\n").encode("ascii"))
+        records[branch] = {"partner": partner, "path": str(path.resolve()), "sha256": sha256_file(path)}
+    report = {"classification": "COMPILED", "base_sha256": sha256_file(base), "branches": records,
+              "boundary": "Serialization and branch representatives only; no graph nonexistence claim."}
+    with (output / "manifest.json").open("x") as stream:
+        json.dump(report, stream, indent=2)
+    return report
 
-print("[+] All branch CNFs generated successfully.")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--base", type=Path, default=ROOT / "conway_z2_f1.cnf")
+    parser.add_argument("--output-dir", type=Path, required=True)
+    args = parser.parse_args()
+    print(json.dumps(generate_branches(args.base, args.output_dir), indent=2))
+
+
+if __name__ == "__main__":
+    main()

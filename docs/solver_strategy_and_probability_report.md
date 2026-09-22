@@ -31,19 +31,19 @@ Sources and exact artifact boundaries are recorded in the [README](../README.md)
 
 ## 3. Correctness precedes further computational interpretation
 
-**COMPILED:** the 13 canonical compiler tests pass, but a small reproducible counterexample shows that the current order-7 encoder confuses primary variable ID `1` with the constant true. The canonical order-3 helper methods use the same convention; each model needs a separate semantic audit.
+**COMPILED:** the canonical and legacy Z3-FPF literal-1 helpers are now repaired; 20 compiler tests, 11 local input-audit tests, and 8 runner tests pass. The follow-up audit also found that historical local C used O10, another secant representative; corrected disjoint C uses O11. Historical CNFs were preserved, so fixing source code does not make old inputs current. Full graph-level certification remains **PENDING**.
 
-The current scripts and historical CNFs must not be assumed equivalent merely because their names match. Before interpreting another result mathematically, the following are **PENDING** obligations:
+The current scripts and historical CNFs must not be assumed equivalent merely because their names match. The obligations now have different scopes:
 
-1. Establish which generator revision and options produced each exact CNF.
-2. Separate Boolean constants from DIMACS literals and validate the affected helper functions.
-3. Check small positive examples, model decoding, and preservation of solutions by symmetry-breaking constraints.
-4. Establish coverage of the intended graph actions and of every branch.
-5. Pair any UNSAT verdict with the exact input and a completed, independently verified refutation.
+1. **COMPILED:** local $f=1$ files were reproduced and hashed; remote input provenance remains **PENDING**.
+2. **COMPILED:** the affected canonical and legacy helper routes are repaired and regression-tested. Retain these tests when changing encodings.
+3. **PENDING:** complete formal graph-to-model interfaces, positive-example validation, and independently checked decoding.
+4. **COMPILED:** finite stabilizer checks validate representatives A=21, B=1, C=11 in the coordinate model. The legacy C=10 file is not the disjoint case; full kernel integration remains **PENDING**.
+5. **PENDING:** pair any eventual UNSAT verdict with its exact input and an independently verified complete refutation.
 
 A SAT model should be decoded and checked directly against all graph conditions. A DRAT check validates a refutation of a formula; it does not validate the formula's interpretation.
 
-This documentation revision does not fix the encoders, invalidate proof-checker software, or identify every historical run as affected. It records a specific source defect and the resulting validation obligations.
+The initial documentation audit did not repair code. The subsequent implementation follow-up repaired the helper routes and branch indexing, preserving old inputs. It does not invalidate proof-checker software or identify every historical run as affected.
 
 ## 4. What telemetry can and cannot establish
 
@@ -79,11 +79,11 @@ These are requirements, not a claim that every historical experiment already sat
 
 ## 6. Historical and live operational state
 
-Older descriptions of machine load, PIDs, storage capacity, uptime, and accumulated conflicts are snapshots or prior reports, not live telemetry. The September 21 documentation audit did not query the cloud VM or external-drive sessions. Current operational conditions remain **PENDING** verification.
+Older descriptions of machine load, PIDs, storage capacity, uptime, and accumulated conflicts are snapshots or prior reports, not live telemetry. The initial September 21 documentation audit did not query the cloud VM or external-drive sessions; the later local follow-up is recorded separately below. Current operational conditions remain **PENDING** verification.
 
 Historical entries are preserved in [agents/audit_log.md](../agents/audit_log.md) with a superseding correction notice. Their presence is not evidence that each reported operation occurred or that every numerical aggregate was independently reconstructed.
 
-No shutdown, cleanup, deletion, restart, cloud reconfiguration, or new graph search was performed for this revision. Operational decisions require current evidence and explicit authorization where applicable, not forecasts from the withdrawn probability tables.
+The initial documentation-only revision performed no operational changes. A later user-authorized follow-up launched one corrected local C search with a 12-hour/50-GiB budget and a 50-GiB reserve; see the [current handover](../agents/handover_briefing.md) for its startup record and evidence directory. No cloud process was changed. Subsequent decisions require current evidence and authorization, not the withdrawn probability tables.
 
 ## 7. Defensible value without a concluding solve
 
