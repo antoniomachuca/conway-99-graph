@@ -62,24 +62,24 @@
   \emph{Permanent contact:} \texttt{contactoantoniomachuca@gmail.com}
 }
 
-\date{September 2026}
+\date{September 24, 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Conway's 99-graph problem (1970) asks for the existence of a strongly regular graph with parameters $(99,14,1,2)$. Theoretical results restrict the prime divisors of the automorphism group order to $\{2, 3\}$. However, automated searches face large combinatorial search spaces. This paper presents a verified benchmark framework that combines interactive theorem proving in Lean~4 with certified propositional satisfiability (SAT) solving. We introduce a four-state taxonomy---\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, and \textsc{Pending}---to separate kernel-verified theorems, certified clausal refutations, tested compilers, and open conjectures.
+Conway's 99-graph problem asks whether a strongly regular graph with parameters $(99,14,1,2)$ exists. Cited results restrict the prime divisors of the automorphism group order to $\{2, 3\}$. This note records a Lean~4 library, SAT compilers, and solver logs, and it uses a four-state taxonomy---\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, and \textsc{Pending}---to separate kernel-checked theorems, checker-certified formula refutations, tested compilers, and open claims. A formula certificate is \textsc{Proved} only when the formula and a completed checker log are both available.
 In Lean~4, we kernel-verify core structural invariants: $K_4$-freeness, 1-factor neighborhood decomposition $7K_2$, diameter at most 2, and decidability of the adjacency matrix equation. These proofs depend solely on the foundational axioms \texttt{[propext, Quot.sound]}. We also formalize the arithmetic contradictions that underlie character-theoretic obstructions. This distinguishes verified arithmetic deductions from unverified geometric action hypotheses.
 For propositional logic, we implement canonical SAT encodings with Crawford symmetry-breaking predicates. A 39-test regression suite verifies the compiler pipeline after eliminating literal/constant collision defects.
-Automorphisms of order 7 were excluded computationally by Behbahani and Lam (2011) and reduced computer-free to $\mathbb{Z}_7$ by Cesarz and Woldar (2025). However, Thakkar (2026) reported an open timeout on this case using CP-SAT. We provide an independently verifiable clausal refutation. CaDiCaL refutes the canonical encoding in 771.59\,s and produces a 192.2\,MB ($183.31$\,MiB) binary proof. The proof checker \texttt{drat-trim} verifies this proof in 844.01\,s.
-We also analyze the incidence geometry of the open involution case ($f=1$, governed by $CC^T = 10I + 2J$) and fixed-point-free order-3 actions. A multi-threaded solver campaign ran for 12.5 days and accumulated over 2.4 billion conflicts without finding a satisfying assignment. All Lean modules, SAT compilers, test suites, and proof certificates are fully reproducible.
+On 10 September 2026, CaDiCaL 3.0.1 recorded \texttt{s UNSATISFIABLE} for a CNF named \texttt{conway\_z7\_canonical.cnf} after 771.59\,s, and \texttt{drat-trim} recorded \texttt{s VERIFIED} for the accompanying binary trace. That CNF is not in the working tree, and it was produced before a later repair of a literal-index defect in the compiler. The trace therefore refutes a missing file. It does not certify the repaired encoding, and it is not shown to be the CP-SAT instance left undecided by Thakkar and Severini (2026).
+The note also records the column-weight identity $CC^T = 10I + 2J$ for the open involution case $f=1$, with corrected branch supports, and a 12.5-day CaDiCaL campaign that accumulated more than 2.4 billion conflicts without a satisfying assignment or a refutation. This source file does not contain the Lean library, the CNFs, or the proof trace.
 \end{abstract}
 
 \keywords{Conway 99-graph \and strongly regular graphs \and interactive theorem proving \and Lean 4 \and SAT solving \and DRAT certification \and symmetry breaking}
 
 \section{Introduction and Literature Attribution}
 
-A strongly regular graph $\mathrm{srg}(v, k, \lambda, \mu)$ is a regular graph on $v$ vertices with degree $k$. Every pair of adjacent vertices has exactly $\lambda$ common neighbors. Every pair of distinct non-adjacent vertices has exactly $\mu$ common neighbors. In 1970, John H. Conway asked whether a strongly regular graph exists with parameters $(99, 14, 1, 2)$~\cite{conway1970}. He offered a \$1,000 prize for its resolution. Over five decades later, the existence of this graph remains an open problem in algebraic combinatorics~\cite{brouwer2011spectra,cesarz2025automorphisms}.
+A strongly regular graph $\mathrm{srg}(v, k, \lambda, \mu)$ is a regular graph on $v$ vertices with degree $k$. Every pair of adjacent vertices has exactly $\lambda$ common neighbors. Every pair of distinct non-adjacent vertices has exactly $\mu$ common neighbors. Whether a strongly regular graph with parameters $(99, 14, 1, 2)$ exists remains open~\cite{brouwer2011spectra,cesarz2025automorphisms}. Conway included the question among five problems carrying a \$1{,}000 prize. The circulated statement is the text of the 2014 OEIS50--DIMACS conference, updated in 2017~\cite{conway1970}. That document is not a 1970 research article.
 
 Let $A \in \{0,1\}^{99 \times 99}$ denote the adjacency matrix of a Conway 99-graph. The strongly regular parameters require $A$ to satisfy the matrix equation
 \begin{equation}
@@ -95,14 +95,14 @@ For each vertex $x \in V(G)$, let $\Gamma(x)$ denote its open neighborhood. Let 
 
 \subsection{Literature Attribution of Automorphism Group Bounds}
 
-An unconstrained combinatorial search on a 99-vertex graph involves $2^{\binom{99}{2}} = 2^{4851}$ possible edge configurations. Computational searches must therefore assume automorphisms. Prior literature establishes strict bounds on the automorphism group $\Aut(G)$:
+An unconstrained combinatorial search on a 99-vertex graph involves $2^{\binom{99}{2}} = 2^{4851}$ possible edge configurations. Computational searches in this note therefore restrict attention to graphs that admit a nontrivial automorphism. Such a restriction cannot find a rigid graph. Prior literature establishes strict bounds on the automorphism group $\Aut(G)$:
 
 \begin{enumerate}
  \item \textbf{Involutions (order 2) fix exactly one vertex.}
- Makhnev and Minakova (2001, 2004)~\cite{makhnev2001automorphisms} classified prime-order automorphisms of strongly regular graphs with $\lambda = 1$ and $\mu = 2$. Makhnev (2009)~\cite{makhnev2009symmetric} summarized that an involution $t \in \Aut(G)$ cannot fix 3, 5, 7, or more vertices due to character integrality. Any involution of a Conway 99-graph must therefore fix exactly $f = |\Fix(t)| = 1$ vertex.
+ Makhnev and Minakova (2004)~\cite{makhnev2001automorphisms} classified prime-order automorphisms of strongly regular graphs with $\lambda = 1$ and $\mu = 2$. Makhnev (2009)~\cite{makhnev2009symmetric} summarized that an involution $t \in \Aut(G)$ cannot fix 3, 5, 7, or more vertices due to character integrality. Any involution of a Conway 99-graph must therefore fix exactly $f = |\Fix(t)| = 1$ vertex.
 
  \item \textbf{Automorphisms of order 3 are fixed-point-free; orders 6 and 9 are excluded.}
- Behbahani and Lam (2011)~\cite{behbahani2011strongly} proved that an automorphism of order 3 on $\mathrm{srg}(99,14,1,2)$ has no fixed points. It acts as a fixed-point-free (FPF) permutation with 33 cycles of length 3. Crnkovi{\'c} and Maksimovi{\'c} (2014)~\cite{crnkovic2014strongly} proved that $\Aut(G)$ contains no subgroups of order 6 or 9. This result excludes $\mathbb{Z}_6, S_3, \mathbb{Z}_9$, and $\mathbb{Z}_3 \times \mathbb{Z}_3$.
+ Behbahani and Lam (2011)~\cite{behbahani2011strongly} proved that an automorphism of order 3 on $\mathrm{srg}(99,14,1,2)$ has no fixed points. It acts as a fixed-point-free (FPF) permutation with 33 cycles of length 3. Crnkovi{\'c} and Maksimovi{\'c} (2020)~\cite{crnkovic2014strongly} proved that $\Aut(G)$ contains no subgroups of order 6 or 9. This result excludes $\mathbb{Z}_6, S_3, \mathbb{Z}_9$, and $\mathbb{Z}_3 \times \mathbb{Z}_3$.
 
  \item \textbf{Prime orders $p \ge 5$ are excluded.}
  Behbahani and Lam (2011)~\cite{behbahani2011strongly} showed that the only possible prime divisors of $|\Aut(G)|$ are 2 and 3. They excluded automorphisms of order 5, 7, and higher primes through computer-assisted orbit matrix enumeration. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} gave computer-free proofs that:
@@ -112,21 +112,21 @@ An unconstrained combinatorial search on a 99-vertex graph involves $2^{\binom{9
   7 \mid |\Aut(G)| \implies \Aut(G) \cong \mathbb{Z}_7.
   \label{eq:prior_bounds}
  \end{equation}
- Combining this even-order implication with Crnkovi{\'c} and Maksimovi{\'c}'s exclusion of order 6 proves that if $2 \mid |\Aut(G)|$, then $|\Aut(G)| = 2$. Therefore, $\Aut(G)$ contains no elements of order 4 or 6.
+ Combining this even-order implication with the exclusion of order 6 gives: if $2 \mid |\Aut(G)|$, then $|\Aut(G)| = 2$. Therefore, $\Aut(G)$ contains no elements of order 4 or 6. This is a consequence of the cited papers, not a new group-order theorem.
 
  \item \textbf{Computational benchmark context.}
- Thakkar (2026)~\cite{thakkar2026forced} introduced forced-structure reductions and encoded symmetry classes using Google OR-Tools CP-SAT. The solver timed out on the single-fixed-point order-7 action, returning \texttt{UNKNOWN} after 48 hours on 14 cores. This left open the task of producing an independently verified computational certificate for that case.
+ Thakkar and Severini (2026)~\cite{thakkar2026forced} encode forced-structure reductions and prescribed automorphisms in Google OR-Tools CP-SAT. They report that the single-fixed-point order-7 instance returned \texttt{UNKNOWN} after 48 hours on 14 cores. Their paper still treats a $\mathbb{Z}_7$-symmetric graph as open. A CNF refutation is a certificate for that instance only when the two formulations are shown to define the same set of graphs. This note does not give that correspondence.
 \end{enumerate}
 
 \subsection{Contributions and Scope of this Benchmark Report}
 
-This work provides a verified computational benchmark that combines interactive theorem proving in Lean~4 with certified SAT solving. The primary contributions are:
+The note keeps the following items separate. The primary contents are:
 \begin{itemize}
  \item We introduce a four-state taxonomy (\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, \textsc{Pending}) to clarify proof verification and modeling limits.
  \item In Lean~4, we verify structural invariants ($K_4$-freeness, 1-factor neighborhood decomposition, diameter at most 2) and the decidability of the adjacency conditions. The Lean kernel checks these proofs using only \texttt{[propext, Quot.sound]}. We also formalize the arithmetic contradictions that arise in character-theoretic analyses.
- \item We implement canonical SAT compilers with Crawford symmetry-breaking predicates~\cite{crawford1996symmetry}. A 39-test regression suite verifies the compiler pipeline across syntax, coordinate models, and truth tables.
- \item We resolve the computational benchmark for order 7. CaDiCaL refutes the canonical encoding in 771.59\,s and generates a 192.2\,MB ($183.31$\,MiB) binary proof. The checker \texttt{drat-trim} independently verifies the proof in 844.01\,s.
- \item We determine the incidence geometry of the open involution case $f=1$ ($CC^T = 10I + 2J$). We report on a multi-threaded cloud campaign that accumulated over 2.4 billion conflicts across $Z_2$ ($f=1$) and $Z_3$ (FPF) without finding a satisfying assignment.
+ \item We implement canonical SAT compilers with Crawford symmetry-breaking predicates~\cite{crawford1996symmetry}. A 39-test regression suite checks helper truth tables, the $f=1$ coordinate model, and the bounded-run supervisor. These tests do not certify that a historical CNF matches the graph.
+ \item We quote a retained order-7 solver log and checker log. The logs record \texttt{s UNSATISFIABLE} and \texttt{s VERIFIED}. The input CNF is absent, and it predates a compiler repair, so the trace is not a certificate for the repaired formula or for the Thakkar--Severini instance.
+ \item We prove that every column of a binary $7\times 42$ matrix satisfying $CC^T = 10I_7 + 2J_7$ has weight 2, and we correct the support labels of the three $f=1$ branch representatives. A 12.5-day campaign on the $f=1$ and fixed-point-free order-3 encodings produced no satisfying assignment and no refutation.
 \end{itemize}
 
 \section{Lean~4 Formalization and Operational Taxonomy}
@@ -134,7 +134,7 @@ This work provides a verified computational benchmark that combines interactive 
 To prevent ambiguity between mechanized proofs, empirical solver outputs, and open conjectures, we classify every result and artifact into one of four operational states:
 
 \begin{description}
- \item[\textsc{Proved}.] A theorem verified by the Lean~4 kernel using only the foundational axioms \texttt{[propext, Quot.sound]}; or a propositional formula whose refutation is certified by an independent proof checker (\texttt{drat-trim}).
+ \item[\textsc{Proved}.] A theorem verified by the Lean~4 kernel using only the foundational axioms \texttt{[propext, Quot.sound]}; or a propositional formula that is on file and whose refutation log contains a completed \texttt{s VERIFIED} verdict from \texttt{drat-trim}. A log that names a missing CNF does not meet this state.
  \item[\textsc{Compiled}.] Formally typed Lean~4 code compiling with \texttt{sorryAx} stubs for open subgoals; or Python SAT compilers whose clausal outputs pass deterministic regression tests.
  \item[\textsc{Explored}.] Combinatorial searches, matrix calculations, and multi-threaded solver executions that finished without finding a satisfying assignment or producing a proof certificate.
  \item[\textsc{Pending}.] Open mathematical questions (such as graph existence or full rigidity $|\Aut(G)| = 1$) and unfinished formalizations connecting group actions to arithmetic hypotheses.
@@ -193,7 +193,7 @@ The strongly regular graph conditions translate into exact cardinality constrain
   2 & \text{if } x \not\sim v.
  \end{cases}
 \end{equation}
-We convert these pseudo-Boolean constraints to CNF with Tseitin transformations, using sequential counters and sorting networks.
+We convert these pseudo-Boolean constraints to CNF with Tseitin variables. Exact cardinality constraints use PySAT sequential counters (\texttt{EncType.seqcounter}). The compilers used for this note do not emit sorting networks.
 
 To prune isomorphic search spaces, we enforce symmetry-breaking predicates following Crawford et al.~\cite{crawford1996symmetry}. Let $\mathcal{G} \le \Sym(m)$ be the automorphism group preserving the orbit partition. For each non-identity generator $\pi \in \mathcal{G}$, we enforce a lexicographical leader constraint: the assignment vector $X$ must precede its permuted image $\pi(X)$:
 \begin{equation}
@@ -220,11 +220,11 @@ To verify compiler correctness, we created a deterministic regression suite of 3
  \item \textbf{Geometric and Input-Audit Tests (11 tests):} Evaluates 2,394 cardinality constraints symbolically against the coordinate model, checking branch cut consistency and index mappings.
  \item \textbf{Supervisor Process Tests (8 tests):} Validates bounded execution, process lifecycle management, wall-time enforcement, and proof byte limits.
 \end{enumerate}
-All 39 tests pass deterministically in $\sim 5.5$\,s. This confirms \textsc{Compiled} status for the SAT generation pipeline.
+On 23 September 2026 the 39 tests in these three groups passed. A later orbit-pair enumeration added five further tests. Passing tests support \textsc{Compiled} status for the current compiler sources. They do not rewrite CNF files generated earlier, and they do not prove that those files express the intended graph constraints.
 
-\section{Certified Refutation of Order 7}
+\section{A Recorded Order-7 CNF Refutation}
 
-Behbahani and Lam (2011)~\cite{behbahani2011strongly} excluded automorphisms of order 7 using orbit matrices. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} reduced the case $7 \mid |\Aut(G)|$ to $\Aut(G) \cong \mathbb{Z}_7$ without computers. However, Thakkar (2026)~\cite{thakkar2026forced} reported that Google OR-Tools CP-SAT timed out on this case. We provide an independently verifiable proof certificate that refutes this symmetry class.
+Behbahani and Lam (2011)~\cite{behbahani2011strongly} excluded automorphisms of order 7 by a computer-assisted orbit-matrix argument. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} proved, without a computer, that $7 \mid |\Aut(G)|$ implies $\Aut(G) \cong \mathbb{Z}_7$. Thakkar and Severini (2026)~\cite{thakkar2026forced} nevertheless report a single-fixed-point $\mathbb{Z}_7$ CP-SAT run that remained \texttt{UNKNOWN} after 48 hours on 14 cores, and they describe that symmetric case as still open. The experiment below does not decide their model.
 
 \subsection{Encoding Parameters and Formula Statistics}
 
@@ -241,7 +241,7 @@ This decomposition matches the orbit structure of Cesarz and Woldar~\cite{cesarz
 
 \subsection{Solver Execution and Independent DRAT Verification}
 
-We solved the canonical order-7 formula using CaDiCaL 1.9.5~\cite{biere2019cadical} with binary DRAT proof logging. The solver proved the formula unsatisfiable:
+On 10 September 2026 the file \texttt{conway\_z7\_canonical.cnf} was passed to CaDiCaL 3.0.1, commit \texttt{c60730422e758ef1cebe7aeddf2dda31c996bf04}~\cite{biere2019cadical}. The retained log \texttt{cadical\_z7.log} quotes the header \texttt{p cnf 176613 421562} and ends as follows. The solver binary identified in that log is 3.0.1, not 1.9.5.
 \begin{lstlisting}
 s UNSATISFIABLE
 c total process time since initialization:       771.59    seconds
@@ -252,7 +252,7 @@ c DRAT 1201268 deleted clauses 52.23%
 c DRAT 192218491 bytes (183.31 MB)
 \end{lstlisting}
 
-To verify the refutation independently of CaDiCaL, we checked the 192.2\,MB ($183.31$\,MiB) binary proof with \texttt{drat-trim}~\cite{heule2013verifying} in backward checking mode:
+The same log records a binary DRAT trace of 192{,}218{,}491 bytes. CaDiCaL prints this size as 183.31 MB; that figure is the mebibyte count. The retained checker log \texttt{drat\_trim\_z7.log} reports \texttt{s VERIFIED} after 844.008\,s~\cite{heule2013verifying}. The checker also deleted duplicate literals in the trace and ignored some deletion lines for unit clauses. The terminal verdict in the log is still \texttt{s VERIFIED}. The listing below is a quotation of that log, not a run repeated for this note.
 \begin{lstlisting}
 c parsing input formula with 176613 variables and 421562 clauses
 c finished parsing, read 192218491 bytes from proof file
@@ -266,26 +266,31 @@ c verification time: 844.008 seconds
 
 \begin{table}[ht]
 \centering
-\small
-\setlength{\tabcolsep}{4.5pt}
-\caption{Benchmark comparison for the order-7 automorphism of Conway's 99-graph.}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\caption{What is recorded for an order-7 encoding. Rows are not proofs of the same formula.}
 \label{tab:order7_benchmark}
 \begin{tabular}{@{}lllll@{}}
 \toprule
-Methodology & Formulation & Solver / Tool & Runtime & Epistemic Verdict \\
+Source & Object & Tool & Runtime & Log \\
 \midrule
-Thakkar (2026)~\cite{thakkar2026forced} & CP Model & OR-Tools CP-SAT & $>48$\,h (Timeout) & Inconclusive (\texttt{UNKNOWN}) \\
-This work (Search) & Canonical CNF & CaDiCaL 1.9.5 & 771.59\,s & \texttt{s UNSATISFIABLE} \\
-This work (Certification) & Binary DRAT & \texttt{drat-trim} & 844.01\,s & \textsc{Proved} (\texttt{s VERIFIED}) \\
+Thakkar--Severini~\cite{thakkar2026forced} & CP model & CP-SAT & $>48$\,h & \texttt{UNKNOWN} \\
+\texttt{cadical\_z7.log} & CNF now absent & CaDiCaL 3.0.1 & 771.59\,s & \texttt{UNSATISFIABLE} \\
+\texttt{drat\_trim\_z7.log} & DRAT trace & \texttt{drat-trim} & 844.01\,s & \texttt{VERIFIED} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:order7_benchmark} summarizes these results. The verified certificate closes the CP-SAT timeout case. Under our taxonomy, the formula refutation is \textsc{Proved}; the translation pipeline from graph theory to CNF is \textsc{Compiled}.
+Table~\ref{tab:order7_benchmark} records what the retained logs say. It does not close the Thakkar--Severini timeout. Three further limits apply.
+\begin{enumerate}
+ \item The file \texttt{conway\_z7\_canonical.cnf} is not in the working tree. The binary trace \texttt{proof\_z7\_canonical.drat} is retained locally and is not part of this source archive. Without that CNF, \texttt{drat-trim} cannot be run again. A CNF emitted by the current compiler must not be substituted for the missing file.
+ \item On 21 September 2026 the order-7 compiler was changed so that DIMACS literal 1 is no longer treated as the Boolean constant true. The 10 September run used the earlier compiler. The repaired sources are \textsc{Compiled} by the regression suite. The September 10 trace does not certify a formula produced after that repair.
+ \item Even a recheckable refutation of a corrected CNF would be \textsc{Proved} only as a refutation of that formula. The implication from a graph with a $\mathbb{Z}_7$ action to that CNF remains \textsc{Compiled}, not a kernel proof.
+\end{enumerate}
 
 \section{Incidence Geometry and Search Limits for Open Branches}
 
-After excluding order 7 and auditing the $f=3$ refutations, only two prime-order actions remain open in the literature:
+The literature cited above leaves two prime-order actions unresolved by this note:
 \begin{enumerate}
  \item An involution ($p=2$) with exactly $f=1$ fixed point (Makhnev--Minakova);
  \item An order-3 automorphism ($p=3$) that is fixed-point-free (Crnkovi{\'c}--Maksimovi{\'c}).
@@ -325,19 +330,19 @@ The binary matrix $C$ allows independent swaps of its 21 duplicate-column pairs.
 \begin{equation}
  W = (\mathbb{Z}_2)^7 \rtimes S_7, \qquad |W| = 2^7 \cdot 7! = 645,120.
 \end{equation}
-Fixing a distinguished orbit $O_0$ with support $\{0, 1\}$, its stabilizer $\Stab_W(O_0)$ has order 15,360. Under this stabilizer, the remaining 41 outer orbits partition into three canonical symmetry classes:
+Fixing a distinguished orbit $O_0$ with support $\{0, 1\}$, the stabilizer $\Stab_W(O_0)$ has order 15{,}360 inside $W$. The global sign flip fixes every orbit label, so it lies in the kernel of the action on the 42 labels. The induced permutation group therefore has order 7{,}680, and the faithful stabilizer of $O_0$ has order 7{,}680. These orders were obtained by enumerating the stabilizer in the signed coordinate model. Under $\Stab_W(O_0)$, the remaining 41 orbits fall into three classes:
 \begin{itemize}
- \item \textbf{Class A (Opposite Phase, Identical Support):} Size 1, representative $O_{21}$ (support $\{0, 1\}$, opposite sign phase).
- \item \textbf{Class B (Intersecting Support):} Size 20, representative $O_1$ with support $\{1, 6\}$ ($|\{0, 1\} \cap \{1, 6\}| = 1$).
- \item \textbf{Class C (Disjoint Support):} Size 20, representative $O_{11}$ with support $\{2, 3\}$ ($\{0, 1\} \cap \{2, 3\} = \emptyset$).
+ \item \textbf{Class A (opposite phase, identical support):} Size 1, representative $O_{21}$, support $\{0, 1\}$, phase $-$. The abstract residual order is 15{,}360 and the faithful residual order is 7{,}680.
+ \item \textbf{Class B (intersecting support):} Size 20, representative $O_1$, support $\{0, 2\}$, phase $+$. Then $|\{0, 1\} \cap \{0, 2\}| = 1$. The abstract residual order is 768 and the faithful residual order is 384.
+ \item \textbf{Class C (disjoint support):} Size 20, representative $O_{11}$, support $\{2, 3\}$, phase $+$. Then $\{0, 1\} \cap \{2, 3\} = \emptyset$. The residual orders are again 768 and 384.
 \end{itemize}
-The canonical branch representatives are $A=21, B=1, C=11$. Orbit $O_{10}$ has support $\{1, 6\}$ and belongs to Class~B. Orbit $O_{11}$ has disjoint support $\{2, 3\}$, ensuring that Class~C remains disjoint from the intersecting support orbits. Unit tests in \texttt{test\_z2\_f1\_input\_audit.py} verify this property.
+An earlier draft assigned support $\{1, 6\}$ to $O_1$. That label is the support of $O_{10}$. Since $O_0$ has support $\{0, 1\}$, the index $O_{10}$ is another intersecting representative, in the same class as $O_1$, and it is not a disjoint representative. The representatives used here are $A=21$, $B=1$, and $C=11$. The input-audit tests check these indices against the compiler's edge list of $K_7$.
 
 \subsection{Limits of Combinatorial Search: The Distributed Solver Campaign}
 
 To test whether CDCL solvers can resolve the open branches without further theoretical reductions, we ran a multi-threaded search campaign using CaDiCaL on Google Cloud Platform (16 cores, dedicated instance). The search targeted the $Z_2$ ($f=1$) branches and the $Z_3$ FPF encoding.
 
-The campaign ran for 12.5 days and ended on September 23, 2026:
+The campaign ran for 12.5 days and ended on 23 September 2026. The conflict total below is the aggregate recorded for that run. The solver logs are not part of this source, and the machines have been shut down, so a reader cannot recompute the total from this file:
 \begin{itemize}
  \item The solvers accumulated over \textbf{2.4 billion conflicts} ($> 2.4 \times 10^9$) across multiple random seeds and variable selection heuristics.
  \item The solvers found neither a satisfying assignment (graph witness) nor an unsatisfiable termination (refutation).
@@ -347,12 +352,12 @@ Under our taxonomy, this campaign is classified as \textsc{Explored}. Conflict c
 
 \section{Conclusion}
 
-This report establishes a verified baseline for research on Conway's 99-graph problem:
+This report records the following boundary. It does not decide existence.
 \begin{enumerate}
- \item We verified foundational structural invariants and arithmetic refutations in Lean~4, distinguishing kernel-checked arithmetic from unverified graph-action hypotheses.
- \item We implemented canonical SAT compilers with Crawford symmetry breaking, resolved literal-constant collision defects, and verified the pipeline with a 39-test regression suite.
- \item We resolved the order-7 computational challenge. CaDiCaL produced a 192.2\,MB ($183.31$\,MiB) binary proof in 771.59\,s, and \texttt{drat-trim} certified this proof in 844.01\,s.
- \item We determined the incidence geometry of the $f=1$ involution case ($C C^T = 10I + 2J$, column weights strictly 2) and classified the multi-threaded search campaign (>2.4 billion conflicts) as \textsc{Explored}.
+ \item The Lean library contains kernel-checked structural invariants and arithmetic refutations. Counting hypotheses that are merely assumed remain \textsc{Pending}. The library is not included in this source archive.
+ \item The current SAT compilers use Crawford symmetry breaking and sequential counters. A literal-index defect was repaired on 21 September 2026. The 39-test suite checks the repaired sources. It does not repair CNF files written before that date.
+ \item Retained logs from 10 September 2026 record an unsatisfiable order-7 CNF and a \texttt{drat-trim} verification. The CNF is missing, the run predates the compiler repair, and the result is not identified with the Thakkar--Severini CP-SAT instance.
+ \item Every binary $7\times 42$ solution of $CC^T = 10I_7 + 2J_7$ has column weight 2. In the signed model the three $f=1$ representatives are $O_{21}$, $O_1$ with support $\{0, 2\}$, and $O_{11}$ with support $\{2, 3\}$. The multi-threaded search remained \textsc{Explored}.
 \end{enumerate}
 
 \paragraph{The Conway 99-Graph and the Rigidity Conjecture.}
@@ -360,17 +365,17 @@ A central question is whether any Conway 99-graph must be rigid:
 \begin{conjecture}[Rigidity Conjecture]
 If a strongly regular graph with parameters $(99, 14, 1, 2)$ exists, then $\Aut(G) = \{1\}$.
 \end{conjecture}
-Symmetry-restricted searches cannot find a rigid graph, because they assume a non-trivial automorphism ($Z_2$, $Z_3$, $Z_7$). Even if future work refutes the open $f=1$ and $Z_3$ FPF branches---proving the Rigidity Conjecture---the existence of Conway's 99-graph remains open. Progress on the general problem will require methods such as algebraic geometry or higher-order semidefinite programming (SDP) relaxations.
+A search that assumes a nontrivial automorphism ($Z_2$, $Z_3$, or $Z_7$) excludes every rigid graph from its search space. Refuting the open $f=1$ and fixed-point-free order-3 branches would prove the rigidity conjecture and would leave existence open.
 
 \section*{Declarations}
 
-\noindent\textbf{Statement of AI Use.} The author used large language models for code maintenance, automated test generation, and LaTeX formatting. All mathematical proofs, Lean~4 formalizations, SAT encodings, and experimental results were audited, checked by compilers, and verified by independent proof checkers.
+\noindent\textbf{Statement of AI Use.} The author used large language models for code maintenance, test generation, and LaTeX editing. Kernel checks, regression tests, and retained solver logs cover only the statements and files identified in the text. Model output is not an independent mathematical review.
 
 \medskip
 \noindent\textbf{Conflict of Interest.} The author declares no competing financial or non-financial interests.
 
 \medskip
-\noindent\textbf{Data and Code Availability.} All Lean~4 modules, Python SAT compilers, regression test suites, and reproduction scripts are openly available in the project repository.
+\noindent\textbf{Data and Code Availability.} This arXiv source contains the note, its bibliography, and the style file. It does not contain the Lean library, the CNF files, or \texttt{proof\_z7\_canonical.drat}. As of 24 September 2026 the implementation repository is private, and \texttt{conway\_z7\_canonical.cnf} is absent from its working tree. The binary trace and the two order-7 logs are retained locally. A public deposit of the missing CNF, the trace, and the sources is required before a reader can repeat the checker.
 
 \medskip
 \noindent\textbf{Acknowledgments.} The author thanks the developers of CaDiCaL, \texttt{drat-trim}, PySAT, and Lean~4 for their open-source tools.
