@@ -18,6 +18,8 @@ Earlier versions overstated novelty, the completeness of the Lean formalization,
 
 **Branch C correction:** the historical local C file selects $O_{10}$, whose support is `{1,6}` and intersects the support `{0,1}` of $O_0$. It is another secant representative, not the disjoint branch. The corrected C selects $O_{11}$ with support `{2,3}`. Historical CNFs and cuts remain untouched; new outputs use new directories. The claim that the three historical local CNFs cover all three classes was false. Local base/A/B/legacy-C files were reproduced byte-for-byte from `build_z2_f1_cnf.py` and their recorded cuts; the prior attribution to `agent_b_cnf_compiler.py` is withdrawn because that file currently generates $Z_7$. Remote GCP provenance remains **PENDING**.
 
+**Campaign conclusion and repository stabilization (September 23, 2026) — EXPLORED:** The remote GCP campaign (`conway-sat-worker`, 16 CaDiCaL solvers) concluded at 20:30 UTC on September 23, 2026 via automated finalizer timer. Across 12.5 days of execution, over 2.4 billion conflicts were accumulated across $f=1$ and order-3 actions without resolving satisfiability (`EXPLORED`). Cloud resources were dismantled and verified at 0 active instances/disks. Ad-hoc launcher and monitor scripts were pruned, and non-TestCase exploratory scripts moved to `scripts/exploratory/`, enabling clean, standard `unittest discover` execution across the 39 regression tests.
+
 
 ## 1. Mathematical background and prior work
 
@@ -85,13 +87,15 @@ Run from the repository root with the toolchain specified in `lean-toolchain` an
 # Build the entire library
 lake build
 lake env lean Conway/TestMatrix.lean
-python3 -B -m unittest discover -s tests -p test_canonical_sat_compilers.py -v
-python3 -B -m unittest discover -s tests -p test_z2_f1_input_audit.py -v
-python3 -B -m unittest discover -s tests -p test_bounded_local_search.py -v
+
+# Run the 39 deterministic regression tests
+python3 -B -m unittest discover -s tests -v
+
+# Run the algebraic validation of the f=1 coordinate model
 python3 -B scripts/validate_z2_f1_inputs.py
 ```
 
-On September 21, 2026, the Lean build completed with 32 jobs and three `sorry` warnings. The current selected Python suites pass 20, 11, and 8 tests respectively. Additional targeted axiom checks were run:
+On September 23, 2026, the Lean build completed with 32 jobs and three `sorry` warnings. The full test discovery suite passes all 39 tests in ~5 seconds. Additional targeted axiom checks were run:
 
 ```bash
 lake env lean --stdin <<'LEAN'
