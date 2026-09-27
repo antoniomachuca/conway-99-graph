@@ -62,16 +62,16 @@
   \emph{Permanent contact:} \texttt{contactoantoniomachuca@gmail.com}
 }
 
-\date{September 24, 2026}
+\date{September 26, 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Conway's 99-graph problem asks whether a strongly regular graph with parameters $(99,14,1,2)$ exists. Cited results restrict the prime divisors of the automorphism group order to $\{2, 3\}$. This note records a Lean~4 library, SAT compilers, and solver logs, and it uses a four-state taxonomy---\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, and \textsc{Pending}---to separate kernel-checked theorems, checker-certified formula refutations, tested compilers, and open claims. A formula certificate is \textsc{Proved} only when the formula and a completed checker log are both available.
+Conway's 99-graph problem asks whether a strongly regular graph with parameters $(99,14,1,2)$ exists. Cited results restrict the prime divisors of the automorphism group order to $\{2, 3\}$. This note records a Lean~4 library, SAT compilers, and solver logs, and it uses a four-state taxonomy---\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, and \textsc{Pending}---to separate kernel-checked theorems, checker-certified formula refutations, tested compilers, and open claims. A SAT claim is \textsc{Proved} only when the cited CNF is the file that was checked, its solver log ends in \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reports \texttt{s VERIFIED} on that pair.
 In Lean~4, we kernel-verify core structural invariants: $K_4$-freeness, 1-factor neighborhood decomposition $7K_2$, diameter at most 2, and decidability of the adjacency matrix equation. These proofs depend solely on the foundational axioms \texttt{[propext, Quot.sound]}. We also formalize the arithmetic contradictions that underlie character-theoretic obstructions. This distinguishes verified arithmetic deductions from unverified geometric action hypotheses.
-For propositional logic, we implement canonical SAT encodings with Crawford symmetry-breaking predicates. A 39-test regression suite verifies the compiler pipeline after eliminating literal/constant collision defects.
-On 10 September 2026, CaDiCaL 3.0.1 recorded \texttt{s UNSATISFIABLE} for a CNF named \texttt{conway\_z7\_canonical.cnf} after 771.59\,s, and \texttt{drat-trim} recorded \texttt{s VERIFIED} for the accompanying binary trace. That CNF is not in the working tree, and it was produced before a later repair of a literal-index defect in the compiler. The trace therefore refutes a missing file. It does not certify the repaired encoding, and it is not shown to be the CP-SAT instance left undecided by Thakkar and Severini (2026).
+For propositional logic, we implement canonical SAT encodings with Crawford symmetry-breaking predicates. On 23 September 2026, 39 regression tests of the repaired compiler sources passed. That is \textsc{Compiled} status for those sources.
+CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE} on the repaired order-7 CNF ($177{,}097$ variables, $422{,}508$ clauses) in $58{,}054.87$\,s process time and wrote a $26{,}746{,}488{,}053$-byte DRAT trace. \texttt{drat-trim} reported \texttt{s VERIFIED} in $103{,}482.837$\,s ($12{,}821{,}576{,}879$ resolution steps, $378{,}191$ core clauses, 0 RAT lemmas). That pair is \textsc{Proved}. Both files are in the Zenodo record \texttt{10.5281/zenodo.22995101}~\cite{conway99_zenodo}. The deposit does not decide the Thakkar--Severini CP-SAT search.
 The note also records the column-weight identity $CC^T = 10I + 2J$ for the open involution case $f=1$, with corrected branch supports, and a 12.5-day CaDiCaL campaign that accumulated more than 2.4 billion conflicts without a satisfying assignment or a refutation. This source file does not contain the Lean library, the CNFs, or the proof trace.
 \end{abstract}
 
@@ -79,7 +79,7 @@ The note also records the column-weight identity $CC^T = 10I + 2J$ for the open 
 
 \section{Introduction and Literature Attribution}
 
-A strongly regular graph $\mathrm{srg}(v, k, \lambda, \mu)$ is a regular graph on $v$ vertices with degree $k$. Every pair of adjacent vertices has exactly $\lambda$ common neighbors. Every pair of distinct non-adjacent vertices has exactly $\mu$ common neighbors. Whether a strongly regular graph with parameters $(99, 14, 1, 2)$ exists remains open~\cite{brouwer2011spectra,cesarz2025automorphisms}. Conway included the question among five problems carrying a \$1{,}000 prize. The circulated statement is the text of the 2014 OEIS50--DIMACS conference, updated in 2017~\cite{conway1970}. That document is not a 1970 research article.
+A strongly regular graph $\mathrm{srg}(v, k, \lambda, \mu)$ is a regular graph on $v$ vertices with degree $k$. Every pair of adjacent vertices has exactly $\lambda$ common neighbors. Every pair of distinct non-adjacent vertices has exactly $\mu$ common neighbors. Whether a strongly regular graph with parameters $(99, 14, 1, 2)$ exists remains open~\cite{brouwer2011spectra,cesarz2025automorphisms}. Conway included the question among five problems carrying a \$1{,}000 prize. The circulated statement is the prize list \emph{Five \$1,000 Problems (Update 2017)}~\cite{conway1970}, Problem~2, with a 2014 update by Bill Cheswick and a 2017 postscript by Cheswick and Sloane. That document is not a 1970 research article and it does not identify itself as conference proceedings.
 
 Let $A \in \{0,1\}^{99 \times 99}$ denote the adjacency matrix of a Conway 99-graph. The strongly regular parameters require $A$ to satisfy the matrix equation
 \begin{equation}
@@ -99,7 +99,7 @@ An unconstrained combinatorial search on a 99-vertex graph involves $2^{\binom{9
 
 \begin{enumerate}
  \item \textbf{Involutions (order 2) fix exactly one vertex.}
- Makhnev and Minakova (2004)~\cite{makhnev2001automorphisms} classified prime-order automorphisms of strongly regular graphs with $\lambda = 1$ and $\mu = 2$. Makhnev (2009)~\cite{makhnev2009symmetric} summarized that an involution $t \in \Aut(G)$ cannot fix 3, 5, 7, or more vertices due to character integrality. Any involution of a Conway 99-graph must therefore fix exactly $f = |\Fix(t)| = 1$ vertex.
+ Makhnev and Minakova (2004)~\cite{makhnev2001automorphisms} classified prime-order automorphisms of strongly regular graphs with $\lambda = 1$ and $\mu = 2$. Makhnev's 2009 slides~\cite{makhnev2009symmetric}, attributing the result to Makhnev--Minakova, state that an involution of a Conway 99-graph fixes exactly one vertex.
 
  \item \textbf{Automorphisms of order 3 are fixed-point-free; orders 6 and 9 are excluded.}
  Behbahani and Lam (2011)~\cite{behbahani2011strongly} proved that an automorphism of order 3 on $\mathrm{srg}(99,14,1,2)$ has no fixed points. It acts as a fixed-point-free (FPF) permutation with 33 cycles of length 3. Crnkovi{\'c} and Maksimovi{\'c} (2020)~\cite{crnkovic2014strongly} proved that $\Aut(G)$ contains no subgroups of order 6 or 9. This result excludes $\mathbb{Z}_6, S_3, \mathbb{Z}_9$, and $\mathbb{Z}_3 \times \mathbb{Z}_3$.
@@ -125,7 +125,7 @@ The note keeps the following items separate. The primary contents are:
  \item We introduce a four-state taxonomy (\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, \textsc{Pending}) to clarify proof verification and modeling limits.
  \item In Lean~4, we verify structural invariants ($K_4$-freeness, 1-factor neighborhood decomposition, diameter at most 2) and the decidability of the adjacency conditions. The Lean kernel checks these proofs using only \texttt{[propext, Quot.sound]}. We also formalize the arithmetic contradictions that arise in character-theoretic analyses.
  \item We implement canonical SAT compilers with Crawford symmetry-breaking predicates~\cite{crawford1996symmetry}. A 39-test regression suite checks helper truth tables, the $f=1$ coordinate model, and the bounded-run supervisor. These tests do not certify that a historical CNF matches the graph.
- \item We quote a retained order-7 solver log and checker log. The logs record \texttt{s UNSATISFIABLE} and \texttt{s VERIFIED}. The input CNF is absent, and it predates a compiler repair, so the trace is not a certificate for the repaired formula or for the Thakkar--Severini instance.
+ \item The repaired compiler's order-7 CNF has a CaDiCaL 1.9.5 log ending \texttt{s UNSATISFIABLE} and a \texttt{drat-trim} log ending \texttt{s VERIFIED} on that file, so the formula refutation is \textsc{Proved}. The CP-SAT model of Thakkar and Severini is a separate encoding.
  \item We prove that every column of a binary $7\times 42$ matrix satisfying $CC^T = 10I_7 + 2J_7$ has weight 2, and we correct the support labels of the three $f=1$ branch representatives. A 12.5-day campaign on the $f=1$ and fixed-point-free order-3 encodings produced no satisfying assignment and no refutation.
 \end{itemize}
 
@@ -134,7 +134,7 @@ The note keeps the following items separate. The primary contents are:
 To prevent ambiguity between mechanized proofs, empirical solver outputs, and open conjectures, we classify every result and artifact into one of four operational states:
 
 \begin{description}
- \item[\textsc{Proved}.] A theorem verified by the Lean~4 kernel using only the foundational axioms \texttt{[propext, Quot.sound]}; or a propositional formula that is on file and whose refutation log contains a completed \texttt{s VERIFIED} verdict from \texttt{drat-trim}. A log that names a missing CNF does not meet this state.
+ \item[\textsc{Proved}.] A theorem verified by the Lean~4 kernel using only the foundational axioms \texttt{[propext, Quot.sound]}; or a SAT claim for which the cited CNF is the file that was checked, its solver log ends in \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reports \texttt{s VERIFIED} on that pair. A checker log for a different formula does not meet this state.
  \item[\textsc{Compiled}.] Formally typed Lean~4 code compiling with \texttt{sorryAx} stubs for open subgoals; or Python SAT compilers whose clausal outputs pass deterministic regression tests.
  \item[\textsc{Explored}.] Combinatorial searches, matrix calculations, and multi-threaded solver executions that finished without finding a satisfying assignment or producing a proof certificate.
  \item[\textsc{Pending}.] Open mathematical questions (such as graph existence or full rigidity $|\Aut(G)| = 1$) and unfinished formalizations connecting group actions to arithmetic hypotheses.
@@ -222,9 +222,9 @@ To verify compiler correctness, we created a deterministic regression suite of 3
 \end{enumerate}
 On 23 September 2026 the 39 tests in these three groups passed. A later orbit-pair enumeration added five further tests. Passing tests support \textsc{Compiled} status for the current compiler sources. They do not rewrite CNF files generated earlier, and they do not prove that those files express the intended graph constraints.
 
-\section{A Recorded Order-7 CNF Refutation}
+\section{Certified Order-7 CNF Refutation}
 
-Behbahani and Lam (2011)~\cite{behbahani2011strongly} excluded automorphisms of order 7 by a computer-assisted orbit-matrix argument. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} proved, without a computer, that $7 \mid |\Aut(G)|$ implies $\Aut(G) \cong \mathbb{Z}_7$. Thakkar and Severini (2026)~\cite{thakkar2026forced} nevertheless report a single-fixed-point $\mathbb{Z}_7$ CP-SAT run that remained \texttt{UNKNOWN} after 48 hours on 14 cores, and they describe that symmetric case as still open. The experiment below does not decide their model.
+Behbahani and Lam (2011)~\cite{behbahani2011strongly} excluded automorphisms of order 7 by a computer-assisted orbit-matrix argument. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} proved, without a computer, that $7 \mid |\Aut(G)|$ implies $\Aut(G) \cong \mathbb{Z}_7$. Thakkar and Severini (2026)~\cite{thakkar2026forced} nevertheless report a single-fixed-point $\mathbb{Z}_7$ CP-SAT run that remained \texttt{UNKNOWN} after 48 hours on 14 cores, and they describe that symmetric case as still open. Here we report a verified SAT refutation for the canonical order-7 encoding.
 
 \subsection{Encoding Parameters and Formula Statistics}
 
@@ -234,58 +234,70 @@ Under a cyclic automorphism $g$ of order 7, the 99 vertices partition into:
  \item 2 orbits of size 7 in the neighborhood $\Gamma(x_0)$ (because $k = 14$);
  \item 12 orbits of size 7 in the second subconstituent $\Gamma_2(x_0)$ ($84$ vertices).
 \end{itemize}
-This decomposition matches the orbit structure of Cesarz and Woldar~\cite{cesarz2025automorphisms}. The canonical CNF encoding uses 498 primary variables: 36 internal orbit valences and 462 cross-orbit circulant variables. We encode degree, $\lambda=1$, and $\mu=2$ constraints into CNF and add Crawford lex-leader cuts for the 11 non-identity elements of the stabilizer $G_{\mathbb{Z}_7}$. The resulting formula has:
+This decomposition matches the orbit structure of Cesarz and Woldar~\cite{cesarz2025automorphisms}. The canonical CNF encoding uses 498 primary variables: 36 internal orbit valences and 462 cross-orbit circulant variables. We encode degree, $\lambda=1$, and $\mu=2$ constraints into CNF and add Crawford lex-leader cuts for the 11 non-identity elements of the stabilizer $G_{\mathbb{Z}_7}$. The resulting formula emitted by the repaired compiler has:
 \begin{equation}
- \text{Variables: } 176,613, \qquad \text{Clauses: } 421,562.
+ \text{Variables: } 177{,}097, \qquad \text{Clauses: } 422{,}508.
 \end{equation}
 
 \subsection{Solver Execution and Independent DRAT Verification}
 
-On 10 September 2026 the file \texttt{conway\_z7\_canonical.cnf} was passed to CaDiCaL 3.0.1, commit \texttt{c60730422e758ef1cebe7aeddf2dda31c996bf04}~\cite{biere2019cadical}. The retained log \texttt{cadical\_z7.log} quotes the header \texttt{p cnf 176613 421562} and ends as follows. The solver binary identified in that log is 3.0.1, not 1.9.5.
+The formula was solved with local CaDiCaL 1.9.5~\cite{biere2019cadical}. That log records header \texttt{p cnf 177097 422508}, verdict \texttt{s UNSATISFIABLE}, exit 20, $58{,}054.87$\,s process time, $58{,}595.63$\,s real time, and $119{,}353{,}667$ conflicts, and it closed a $26{,}746{,}488{,}053$-byte proof at \texttt{/Volumes/Untitled/conway\_repro\_z7/proof\_z7\_canonical.drat}. The binary version string 3.0.1 and commit \texttt{c60730422e758ef1cebe7aeddf2dda31c996bf04} belong to an earlier run on the formula \texttt{p cnf 176613 421562}. The following lines are a non-contiguous extract from the 1.9.5 log:
 \begin{lstlisting}
+c DRAT proof file '/Volumes/Untitled/conway_repro_z7/proof_z7_canonical.drat' closed
+c DRAT 127774798 added clauses 50.10%
+c DRAT 127286510 deleted clauses 49.90%
+c DRAT 26746488053 bytes (25507.44 MB)
 s UNSATISFIABLE
-c total process time since initialization:       771.59    seconds
-c total real time since initialization:          771.76    seconds
-c maximum resident set size of process:          219.38    MB
-c DRAT 1098900 added clauses 47.77%
-c DRAT 1201268 deleted clauses 52.23%
-c DRAT 192218491 bytes (183.31 MB)
+c total process time since initialization:     58054.87    seconds
+c total real time since initialization:        58595.63    seconds
+c exit 20
 \end{lstlisting}
 
-The same log records a binary DRAT trace of 192{,}218{,}491 bytes. CaDiCaL prints this size as 183.31 MB; that figure is the mebibyte count. The retained checker log \texttt{drat\_trim\_z7.log} reports \texttt{s VERIFIED} after 844.008\,s~\cite{heule2013verifying}. The checker also deleted duplicate literals in the trace and ignored some deletion lines for unit clauses. The terminal verdict in the log is still \texttt{s VERIFIED}. The listing below is a quotation of that log, not a run repeated for this note.
+\texttt{drat-trim}~\cite{heule2013verifying} logged backward checking of this CNF against that proof and \texttt{s VERIFIED} after $103{,}482.837$\,s verification time. The command-line timeout is not in the log:
 \begin{lstlisting}
-c parsing input formula with 176613 variables and 421562 clauses
-c finished parsing, read 192218491 bytes from proof file
+c parsing input formula with 177097 variables and 422508 clauses
+c finished parsing, read 26746488053 bytes from proof file
 c detected empty clause; start verification via backward checking
-c 213600 of 421562 clauses in core
-c 495181 of 1098901 lemmas in core using 74443066 resolution steps
-c 0 RAT lemmas in core; 285673 redundant literals in core lemmas
+c 378191 of 422508 clauses in core                            
+c 66748552 of 127774799 lemmas in core using 12821576879 resolution steps
+c 0 RAT lemmas in core; 62829297 redundant literals in core lemmas
 s VERIFIED
-c verification time: 844.008 seconds
+c verification time: 103482.837 seconds
 \end{lstlisting}
+
+The checker extracted $378{,}191$ core clauses ($89.51\%$) and $66{,}748{,}552$ core lemmas ($52.24\%$) across $12{,}821{,}576{,}879$ resolution steps, requiring zero RAT lemmas (pure RUP resolution).
 
 \begin{table}[ht]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
-\caption{What is recorded for an order-7 encoding. Rows are not proofs of the same formula.}
+\caption{Two order-7 encodings. No equivalence between the CP-SAT model and this CNF is proved.}
 \label{tab:order7_benchmark}
 \begin{tabular}{@{}lllll@{}}
 \toprule
-Source & Object & Tool & Runtime & Log \\
+Source & Object & Tool & Runtime & Outcome \\
 \midrule
-Thakkar--Severini~\cite{thakkar2026forced} & CP model & CP-SAT & $>48$\,h & \texttt{UNKNOWN} \\
-\texttt{cadical\_z7.log} & CNF now absent & CaDiCaL 3.0.1 & 771.59\,s & \texttt{UNSATISFIABLE} \\
-\texttt{drat\_trim\_z7.log} & DRAT trace & \texttt{drat-trim} & 844.01\,s & \texttt{VERIFIED} \\
+Thakkar--Severini~\cite{thakkar2026forced} & CP model & CP-SAT & $>48$\,h (14 cores) & \texttt{UNKNOWN} \\
+This work (solve) & \texttt{p cnf 177097 422508} & CaDiCaL 1.9.5 & $58{,}054.87$\,s & \texttt{s UNSATISFIABLE} \\
+This work (verify) & 24.91\,GiB DRAT & \texttt{drat-trim} & $103{,}482.84$\,s & \texttt{s VERIFIED} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:order7_benchmark} records what the retained logs say. It does not close the Thakkar--Severini timeout. Three further limits apply.
+\subsection{Cryptographic Integrity and Operational Status}
+
+Both artifacts are preserved with deterministic SHA-256 cryptographic checksums:
+\begin{itemize}
+ \item \texttt{conway\_z7\_canonical.cnf}:\\
+   {\footnotesize\texttt{fc67a85f300151b628ffc5d808b5cb384e69efac2a87c9891aab2c8115e0af47}}
+ \item \texttt{proof\_z7\_canonical.drat}:\\
+   {\footnotesize\texttt{f312d2a83d85bd11f1c9c2428cb67566ca12b11c70527cfebf0f72572da14a39}}
+\end{itemize}
+Those two digests match the CNF and the $26{,}746{,}488{,}053$-byte proof in the Zenodo record \texttt{10.5281/zenodo.22995101}~\cite{conway99_zenodo}. The earlier record \texttt{10.5281/zenodo.22983776} stores this CNF beside a $192{,}218{,}491$-byte proof. Under our taxonomy:
 \begin{enumerate}
- \item The file \texttt{conway\_z7\_canonical.cnf} is not in the working tree. The binary trace \texttt{proof\_z7\_canonical.drat} is retained locally and is not part of this source archive. Without that CNF, \texttt{drat-trim} cannot be run again. A CNF emitted by the current compiler must not be substituted for the missing file.
- \item On 21 September 2026 the order-7 compiler was changed so that DIMACS literal 1 is no longer treated as the Boolean constant true. The 10 September run used the earlier compiler. The repaired sources are \textsc{Compiled} by the regression suite. The September 10 trace does not certify a formula produced after that repair.
- \item Even a recheckable refutation of a corrected CNF would be \textsc{Proved} only as a refutation of that formula. The implication from a graph with a $\mathbb{Z}_7$ action to that CNF remains \textsc{Compiled}, not a kernel proof.
+ \item The propositional refutation of \texttt{conway\_z7\_canonical.cnf} is \textsc{Proved}: the solver log ends in \texttt{s UNSATISFIABLE} and \texttt{drat-trim} reports \texttt{s VERIFIED} on that pair.
+ \item The graph-to-CNF step is \textsc{Compiled}. The regression tests pass and do not kernel-certify the encoding. A Lean equivalence remains \textsc{Pending}.
+ \item This is a checked refutation of this CNF. It does not re-prove the Behbahani--Lam exclusion~\cite{behbahani2011strongly}, and it does not decide the Thakkar--Severini CP-SAT instance~\cite{thakkar2026forced}.
 \end{enumerate}
 
 \section{Incidence Geometry and Search Limits for Open Branches}
@@ -293,7 +305,7 @@ Table~\ref{tab:order7_benchmark} records what the retained logs say. It does not
 The literature cited above leaves two prime-order actions unresolved by this note:
 \begin{enumerate}
  \item An involution ($p=2$) with exactly $f=1$ fixed point (Makhnev--Minakova);
- \item An order-3 automorphism ($p=3$) that is fixed-point-free (Crnkovi{\'c}--Maksimovi{\'c}).
+ \item A fixed-point-free automorphism of order 3. Behbahani's fixed-point restriction does not remove it, and Crnkovi{\'c}--Maksimovi{\'c} do not exclude it when they exclude orders 6 and 9.
 \end{enumerate}
 
 \subsection{Incidence Geometry of the One-Fixed-Vertex Involution \texorpdfstring{($f=1$)}{(f=1)}}
@@ -348,7 +360,7 @@ The campaign ran for 12.5 days and ended on 23 September 2026. The conflict tota
  \item The solvers found neither a satisfying assignment (graph witness) nor an unsatisfiable termination (refutation).
 \end{itemize}
 
-Under our taxonomy, this campaign is classified as \textsc{Explored}. Conflict counts, clause counts, and proof sizes do not measure the proportion of the mathematical search space eliminated. In combinatorial problems of this scale, CDCL solvers often generate redundant learned clauses without resolving the algebraic constraints. Unguided SAT solving on the $f=1$ and $Z_3$ FPF branches appears intractable without additional symmetry cuts or algebraic invariants.
+Under our taxonomy, this campaign is classified as \textsc{Explored}. Conflict counts, clause counts, and proof sizes do not measure the proportion of the mathematical search space eliminated. The 12.5-day run ended without a satisfying assignment or a refutation.
 
 \section{Conclusion}
 
@@ -356,7 +368,7 @@ This report records the following boundary. It does not decide existence.
 \begin{enumerate}
  \item The Lean library contains kernel-checked structural invariants and arithmetic refutations. Counting hypotheses that are merely assumed remain \textsc{Pending}. The library is not included in this source archive.
  \item The current SAT compilers use Crawford symmetry breaking and sequential counters. A literal-index defect was repaired on 21 September 2026. The 39-test suite checks the repaired sources. It does not repair CNF files written before that date.
- \item Retained logs from 10 September 2026 record an unsatisfiable order-7 CNF and a \texttt{drat-trim} verification. The CNF is missing, the run predates the compiler repair, and the result is not identified with the Thakkar--Severini CP-SAT instance.
+ \item The canonical order-7 CNF from the repaired compiler is \textsc{Proved} as a formula. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE} in $58{,}054.87$\,s process time, and \texttt{drat-trim} reported \texttt{s VERIFIED} on the $26{,}746{,}488{,}053$-byte proof in $103{,}482.837$\,s. The SHA-256 digests above match those two files in the published Zenodo record \texttt{10.5281/zenodo.22995101}. The record \texttt{10.5281/zenodo.22983776} stores a $192{,}218{,}491$-byte proof from an earlier run.
  \item Every binary $7\times 42$ solution of $CC^T = 10I_7 + 2J_7$ has column weight 2. In the signed model the three $f=1$ representatives are $O_{21}$, $O_1$ with support $\{0, 2\}$, and $O_{11}$ with support $\{2, 3\}$. The multi-threaded search remained \textsc{Explored}.
 \end{enumerate}
 
@@ -375,7 +387,7 @@ A search that assumes a nontrivial automorphism ($Z_2$, $Z_3$, or $Z_7$) exclude
 \noindent\textbf{Conflict of Interest.} The author declares no competing financial or non-financial interests.
 
 \medskip
-\noindent\textbf{Data and Code Availability.} This arXiv source contains the note, its bibliography, and the style file. It does not contain the Lean library, the CNF files, or \texttt{proof\_z7\_canonical.drat}. As of 24 September 2026 the implementation repository is private, and \texttt{conway\_z7\_canonical.cnf} is absent from its working tree. The binary trace and the two order-7 logs are retained locally. A public deposit of the missing CNF, the trace, and the sources is required before a reader can repeat the checker.
+\noindent\textbf{Data and Code Availability.} The checked pair is the CNF \texttt{p cnf 177097 422508} and the $26{,}746{,}488{,}053$-byte proof, together with the CaDiCaL 1.9.5 log and the \texttt{drat-trim} log, in the Zenodo record \texttt{10.5281/zenodo.22995101}~\cite{conway99_zenodo}. The earlier record \texttt{10.5281/zenodo.22983776} stores this CNF beside a $192{,}218{,}491$-byte proof. Neither record contains the Lean library or the compilers. This source file does not contain them either.
 
 \medskip
 \noindent\textbf{Acknowledgments.} The author thanks the developers of CaDiCaL, \texttt{drat-trim}, PySAT, and Lean~4 for their open-source tools.

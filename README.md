@@ -8,6 +8,17 @@
 
 **Technical note:** [LaTeX source](manuscript/conway_involutions.tex) · [PDF](manuscript/conway_involutions.pdf)
 
+## Certificate deposit
+
+CNF files, DRAT traces, and solver logs are gitignored. Cloning this repository does not reproduce the order-7 certificate.
+
+Zenodo concept DOI: [10.5281/zenodo.22983775](https://doi.org/10.5281/zenodo.22983775).
+
+- Published record [10.5281/zenodo.22995101](https://doi.org/10.5281/zenodo.22995101) (27 September 2026, version v2). It stores `conway_z7_canonical.cnf` (`p cnf 177097 422508`), the 26,746,488,053-byte `proof_z7_canonical.drat`, the CaDiCaL 1.9.5 log, the `drat-trim` log ending in `s VERIFIED`, and `SHA256SUMS.txt`. Zenodo reports MD5 `f8ec9e423465f4a28ca21402ab00718d` for that proof.
+- Earlier published record [10.5281/zenodo.22983776](https://doi.org/10.5281/zenodo.22983776). It stores the same CNF next to a 192,218,491-byte proof from an earlier run. That record is not the verified certificate.
+
+That formula is **PROVED** only together with `s UNSATISFIABLE` and `s VERIFIED` on the 26,746,488,053-byte proof. The graph-to-CNF implication remains **COMPILED**. The deposit is not the CP-SAT model of Thakkar and Severini. The Lean library and the compilers are not in the deposit.
+
 ## Scope and correction notice
 
 This repository contains a partial Lean 4 formalization, Python SAT encoders, structural calculations, and records of symmetry-restricted searches for a strongly regular graph with parameters $(99,14,1,2)$. The existence problem remains open. No new mathematical restriction beyond the cited literature is established by this documentation audit.
@@ -73,7 +84,7 @@ The local $f=1$ compiler uses a separate Tseitin helper without that shortcut. I
 
 ### Reproducibility and historical records
 
-The order-7 solver log names `conway_z7_canonical.cnf`, but that input is not present at the audited repository root. The corresponding DRAT file and verification logs are present. Recover the exact input and establish its provenance before rechecking the certificate; a freshly generated CNF must not be assumed identical.
+The order-7 CNF, DRAT, and logs are gitignored; they are not in a clone. The on-disk files from the 10–11 September run are not the 24–26 September certificate. See [Certificate deposit](#certificate-deposit). A freshly generated CNF must not be assumed identical to either file.
 
 The $f=3$ records provide one Case A pair and one Case B pair of solver/checker logs. Earlier tables claimed additional partitions and conflict counts not individually supported by those retained records. This revision does not certify all historical partitions.
 
@@ -139,6 +150,7 @@ A user-authorized **EXPLORED** run of corrected C started on September 21 at 15:
 
 ## 5. Navigation
 
+- [Certificate deposit](#certificate-deposit): which Zenodo record holds the order-7 files, and which published record does not.
 - [Technical audit and analytical reconstructions](docs/technical_report.md): exact proof boundaries, encoding counterexample, incidence calculation, and verification obligations.
 - [Search strategy and evidence limits](docs/solver_strategy_and_probability_report.md): withdrawn probability estimates and requirements for meaningful experiments.
 - [Lean library](Conway): definitions, checker, structural lemmas, conditional deductions, and unfinished nonexistence declarations.
