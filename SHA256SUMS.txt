@@ -1,0 +1,2 @@
+fc67a85f300151b628ffc5d808b5cb384e69efac2a87c9891aab2c8115e0af47  /Volumes/Untitled/conway_repro_z7/conway_z7_canonical.cnf
+f312d2a83d85bd11f1c9c2428cb67566ca12b11c70527cfebf0f72572da14a39  /Volumes/Untitled/conway_repro_z7/proof_z7_canonical.drat
