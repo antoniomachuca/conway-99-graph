@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 analyze_z2_f7_involutions.py
-Analizador algebraico, topologico y combinatorio para involuciones (Z_2)
-con f = 7 puntos fijos en el 99-Grafo de Conway srg(99, 14, 1, 2).
+Algebraic, topological, and combinatorial analyzer for involutions (Z_2)
+with f = 7 fixed points on Conway's 99-graph srg(99, 14, 1, 2).
 """
 
 import sys
@@ -11,7 +11,7 @@ import z3
 
 def spectral_analysis():
     print("=" * 70)
-    print("1. ANALISIS ESPECTRAL Y MODULAR PARA f = 7")
+    print("1. SPECTRAL AND MODULAR ANALYSIS FOR f = 7")
     print("=" * 70)
     admissible = []
     for a in range(8, 53):
@@ -21,15 +21,15 @@ def spectral_analysis():
             if 0 <= eps_1 <= 46:
                 admissible.append((a, c, eps_1))
                 
-    print(f"Traza: Tr(P_t) = 7 => a + c = 52")
-    print(f"Formula de aristas internas: eps_1 = 7a - 194 = 2 (mod 7)")
-    print(f"Candidatos espectrales admisibles en [0, 46]:")
+    print(f"Trace: Tr(P_t) = 7 => a + c = 52")
+    print(f"Internal-edge formula: eps_1 = 7a - 194 = 2 (mod 7)")
+    print(f"Admissible spectral candidates in [0, 46]:")
     for a, c, eps_1 in admissible:
         print(f"  a = {a:2d}, c = {c:2d} => eps_1 = {eps_1:2d} (= {eps_1 % 7} mod 7)")
     return [eps for _, _, eps in admissible]
 
 def z3_model_f7(case_name, adj_fix, valid_spectral_eps):
-    print(f"\n--- Modelado Z3 / ILP para {case_name} ---")
+    print(f"\n--- Z3 / ILP model for {case_name} ---")
     c_fix = {}
     c_U = {}
     for x in range(7):
@@ -47,8 +47,8 @@ def z3_model_f7(case_name, adj_fix, valid_spectral_eps):
         deg_Fix = sum(adj_fix[x])
         deg_U.append(14 - deg_Fix)
     sum_d = sum(deg_U)
-    print(f"Grados de Fix hacia U: {deg_U}, suma = {sum_d}")
-    print(f"Total de pares de vecinos en U: sum binom(d_j, 2) = {sum_binom_d}")
+    print(f"Degrees from Fix into U: {deg_U}, sum = {sum_d}")
+    print(f"Total neighbor pairs in U: sum binom(d_j, 2) = {sum_binom_d}")
     
     solver = z3.Solver()
     N = {k: z3.Int(f"N_{k}") for k in range(8)}
@@ -85,10 +85,10 @@ def z3_model_f7(case_name, adj_fix, valid_spectral_eps):
     solver_spec.add(z3.Or([eps_1 == val for val in valid_spectral_eps]))
     
     res = solver_spec.check()
-    print(f"Resultado Z3 con restriccion espectral eps_1 in {valid_spectral_eps}: {res}")
+    print(f"Z3 result under the spectral restriction eps_1 in {valid_spectral_eps}: {res}")
     if res == z3.sat:
         m = solver_spec.model()
-        print(f"  MODELO ENCONTRADO:")
+        print(f"  MODEL FOUND:")
         print(f"  eps_1 = {m[eps_1]}")
         for k in range(8):
             print(f"  N_{k} = {m[N[k]]}")
@@ -101,23 +101,23 @@ def z3_model_f7(case_name, adj_fix, valid_spectral_eps):
             possible_eps.append((v, [m[N[k]].as_long() for k in range(8)]))
             solver.add(eps_1 != v)
         possible_eps.sort(key=lambda x: x[0])
-        print(f"  Valores de eps_1 algebraicamente posibles (sin mod 7): {[x[0] for x in possible_eps]}")
+        print(f"  Algebraically possible eps_1 values (without mod 7): {[x[0] for x in possible_eps]}")
         for val, n_dist in possible_eps:
-            print(f"    eps_1 = {val:2d} => mod 7 = {val % 7} (requerido: 2) | N = {n_dist}")
+            print(f"    eps_1 = {val:2d} => mod 7 = {val % 7} (required: 2) | N = {n_dist}")
 
 def main():
     spectral_eps = spectral_analysis()
     
     # Case 0: 7K_1
     adj_0 = [[0]*7 for _ in range(7)]
-    z3_model_f7("Caso 0: 7K_1 (7-coclique)", adj_0, spectral_eps)
+    z3_model_f7("Case 0: 7K_1 (7-coclique)", adj_0, spectral_eps)
     
     # Case 1: K_3 + 4K_1
     adj_1 = [[0]*7 for _ in range(7)]
     adj_1[0][1] = adj_1[1][0] = 1
     adj_1[1][2] = adj_1[2][1] = 1
     adj_1[2][0] = adj_1[0][2] = 1
-    z3_model_f7("Caso 1: K_3 + 4K_1 (1 triangulo, 4 aislados)", adj_1, spectral_eps)
+    z3_model_f7("Case 1: K_3 + 4K_1 (1 triangle, 4 isolated vertices)", adj_1, spectral_eps)
     
     # Case 2: 2K_3 + K_1
     adj_2 = [[0]*7 for _ in range(7)]
@@ -127,7 +127,7 @@ def main():
     adj_2[3][4] = adj_2[4][3] = 1
     adj_2[4][5] = adj_2[5][4] = 1
     adj_2[5][3] = adj_2[3][5] = 1
-    z3_model_f7("Caso 2: 2K_3 + K_1 (2 triangulos disjuntos, 1 aislado)", adj_2, spectral_eps)
+    z3_model_f7("Case 2: 2K_3 + K_1 (2 disjoint triangles, 1 isolated vertex)", adj_2, spectral_eps)
 
 if __name__ == "__main__":
     main()

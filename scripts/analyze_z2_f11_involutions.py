@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
 analyze_z2_f11_involutions.py
-Analizador formal y refutador exhaustivo para involuciones (Z_2) con f = 11 puntos fijos
-en el 99-Grafo de Conway srg(99, 14, 1, 2).
+Formal exhaustive analyzer and refuter for involutions (Z_2) with f = 11 fixed points
+on Conway's 99-graph srg(99, 14, 1, 2).
 
-Teoremas aplicados:
-1. Traza Espectral: Tr(P_t) = 11 => a + c = 54 => eps_1 = 7a - 202 ≡ 1 (mod 7).
-   Candidatos admisibles en [0, 44]: {1, 8, 15, 22, 29, 36, 43}.
-2. Rigidez de Grados: Todo vertice en un subgrafo localmente lineal (lambda = 1)
-   tiene grado par: deg_H(z) in {0, 2, 4, 6, 8, 10}.
-3. Identidad Universal de Conteo:
+Theorems applied:
+1. Spectral trace: Tr(P_t) = 11 => a + c = 54 => eps_1 = 7a - 202 ≡ 1 (mod 7).
+   Admissible candidates in [0, 44]: {1, 8, 15, 22, 29, 36, 43}.
+2. Degree rigidity: every vertex of a locally linear subgraph (lambda = 1)
+   has even degree: deg_H(z) in {0, 2, 4, 6, 8, 10}.
+3. Universal counting identity:
    eps_1 = f*(8 - f) + sum_{z in Fix(t)} binom(deg_H(z), 2) = -33 + sum binom.
-   Dado eps_1 >= 0, exige estrictamente sum binom(deg_H(z), 2) >= 33.
-4. Rigidez de Co-vecinos: para todo par no adyacente x, y in Fix(t), c_Fix(x, y) in {0, 2}.
-5. Refutacion Exhaustiva via CaDiCaL:
-   De las 19 particiones aritmeticas posibles con eps_1 ≡ 1 (mod 7) y sum binom >= 33,
-   exactamente 0 admiten realizacion como grafo con lambda = 1 y c_Fix in {0, 2}.
+   Given eps_1 >= 0, this strictly requires sum binom(deg_H(z), 2) >= 33.
+4. Common-neighbor rigidity: for every non-adjacent pair x, y in Fix(t), c_Fix(x, y) in {0, 2}.
+5. Exhaustive refutation via CaDiCaL:
+   Of the 19 arithmetically possible partitions with eps_1 ≡ 1 (mod 7) and sum binom >= 33,
+   exactly 0 are realizable as a graph with lambda = 1 and c_Fix in {0, 2}.
 """
 
 import sys
@@ -26,19 +26,19 @@ from pysat.card import CardEnc, EncType
 
 def main():
     print("=" * 80)
-    print("DEMOSTRACION Y REFUTACION EXHAUSTIVA PARA f = 11 PUNTOS FIJOS")
+    print("EXHAUSTIVE PROOF AND REFUTATION FOR f = 11 FIXED POINTS")
     print("=" * 80)
 
     f = 11
     spectral_mod = (5 * (f - 1)) % 7
     m2 = (99 - f) // 2
     allowed_eps = [e for e in range(0, m2 + 1) if e % 7 == spectral_mod]
-    print(f"1. Traza espectral exige: eps_1 ≡ {spectral_mod} (mod 7)")
-    print(f"   Candidatos admisibles en [0, {m2}]: {allowed_eps}")
-    print(f"2. Formula universal: eps_1 = -33 + sum_{{z in Fix(t)}} binom(deg_H(z), 2)")
-    print(f"   Para eps_1 >= 0, se exige sum binom >= 33.")
+    print(f"1. Spectral trace requires: eps_1 ≡ {spectral_mod} (mod 7)")
+    print(f"   Admissible candidates in [0, {m2}]: {allowed_eps}")
+    print(f"2. Universal formula: eps_1 = -33 + sum_{{z in Fix(t)}} binom(deg_H(z), 2)")
+    print(f"   For eps_1 >= 0, the binomial sum must be >= 33.")
 
-    # Generacion de particiones de grados posibles
+    # Generate possible degree partitions
     deg_options = [0, 2, 4, 6, 8, 10]
     b_map = {0: 0, 2: 1, 4: 6, 6: 15, 8: 28, 10: 45}
     max_edges = f * (f - 1) // 2 # 55
@@ -57,12 +57,12 @@ def main():
                         valid_seqs.append((eps_1, T, tuple(sorted(seq, reverse=True))))
 
     valid_seqs.sort()
-    print(f"\n3. Particiones de grados aritmeticamente posibles: {len(valid_seqs)}")
+    print(f"\n3. Arithmetically possible degree partitions: {len(valid_seqs)}")
     for eps, T, degs in valid_seqs:
         print(f"   eps_1 = {eps:2d} (T = {T:2d}): {degs}")
 
-    # Construccion de la base CNF para grafos localmente lineales con c_Fix in {0, 2}
-    print(f"\n4. Construyendo modelo SAT (lambda_H = 1, c_Fix in {{0, 2}})...")
+    # Build the base CNF for locally linear graphs with c_Fix in {0, 2}
+    print(f"\n4. Building the SAT model (lambda_H = 1, c_Fix in {{0, 2}})...")
     edge_vars = {}
     idx = 1
     for i in range(f):
@@ -105,9 +105,9 @@ def main():
                 other_lits = [lits[b] for b in range(len(lits)) if b != a]
                 base_cnf.append([e_ij, -lits[a]] + other_lits)
 
-    print(f"   Base CNF construida: {next_var - 1} variables, {len(base_cnf.clauses)} clausulas.")
+    print(f"   Base CNF built: {next_var - 1} variables, {len(base_cnf.clauses)} clauses.")
 
-    print(f"\n5. Verificando realizabilidad topologica con CaDiCaL...")
+    print(f"\n5. Checking topological realizability with CaDiCaL...")
     all_unsat = True
     for idx_seq, (eps, T, target_deg) in enumerate(valid_seqs):
         if max(target_deg) > 2 * T:
@@ -128,18 +128,18 @@ def main():
         res = solver.solve()
         if res:
             all_unsat = False
-            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => SAT (MODELO ENCONTRADO)")
+            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => SAT (MODEL FOUND)")
         else:
-            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => UNSAT (100% verificado)")
+            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => UNSAT (100% checked)")
 
     print("\n" + "=" * 80)
     if all_unsat:
-        print("CONCLUSION MATEMATICA DEFINITIVA:")
-        print("NO EXISTE NINGUN SUBGRAFO LOCALMENTE LINEAL EN 11 VERTICES CON c_Fix in {0, 2}")
-        print("QUE SATISFAGA LA CONGRUENCIA ESPECTRAL eps_1 ≡ 1 (mod 7) Y eps_1 >= 0.")
-        print("EL CASO f = 11 QUEDA 100% REFUTADO E INCONDICIONALMENTE CERRADO.")
+        print("MATHEMATICAL CONCLUSION:")
+        print("NO LOCALLY LINEAR SUBGRAPH ON 11 VERTICES WITH c_Fix in {0, 2}")
+        print("SATISFIES THE SPECTRAL CONGRUENCE eps_1 ≡ 1 (mod 7) AND eps_1 >= 0.")
+        print("UNDER THESE CONSTRAINTS, CASE f = 11 IS REFUTED.")
     else:
-        print("ALERTA: Se encontro al menos un modelo compatible.")
+        print("ALERT: at least one compatible model was found.")
     print("=" * 80)
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 analyze_z2_f15_involutions.py
-Analizador formal y refutador exhaustivo para involuciones (Z_2) con f = 15 puntos fijos
-en el 99-Grafo de Conway srg(99, 14, 1, 2).
+Formal exhaustive analyzer and refuter for involutions (Z_2) with f = 15 fixed points
+on Conway's 99-graph srg(99, 14, 1, 2).
 """
 
 import sys
@@ -13,17 +13,17 @@ from pysat.card import CardEnc, EncType
 
 def main():
     print("=" * 80)
-    print("DEMOSTRACION Y REFUTACION EXHAUSTIVA PARA f = 15 PUNTOS FIJOS")
+    print("EXHAUSTIVE PROOF AND REFUTATION FOR f = 15 FIXED POINTS")
     print("=" * 80)
 
     f = 15
     spectral_mod = (5 * (f - 1)) % 7 # 0
     m2 = (99 - f) // 2 # 42
     allowed_eps = [e for e in range(0, m2 + 1) if e % 7 == spectral_mod]
-    print(f"1. Traza espectral exige: eps_1 ≡ {spectral_mod} (mod 7)")
-    print(f"   Candidatos admisibles en [0, {m2}]: {allowed_eps}")
-    print(f"2. Formula universal: eps_1 = -105 + sum_{{z in Fix(t)}} binom(deg_H(z), 2)")
-    print(f"   Para eps_1 >= 0, se exige sum binom >= 105.")
+    print(f"1. Spectral trace requires: eps_1 ≡ {spectral_mod} (mod 7)")
+    print(f"   Admissible candidates in [0, {m2}]: {allowed_eps}")
+    print(f"2. Universal formula: eps_1 = -105 + sum_{{z in Fix(t)}} binom(deg_H(z), 2)")
+    print(f"   For eps_1 >= 0, the binomial sum must be >= 105.")
 
     deg_options = [0, 2, 4, 6, 8, 10, 12, 14]
     b_map = {0: 0, 2: 1, 4: 6, 6: 15, 8: 28, 10: 45, 12: 66, 14: 91}
@@ -43,16 +43,16 @@ def main():
                         valid_seqs.append((eps_1, T, tuple(sorted(seq, reverse=True))))
 
     valid_seqs.sort()
-    print(f"\n3. Particiones de grados aritmeticamente posibles: {len(valid_seqs)}")
+    print(f"\n3. Arithmetically possible degree partitions: {len(valid_seqs)}")
     for eps, T, degs in valid_seqs:
         print(f"   eps_1 = {eps:2d} (T = {T:2d}): {degs}")
 
     if not valid_seqs:
-        print("Cero particiones posibles! UNSAT inmediato!")
+        print("Zero possible partitions. Immediate UNSAT.")
         return
 
     # Base CNF
-    print(f"\n4. Construyendo modelo SAT (lambda_H = 1, c_Fix in {{0, 2}})...")
+    print(f"\n4. Building the SAT model (lambda_H = 1, c_Fix in {{0, 2}})...")
     edge_vars = {}
     idx = 1
     for i in range(f):
@@ -94,9 +94,9 @@ def main():
                 others = [lits[b] for b in range(len(lits)) if b != a]
                 base_cnf.append([e_ij, -lits[a]] + others)
 
-    print(f"   Base CNF construida: {next_var - 1} variables, {len(base_cnf.clauses)} clausulas.")
+    print(f"   Base CNF built: {next_var - 1} variables, {len(base_cnf.clauses)} clauses.")
 
-    print(f"\n5. Verificando realizabilidad topologica exacta con CaDiCaL...")
+    print(f"\n5. Checking exact topological realizability with CaDiCaL...")
     all_unsat = True
     for idx_seq, (eps, T, target_deg) in enumerate(valid_seqs):
         if max(target_deg) > 2 * T:
@@ -117,19 +117,19 @@ def main():
         res = solver.solve()
         if res:
             all_unsat = False
-            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => SAT (MODELO ENCONTRADO!)")
+            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => SAT (MODEL FOUND)")
             break
         else:
-            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => UNSAT (100% verificado)")
+            print(f"   [{idx_seq+1:2d}/{len(valid_seqs)}] eps_1={eps:2d}, T={T:2d}, degs={target_deg} => UNSAT (100% checked)")
         solver.delete()
 
     print("\n" + "=" * 80)
     if all_unsat:
-        print("CONCLUSION MATEMATICA DEFINITIVA:")
-        print("TODAS LAS PARTICIONES PARA f = 15 SON ESTRICTAMENTE UNSAT.")
-        print("NO EXISTE NINGUNA INVOLUCION CON f = 15 PUNTOS FIJOS EN CONWAY-99.")
+        print("MATHEMATICAL CONCLUSION:")
+        print("EVERY PARTITION FOR f = 15 IS UNSAT.")
+        print("NO INVOLUTION WITH f = 15 FIXED POINTS SATISFIES THESE CONSTRAINTS IN CONWAY-99.")
     else:
-        print("ALERTA: Se encontro al menos un modelo compatible.")
+        print("ALERT: at least one compatible model was found.")
     print("=" * 80)
 
 if __name__ == "__main__":

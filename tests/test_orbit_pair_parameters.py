@@ -116,8 +116,8 @@ class TestOrbitPairParameters(unittest.TestCase):
 
     def test_printed_table_states_the_explored_verdict(self):
         text = format_report(self.report)
-        self.assertIn("Estado: EXPLORED", text)
-        self.assertIn("Obstrucción aritmética: no", text)
+        self.assertIn("Status: EXPLORED", text)
+        self.assertIn("Arithmetic obstruction: no", text)
         self.assertIn("7680", text)
         self.assertIn("15360", text)
 

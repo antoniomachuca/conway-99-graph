@@ -1,58 +1,58 @@
-# Documento de traspaso — estado corregido de Conway-99
+# Handover document — corrected status of Conway-99
 
-**Revisión documental:** 21 de septiembre de 2026
+**Documentation review:** 21 September 2026
 
-**Estado vigente detallado:** [README](README.md), [informe técnico](docs/technical_report.md) y [traspaso para agentes](agents/handover_briefing.md).
+**Current detailed status:** [README](README.md), [technical report](docs/technical_report.md), and [agent handover](agents/handover_briefing.md).
 
-## 1. Correcciones científicas
+## 1. Scientific corrections
 
-- La restricción a una involución con un único vértice fijo ya aparece en la exposición de Makhnev de septiembre de 2009, atribuida a Makhnev–Minakova. No es un descubrimiento de este repositorio.
-- La exclusión de orden 7 ya era conocida por Behbahani–Lam (2011). Los logs locales de UNSAT/VERIFIED son evidencia sobre la fórmula registrada, no una prueba de la corrección de su traducción desde grafos.
-- El caso de orden 3 sin puntos fijos no debe darse por excluido por confusión con el caso que tiene puntos fijos.
-- Las declaraciones finales de Lean para $f=5$ y $f=7$ incorporan hipótesis aritméticas incompatibles. La afirmación de que son exclusiones incondicionales formalizadas de extremo a extremo es incorrecta: **The claim is false according to the current state of the repository.**
-- **COMPILED:** se ha reparado el defecto del literal `1` en los compiladores canónicos y en la ruta antigua `build_z3_fpf_cnf.py`. Pasan 20 tests de compiladores, 11 de auditoría de entradas y 8 del supervisor.
-- **COMPILED:** la C local antigua usaba O10, soporte `{1,6}`, y repetía la clase secante. La C disjunta corregida usa O11, soporte `{2,3}`. Se conservan los archivos anteriores y se generan entradas nuevas; esto no es una nueva exclusión matemática.
+- The restriction to an involution with a single fixed vertex already appears in Makhnev's September 2009 exposition, attributed to Makhnev–Minakova. It is not a discovery of this repository.
+- The exclusion of order 7 was already known to Behbahani–Lam (2011). The local UNSAT/VERIFIED logs are evidence about the recorded formula, not a proof that its translation from graphs is correct.
+- The fixed-point-free order-3 case must not be treated as excluded by conflating it with the case that has fixed points.
+- The final Lean declarations for $f=5$ and $f=7$ include incompatible arithmetic hypotheses. The claim that they are unconditional, end-to-end formalized exclusions is incorrect: **The claim is false according to the current state of the repository.**
+- **COMPILED:** the literal-`1` defect has been repaired in the canonical compilers and in the legacy route `build_z3_fpf_cnf.py`. 20 compiler tests, 11 input-audit tests, and 8 supervisor tests pass.
+- **COMPILED:** the old local C used O10, support `{1,6}`, and repeated the secant class. The corrected disjoint C uses O11, support `{2,3}`. The earlier files are kept and new inputs are generated; this is not a new mathematical exclusion.
 
-## 2. Taxonomía vigente
+## 2. Current taxonomy
 
-| Estado | Alcance |
+| Status | Scope |
 |---|---|
-| **PROVED** | Equivalencia del comprobador, lemas estructurales seleccionados y contradicciones aritméticas auditadas con axiomas estándar. Registros históricos de refutaciones SAT: únicamente al nivel de sus fórmulas. |
-| **COMPILED** | Compilación Lean anterior de 32 jobs con tres advertencias `sorry`; wrappers condicionales; 39 tests Python seleccionados pasan (20 compiladores, 11 auditoría, 8 supervisor). La clasificación agregada sigue dependiendo de `sorryAx`. |
-| **EXPLORED** | Cálculo reproducible de órbitas y búsquedas sin resolución certificada. No se infiere una probabilidad ni porcentaje de avance de los conflictos. |
-| **PENDING** | Reparar y validar codificaciones, recuperar la procedencia exacta de entradas, verificar cobertura, completar interfaces formales, acreditar novedad y resolver las cuestiones abiertas. |
+| **PROVED** | Checker equivalence, selected structural lemmas, and audited arithmetic contradictions with standard axioms. Historical SAT-refutation records: only at the level of their formulas. |
+| **COMPILED** | Earlier Lean build of 32 jobs with three `sorry` warnings; conditional wrappers; 39 selected Python tests pass (20 compilers, 11 audit, 8 supervisor). The aggregate classification still depends on `sorryAx`. |
+| **EXPLORED** | Reproducible orbit calculation and searches without a certified resolution. No probability or percentage of progress is inferred from conflict counts. |
+| **PENDING** | Repair and validate encodings, recover the exact provenance of inputs, verify coverage, complete formal interfaces, establish novelty, and resolve the open questions. |
 
-La entrada `conway_z7_canonical.cnf` nombrada en el log no está en la raíz local auditada; el DRAT y los logs sí están. No se ha vuelto a ejecutar `drat-trim` en esta auditoría. La presencia de esos archivos no completa las obligaciones de traducción grafo–CNF.
+The input `conway_z7_canonical.cnf` named in the log is not in the audited local root; the DRAT and the logs are. `drat-trim` was not rerun in this audit. The presence of those files does not complete the graph-to-CNF translation obligations.
 
-## Sesión posterior autorizada — EXPLORED
+## Authorized follow-up session — EXPLORED
 
-El 21 de septiembre a las 15:32:09 CEST se inició una sola búsqueda de **C disjunta corregida (O11)**: PID 12384, supervisor 12329, `nice 10`, semilla 20260921 y DRAT binario. La parada máxima configurada es el **22 de septiembre a las 03:32:09 CEST**, o antes por 50 GiB de DRAT o menos de 50 GiB libres. El supervisor conserva los artefactos parciales y solo detiene su propio proceso.
+On 21 September at 15:32:09 CEST a single search of **corrected disjoint C (O11)** was started: PID 12384, supervisor 12329, `nice 10`, seed 20260921, and binary DRAT. The configured maximum stop is **22 September at 03:32:09 CEST**, or earlier at 50 GiB of DRAT or fewer than 50 GiB free. The supervisor keeps partial artifacts and stops only its own process.
 
-La carpeta es `/Volumes/Untitled/conway_local_run/f1_c_drat_20260921T132559366256Z`. Incluye entrada, hashes, copia de fuentes, manifiesto, logs y `status.json`. Esta anotación registra el arranque; hay que consultar procesos y estado para confirmar actividad posterior. La comprobación DRAT sigue **PENDING**. No se modificó GCP ni se enviaron notificaciones.
+The directory is `/Volumes/Untitled/conway_local_run/f1_c_drat_20260921T132559366256Z`. It includes the input, hashes, a source copy, the manifest, logs, and `status.json`. This note records the startup; processes and status must be queried to confirm later activity. DRAT checking remains **PENDING**. GCP was not modified and no notifications were sent.
 
-## 3. Registro histórico del 20 de septiembre — no es telemetría actual
+## 3. Historical record of 20 September — not current telemetry
 
-El documento anterior, fechado el **20 de septiembre de 2026 a las 21:49 CEST**, informó de los siguientes datos. Se conservan como **información histórica comunicada**, no como mediciones confirmadas el día 21:
+The previous document, dated **20 September 2026 at 21:49 CEST**, reported the following data. They are kept as **communicated historical information**, not as measurements confirmed on the 21st:
 
-| Concepto informado entonces | Valor comunicado |
+| Item reported then | Communicated value |
 |---|---|
-| Rama A | Aproximadamente 135.590.239 conflictos; DRAT de 51 GB. |
-| Rama B | Aproximadamente 179.187.847 conflictos; DRAT de 56 GB. |
-| Rama C | Aproximadamente 178.504.217 conflictos; DRAT de 54 GB. |
-| Total de las tres ramas | Más de 493 millones de conflictos; ninguna declarada resuelta. |
-| Orden 3 en GCP | Más de 177 millones de conflictos en fixed-3 y 163 millones en FPF. |
-| Cartera acumulada | Más de 1.200 millones en GCP y 1.740 millones globales, según el informe anterior. |
-| VM | `conway-sat-worker`, `us-central1-b`, `e2-standard-16`; 16 solvers informados. |
-| Uptime | 10 días, 9 horas y 48 minutos comunicados. |
-| Disco remoto | Ampliación comunicada de 550 GB a 850 GB; 824 GiB de sistema de archivos; 291 GB libres y 65% usado. |
-| Interrupciones y pérdida de datos | El informe anterior declaró ninguna interrupción y 0 bytes perdidos; no se ha reconstruido aquí esa comprobación. |
-| Mac | Reinicio comunicado a las 10:03 y 79 GiB libres. |
-| DRAT de orden 7 | Descarga local comunicada de aproximadamente 183 MB; los archivos locales se inspeccionaron en la auditoría posterior. |
+| Branch A | Approximately 135,590,239 conflicts; 51 GB DRAT. |
+| Branch B | Approximately 179,187,847 conflicts; 56 GB DRAT. |
+| Branch C | Approximately 178,504,217 conflicts; 54 GB DRAT. |
+| Total of the three branches | More than 493 million conflicts; none reported resolved. |
+| Order 3 on GCP | More than 177 million conflicts on fixed-3 and 163 million on FPF. |
+| Accumulated portfolio | More than 1,200 million on GCP and 1,740 million globally, according to the previous report. |
+| VM | `conway-sat-worker`, `us-central1-b`, `e2-standard-16`; 16 solvers reported. |
+| Uptime | 10 days, 9 hours, and 48 minutes reported. |
+| Remote disk | Reported expansion from 550 GB to 850 GB; 824 GiB filesystem; 291 GB free and 65% used. |
+| Interruptions and data loss | The previous report stated no interruption and 0 bytes lost; that check was not reconstructed here. |
+| Mac | Reported reboot at 10:03 and 79 GiB free. |
+| Order-7 DRAT | Reported local download of approximately 183 MB; the local files were inspected in the later audit. |
 
-**PENDING:** verificar el estado remoto con evidencia nueva. La revisión documental inicial no accedió a la VM ni lanzó búsquedas. El seguimiento local autorizado y su registro de arranque se describen arriba; los datos históricos del día 20 no son telemetría actual.
+**PENDING:** verify the remote state with new evidence. The initial documentation review did not access the VM and did not launch searches. The authorized local follow-up and its startup record are described above; the historical data from the 20th are not current telemetry.
 
-## 4. Interpretación y siguientes pasos
+## 4. Interpretation and next steps
 
-Los registros retenidos de orden 7 contienen `s UNSATISFIABLE` y `s VERIFIED`, pero el enunciado anterior de una demostración local incondicional del caso completo excedía esa evidencia. Deben verificarse la codificación y la procedencia de la CNF antes de trasladar el veredicto al problema del grafo.
+The retained order-7 records contain `s UNSATISFIABLE` and `s VERIFIED`, but the earlier statement of an unconditional local proof of the full case exceeded that evidence. The encoding and the provenance of the CNF must be verified before the verdict is transferred to the graph problem.
 
-Las estimaciones de probabilidad y de tiempo hasta UNSAT han sido retiradas del [informe de estrategia](docs/solver_strategy_and_probability_report.md). La prioridad pendiente es validar los modelos y sus interfaces matemáticas. El código formal comprobado conserva utilidad aunque no concluya otra rama; no acredita por sí solo novedad matemática ni resuelve la existencia de un posible grafo rígido.
+Probability estimates and time-to-UNSAT estimates have been removed from the [strategy report](docs/solver_strategy_and_probability_report.md). The pending priority is to validate the models and their mathematical interfaces. The checked formal code remains useful even if no further branch concludes; it does not by itself establish mathematical novelty or resolve the existence of a possible rigid graph.

@@ -28,17 +28,17 @@ import Conway.CesarzWoldarTheorems
 
 namespace Matrix99
 
-/-! ## 1. Aritmética Fundamental de Divisibilidad para Paridad -/
+/-! ## 1. Fundamental Divisibility Arithmetic for Parity -/
 
 /--
-  Teorema de Aritmética de Divisibilidad (Parity Divisibility Lemma):
-  Si un número natural `n` es par (`2 ∣ n`), divide a 6 (`n ∣ 6`),
-  y no es divisible por 6 (`¬ (6 ∣ n)`), entonces forzosamente `n = 2`.
-  Los divisores de 6 son 1, 2, 3, 6.
-  - Ser par (`2 ∣ n`) descarta 1 y 3.
-  - No ser divisible por 6 (`¬ 6 ∣ n`) descarta 6.
-  - Queda de forma única n = 2.
-  Demostrado formalmente con 0 sorry y sólo axiomas estándar [propext, Quot.sound].
+  Divisibility Arithmetic Theorem (Parity Divisibility Lemma):
+  If a natural number `n` is even (`2 ∣ n`), divides 6 (`n ∣ 6`),
+  and is not divisible by 6 (`¬ (6 ∣ n)`), then necessarily `n = 2`.
+  The divisors of 6 are 1, 2, 3, and 6.
+  - Being even (`2 ∣ n`) rules out 1 and 3.
+  - Not being divisible by 6 (`¬ 6 ∣ n`) rules out 6.
+  - The only remaining value is n = 2.
+  Formally proved with 0 sorry and only the standard axioms [propext, Quot.sound].
 -/
 theorem even_divides_six_and_not_six_eq_two (n : Nat)
     (h_even : 2 ∣ n) (h_div6 : n ∣ 6) (h_not6 : ¬ (6 ∣ n)) : n = 2 := by
@@ -63,10 +63,10 @@ theorem even_divides_six_and_not_six_eq_two (n : Nat)
     exact Nat.dvd_refl 6
 
 /--
-  Teorema de Exclusión de Orden 4:
-  Ningún grupo cuyo orden `n` divida a 6 puede admitir un subgrupo o elemento de orden 4
-  (puesto que 4 no divide a 6).
-  Demostrado formalmente con 0 sorry usando `omega`.
+  Order-4 Exclusion Theorem:
+  No group whose order `n` divides 6 can admit a subgroup or element of order 4
+  (since 4 does not divide 6).
+  Formally proved with 0 sorry using `omega`.
 -/
 theorem conway_no_order_4_subgroup (n : Nat) (h_div : 4 ∣ n) (h_div6 : n ∣ 6) : False := by
   rcases h_div with ⟨k1, rfl⟩
@@ -76,8 +76,8 @@ theorem conway_no_order_4_subgroup (n : Nat) (h_div : 4 ∣ n) (h_div6 : n ∣ 6
   omega
 
 /--
-  Exclusión de Orden 4 cuando el orden del grupo es 2:
-  Si |G| = 2, es imposible que 4 divida a |G|.
+  Exclusion of order 4 when the group order is 2:
+  If |G| = 2, then 4 cannot divide |G|.
 -/
 theorem conway_no_order_4_when_order_two (n : Nat) (hn2 : n = 2) (h_sub4 : 4 ∣ n) : False := by
   subst hn2
@@ -85,9 +85,9 @@ theorem conway_no_order_4_when_order_two (n : Nat) (hn2 : n = 2) (h_sub4 : 4 ∣
   omega
 
 /--
-  Exclusión de Grupos Diédricos D_{2k} para k ≥ 2:
-  El grupo diédrico D_{2k} tiene orden 2k. Para k ≥ 2, su orden es al menos 4.
-  Si el orden del grupo total es 2, no puede admitir D_{2k} como subgrupo.
+  Exclusion of dihedral groups D_{2k} for k ≥ 2:
+  The dihedral group D_{2k} has order 2k. For k ≥ 2, its order is at least 4.
+  If the ambient group has order 2, it cannot admit D_{2k} as a subgroup.
 -/
 theorem conway_no_dihedral_subgroup (n : Nat) (hn2 : n = 2) (k : Nat) (hk : 2 ≤ k)
     (h_sub : (2 * k) ∣ n) : False := by
@@ -96,32 +96,32 @@ theorem conway_no_dihedral_subgroup (n : Nat) (hn2 : n = 2) (k : Nat) (hk : 2 �
   omega
 
 /--
-  Exclusión de Cualquier Orden Par Mayor que 2:
-  Cualquier orden par `n` que divida a 6 y no sea divisible por 6 satisface n ≤ 2,
-  haciendo imposible n > 2.
+  Exclusion of any even order greater than 2:
+  Any even order `n` that divides 6 and is not divisible by 6 satisfies n ≤ 2,
+  so n > 2 is impossible.
 -/
 theorem conway_no_even_order_gt_two (n : Nat) (h_even : 2 ∣ n) (h_div6 : n ∣ 6) (h_not6 : ¬ (6 ∣ n))
     (h_gt : n > 2) : False := by
   have hn2 := even_divides_six_and_not_six_eq_two n h_even h_div6 h_not6
   omega
 
-/-! ## 2. Estructura Abstracta y Corolario de Rigidez de Paridad -/
+/-! ## 2. Abstract Structure and the Parity Rigidity Corollary -/
 
 /--
-  Condiciones analíticas globales establecidas en la literatura para |Aut(G)|:
-  1. Cesarz & Woldar (2025, Corolario 3.13): Si 2 divide a |G|, entonces |G| divide a 6.
-  2. Crnković & Maksimović (2020): 6 no divide a |G| (no existen subgrupos de orden 6).
+  Global analytic conditions from the literature for |Aut(G)|:
+  1. Cesarz & Woldar (2025, Corollary 3.13): if 2 divides |G|, then |G| divides 6.
+  2. Crnković & Maksimović (2020): 6 does not divide |G| (there is no subgroup of order 6).
 -/
 structure ConwayAutGroupBounds (order_G : Nat) : Prop where
   h_cw_cor_3_13 : 2 ∣ order_G → order_G ∣ 6
   h_crnkovic_maksimovic : ¬ (6 ∣ order_G)
 
 /--
-  Corolario 1.3: Rigidez de Paridad de Conway-99 (Parity Rigidity Corollary):
-  Bajo las cotas analíticas de Cesarz & Woldar (2025) y Crnković & Maksimović (2020),
-  si el grupo de automorfismos Aut(Γ) tiene orden par (2 ∣ |G|),
-  entonces forzosamente |G| = 2.
-  En consecuencia: G ≅ Z_2.
+  Corollary 1.3: Parity rigidity of Conway-99 (Parity Rigidity Corollary):
+  Under the analytic bounds of Cesarz & Woldar (2025) and Crnković & Maksimović (2020),
+  if the automorphism group Aut(Γ) has even order (2 ∣ |G|),
+  then necessarily |G| = 2.
+  Consequently: G ≅ Z_2.
 -/
 theorem conway_parity_rigidity (order_G : Nat)
     (h_bounds : ConwayAutGroupBounds order_G)
@@ -131,9 +131,9 @@ theorem conway_parity_rigidity (order_G : Nat)
   exact even_divides_six_and_not_six_eq_two order_G h_even h_div6 h_not6
 
 /--
-  Acotación Universal de Subgrupos bajo Rigidez de Paridad:
-  Si |Aut(G)| es par, cualquier subgrupo H ≤ Aut(G) con orden m = |H|
-  debe tener orden m = 1 (trivial) o m = 2 (involución).
+  Universal subgroup bound under parity rigidity:
+  If |Aut(G)| is even, every subgroup H ≤ Aut(G) of order m = |H|
+  must have order m = 1 (trivial) or m = 2 (an involution).
 -/
 theorem conway_parity_rigidity_subgroup_bound (order_G : Nat)
     (h_bounds : ConwayAutGroupBounds order_G)
@@ -149,8 +149,8 @@ theorem conway_parity_rigidity_subgroup_bound (order_G : Nat)
   omega
 
 /--
-  Exclusión de Subgrupos de Orden 4 bajo Rigidez de Paridad:
-  Descarta subgrupos de orden 4, como Z_4 y el grupo de cuatro de Klein V_4.
+  Exclusion of subgroups of order 4 under parity rigidity:
+  Rules out subgroups of order 4, such as Z_4 and the Klein four-group V_4.
 -/
 theorem conway_parity_rigidity_no_order_4 (order_G : Nat)
     (h_bounds : ConwayAutGroupBounds order_G)
@@ -159,8 +159,8 @@ theorem conway_parity_rigidity_no_order_4 (order_G : Nat)
   exact conway_no_order_4_subgroup order_G h_sub4 h_div6
 
 /--
-  Exclusión de Subgrupos Diédricos D_{2k} para k ≥ 2 bajo Rigidez de Paridad:
-  Descarta D_4 ≅ V_4, D_6 ≅ S_3, D_8, etc.
+  Exclusion of dihedral subgroups D_{2k} for k ≥ 2 under parity rigidity:
+  Rules out D_4 ≅ V_4, D_6 ≅ S_3, D_8, and so on.
 -/
 theorem conway_parity_rigidity_no_dihedral (order_G : Nat)
     (h_bounds : ConwayAutGroupBounds order_G)
@@ -170,17 +170,17 @@ theorem conway_parity_rigidity_no_dihedral (order_G : Nat)
   exact conway_no_dihedral_subgroup order_G h2 k hk h_sub
 
 /--
-  Exclusión de No Divisibilidad por 6:
-  6 no divide al orden del grupo de automorfismos.
+  Exclusion of divisibility by 6:
+  6 does not divide the order of the automorphism group.
 -/
 theorem conway_parity_rigidity_not_divisible_by_6 (order_G : Nat)
     (h_bounds : ConwayAutGroupBounds order_G) : ¬ (6 ∣ order_G) :=
   h_bounds.h_crnkovic_maksimovic
 
 /--
-  Exclusión de Automorfismos de Orden 14 por Cota de Paridad:
-  Si |Aut(G)| es par (|Aut(G)| = 2), no puede albergar ningún elemento de orden 14,
-  corroborando de forma independiente el Teorema 3.11 de Cesarz & Woldar (2025).
+  Exclusion of automorphisms of order 14 by the parity bound:
+  If |Aut(G)| is even (|Aut(G)| = 2), it cannot contain an element of order 14,
+  independently corroborating Theorem 3.11 of Cesarz & Woldar (2025).
 -/
 theorem conway_parity_rigidity_no_order_14 (order_G : Nat)
     (h_bounds : ConwayAutGroupBounds order_G)
