@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
 analyze_z2_f7_exhaustive.py
-Demostracion exhaustiva e incondicional de la inexistencia de involuciones
-con f = 7 puntos fijos en Conway's 99-Graph srg(99, 14, 1, 2).
+Exhaustive check, under the constraints listed below, of involutions
+with f = 7 fixed points on Conway's 99-graph srg(99, 14, 1, 2).
 
-Teoremas aplicados:
-1. Traza Espectral: eps_1 = 7a - 194 ≡ 2 (mod 7).
-2. Rigidez de Grado en Aristas Internas: para todo u ~ t(u), d(u) = 1 exactamente (por lambda = 1).
-3. Rigidez de Grado en Pares Transpuestos: para todo u !~ t(u), d(u) in {0, 2} (por mu = 2).
-4. Identidad Universal de Conteo:
+Theorems applied:
+1. Spectral trace: eps_1 = 7a - 194 ≡ 2 (mod 7).
+2. Degree rigidity on internal edges: for every u ~ t(u), d(u) = 1 exactly (by lambda = 1).
+3. Degree rigidity on transposed pairs: for every u !~ t(u), d(u) in {0, 2} (by mu = 2).
+4. Universal counting identity:
    eps_1 = f*(8 - f) + sum_{z in Fix(t)} binom(deg_H(z), 2)
-   Para f = 7: eps_1 = 7 + sum_{z in Fix(t)} binom(deg_H(z), 2) ≡ sum binom(deg_H(z), 2) (mod 7).
-5. Rigidez de Co-vecinos en Fix(t): para todo par no adyacente x, y in Fix(t), c_Fix(x, y) in {0, 2}.
+   For f = 7: eps_1 = 7 + sum_{z in Fix(t)} binom(deg_H(z), 2) ≡ sum binom(deg_H(z), 2) (mod 7).
+5. Common-neighbor rigidity in Fix(t): for every non-adjacent pair x, y in Fix(t), c_Fix(x, y) in {0, 2}.
 """
 
 from itertools import combinations
 
 def main():
     print("=" * 75)
-    print("DEMOSTRACION EXHAUSTIVA DE NO EXISTENCIA: INVOLUCIONES CON f = 7")
+    print("EXHAUSTIVE NONEXISTENCE CHECK: INVOLUTIONS WITH f = 7")
     print("=" * 75)
     
     # Vertices of Fix(t)
@@ -45,7 +45,7 @@ def main():
             search(idx + 1, new_curr)
             
     search(0, [])
-    print(f"1. Total de subgrafos localmente lineales posibles en 7 vertices: {len(valid_triangle_sets)}")
+    print(f"1. Total locally linear subgraphs possible on 7 vertices: {len(valid_triangle_sets)}")
     
     # 2. Filter by c_Fix(x, y) in {0, 2} for all non-edges (mu_Fix in {0, 2})
     admissible_graphs = []
@@ -79,23 +79,23 @@ def main():
         eps_mod7 = eps_1 % 7
         admissible_graphs.append((len(t_set), tuple(sorted(deg, reverse=True)), sum_binom, eps_1, eps_mod7))
         
-    print(f"2. Subgrafos admisibles que respetan c_Fix in {{0, 2}}: {len(admissible_graphs)}")
+    print(f"2. Admissible subgraphs respecting c_Fix in {{0, 2}}: {len(admissible_graphs)}")
     
     matches = [g for g in admissible_graphs if g[4] == 2]
-    print(f"3. Subgrafos compatibles con la traza espectral eps_1 ≡ 2 (mod 7): {len(matches)}")
+    print(f"3. Subgraphs compatible with the spectral trace eps_1 ≡ 2 (mod 7): {len(matches)}")
     
     unique_classes = sorted(list(set(admissible_graphs)))
-    print("\n--- CLASIFICACION TOPOLOGICA COMPLETA DE SUBGRAFOS ADMISIBLES ---")
+    print("\n--- COMPLETE TOPOLOGICAL CLASSIFICATION OF ADMISSIBLE SUBGRAPHS ---")
     for t_count, degs, sum_b, eps_1, mod7 in unique_classes:
-        print(f"Triangulos: {t_count} | Grados: {degs} | sum binom: {sum_b:3d} | eps_1 = {eps_1:3d} | eps_1 mod 7 = {mod7}")
+        print(f"Triangles: {t_count} | Degrees: {degs} | sum binom: {sum_b:3d} | eps_1 = {eps_1:3d} | eps_1 mod 7 = {mod7}")
         
     print("\n" + "=" * 75)
     if len(matches) == 0:
-        print("CONCLUSION MATEMATICA DEFINITIVA:")
-        print("NO EXISTE NINGUN SUBGRAFO ADMISIBLE EN Fix(t) CON eps_1 ≡ 2 (mod 7).")
-        print("EL CASO f = 7 QUEDA 100% REFUTADO E INCONDICIONALMENTE CERRADO.")
+        print("MATHEMATICAL CONCLUSION:")
+        print("NO ADMISSIBLE SUBGRAPH OF Fix(t) HAS eps_1 ≡ 2 (mod 7).")
+        print("UNDER THESE CONSTRAINTS, CASE f = 7 IS REFUTED.")
     else:
-        print(f"ALERTA: Se encontraron {len(matches)} candidatos.")
+        print(f"ALERT: {len(matches)} candidates were found.")
     print("=" * 75)
 
 if __name__ == "__main__":

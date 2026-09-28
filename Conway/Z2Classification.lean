@@ -688,7 +688,7 @@ theorem foldl_ge_two_other_exists {α : Type} [DecidableEq α] (f : α → Nat) 
         exact ⟨w, List.mem_cons_of_mem z hw_zs, hw_ne, hw_pos⟩
 
 /--
-  Lema de Vecindad de Puntos Fijos:
+  Fixed-point neighborhood lemma:
   For any automorphism t with t x = x and any vertex u,
   A x (t u) = A x u.
 -/
@@ -700,7 +700,7 @@ theorem fixed_point_neighbor_comm (A : Matrix99 Nat) (t : Fin 99 → Fin 99)
   exact h
 
 /--
-  Lema de No-Covecinos Fijos en Caso A:
+  Lemma: no fixed co-neighbors in Case A.
   If x₀, x₁, x₂ form a triangle K_3 and u ∉ {x₀, x₁, x₂} is adjacent to x₀ (A x₀ u = 1),
   then u cannot be adjacent to x₁ or x₂: A x₁ u = 0 ∧ A x₂ u = 0.
 -/
@@ -737,7 +737,7 @@ theorem conway_z2_f3_case_a_other_fixed_non_adjacent
       exact hu_ne.2.1 heq
   exact ⟨h1_u, h2_u⟩
 
-/-- Alias matching the naming convention: No-Covecinos Fijos en Caso A. -/
+/-- Alias matching the naming convention: no fixed co-neighbors in Case A. -/
 theorem conway_z2_f3_case_a_no_fixed_co_neighbors
     (A : Matrix99 Nat) (hA : ConwayAdj A)
     (x₀ x₁ x₂ : Fin 99)
@@ -750,7 +750,7 @@ theorem conway_z2_f3_case_a_no_fixed_co_neighbors
   conway_z2_f3_case_a_other_fixed_non_adjacent A hA x₀ x₁ x₂ h_distinct h_tri u hu_ne h0u
 
 /--
-  Teorema Principal de Forzamiento de Arista Interna en Caso A:
+  Main theorem forcing an internal edge in Case A:
   In Case A (the three fixed points {x₀, x₁, x₂} form a triangle K_3),
   every vertex u ∉ {x₀, x₁, x₂} adjacent to x₀ must satisfy A (t u) u = 1,
   meaning that {u, t u} is necessarily an internal edge of the involution.
@@ -1699,13 +1699,13 @@ theorem conway_z2_f5_fixed_points_dichotomy_012
     conway_z2_f5_case_a_edges A hA t h_inv h_iso x₀ x₁ x₂ x₃ x₄ h_distinct h_fix h_case_a
   refine ⟨h_tri.1, h_tri.2.1, h_tri.2.2, h_iso_rem⟩
 
-/-! ### Refutación Espectral-Topológica de f = 5 -/
+/-! ### Spectral-topological refutation of f = 5 -/
 
 /--
-  Teorema de Incompatibilidad Aritmética para f = 5 en Caso A (K_3 + 2K_1):
-  El número de aristas internas forzado por la topología es ε₁ = 18.
-  La ley modular espectral de traza exige ε₁ ≡ 5(5 - 1) = 20 ≡ 6 (mod 7).
-  Sin embargo, 18 = 2 · 7 + 4 ≡ 4 (mod 7) ≠ 6, produciendo una contradicción aritmética inmediata.
+  Arithmetic incompatibility theorem for f = 5 in Case A (K_3 + 2K_1):
+  The number of internal edges forced by the topology is ε₁ = 18.
+  The modular spectral trace law requires ε₁ ≡ 5(5 - 1) = 20 ≡ 6 (mod 7).
+  But 18 = 2 · 7 + 4 ≡ 4 (mod 7) ≠ 6, an immediate arithmetic contradiction.
 -/
 theorem conway_z2_f5_case_a_spectral_contradiction
     (eps_1 : Nat)
@@ -1715,10 +1715,10 @@ theorem conway_z2_f5_case_a_spectral_contradiction
   omega
 
 /--
-  Teorema de Incompatibilidad Aritmética para f = 5 en Caso B (5K_1):
-  El número de aristas internas para el 5-coclique es ε₁ = 5 · (8 - 5) = 15.
-  La ley modular espectral de traza exige ε₁ ≡ 5(5 - 1) = 20 ≡ 6 (mod 7).
-  Sin embargo, 15 = 2 · 7 + 1 ≡ 1 (mod 7) ≠ 6, produciendo una contradicción aritmética inmediata.
+  Arithmetic incompatibility theorem for f = 5 in Case B (5K_1):
+  The number of internal edges for the 5-coclique is ε₁ = 5 · (8 - 5) = 15.
+  The modular spectral trace law requires ε₁ ≡ 5(5 - 1) = 20 ≡ 6 (mod 7).
+  But 15 = 2 · 7 + 1 ≡ 1 (mod 7) ≠ 6, an immediate arithmetic contradiction.
 -/
 theorem conway_z2_f5_case_b_spectral_contradiction
     (eps_1 : Nat)
@@ -1728,12 +1728,12 @@ theorem conway_z2_f5_case_b_spectral_contradiction
   omega
 
 /--
-  Teorema de Incompatibilidad Aritmética Global para f = 5:
-  Los dos únicos valores topológicamente admisibles de aristas internas
-  ε₁ ∈ {18, 15} dictados por la dicotomía de puntos fijos (K_3 + 2K_1 vs 5K_1)
-  son mutuamente excluyentes con la congruencia espectral de traza ε₁ ≡ 6 (mod 7):
-  - Caso A: 18 ≡ 4 (mod 7) ≠ 6
-  - Caso B: 15 ≡ 1 (mod 7) ≠ 6.
+  Global arithmetic incompatibility theorem for f = 5:
+  The only two topologically admissible internal-edge counts
+  ε₁ ∈ {18, 15}, dictated by the fixed-point dichotomy (K_3 + 2K_1 vs 5K_1),
+  are mutually exclusive with the spectral trace congruence ε₁ ≡ 6 (mod 7):
+  - Case A: 18 ≡ 4 (mod 7) ≠ 6
+  - Case B: 15 ≡ 1 (mod 7) ≠ 6.
 -/
 theorem conway_z2_f5_spectral_arithmetic_contradiction
     (eps_1 : Nat)
@@ -1743,14 +1743,14 @@ theorem conway_z2_f5_spectral_arithmetic_contradiction
   rcases h_topo with rfl | rfl <;> omega
 
 /--
-  Teorema de Incompatibilidad por Fórmula Topológica (ε₁ = 15 + m_edges):
-  Por el Teorema Universal de Conteo con f = 5:
+  Incompatibility theorem from the topological formula (ε₁ = 15 + m_edges):
+  By the universal counting theorem with f = 5:
     ε₁ = f(8 - f) + ∑_{z ∈ Fix(t)} binom(deg_H(z), 2) = 15 + m_edges.
-  Dado que Fix(t) contiene a lo sumo un triángulo K_3 (aislando a los otros 2 vértices)
-  y ningún otro enlace, m_edges ∈ {0, 3}.
-  La congruencia ε₁ = 15 + m_edges ≡ 1 + m_edges (mod 7) no puede alcanzar 6 (mod 7):
-  - Si m_edges = 0: 15 ≡ 1 (mod 7) ≠ 6.
-  - Si m_edges = 3: 18 ≡ 4 (mod 7) ≠ 6.
+  Since Fix(t) contains at most one triangle K_3 (isolating the other 2 vertices)
+  and no other edge, m_edges ∈ {0, 3}.
+  The congruence ε₁ = 15 + m_edges ≡ 1 + m_edges (mod 7) cannot reach 6 (mod 7):
+  - If m_edges = 0: 15 ≡ 1 (mod 7) ≠ 6.
+  - If m_edges = 3: 18 ≡ 4 (mod 7) ≠ 6.
 -/
 theorem conway_z2_f5_spectral_formula_contradiction
     (m_edges : Nat)
@@ -1762,9 +1762,9 @@ theorem conway_z2_f5_spectral_formula_contradiction
   rcases hm with rfl | rfl <;> omega
 
 /--
-  Derivación de Candidatos Topológicos para f = 5:
-  Dada la cota de aristas m_edges ∈ {0, 3} impuesta por la rigidez de triángulos,
-  el valor de ε₁ = 15 + m_edges pertenece necesariamente a {18, 15}.
+  Derivation of topological candidates for f = 5:
+  Given the edge bound m_edges ∈ {0, 3} imposed by triangle rigidity,
+  the value ε₁ = 15 + m_edges necessarily lies in {18, 15}.
 -/
 theorem conway_z2_f5_eps1_candidates
     (m_edges : Nat)
@@ -1775,9 +1775,9 @@ theorem conway_z2_f5_eps1_candidates
   rcases hm with rfl | rfl <;> omega
 
 /--
-  Refutación Estructural Directa de Caso A para f = 5:
-  Si los puntos fijos contienen el triángulo {x₀, x₁, x₂}, la topología fija ε₁ = 18,
-  lo cual refuta inmediatamente la existencia bajo la ley espectral ε₁ ≡ 6 (mod 7).
+  Direct structural refutation of Case A for f = 5:
+  If the fixed points contain the triangle {x₀, x₁, x₂}, the topology forces ε₁ = 18,
+  which immediately refutes existence under the spectral law ε₁ ≡ 6 (mod 7).
 -/
 theorem conway_z2_f5_case_a_refutation
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -1796,9 +1796,9 @@ theorem conway_z2_f5_case_a_refutation
   exact conway_z2_f5_case_a_spectral_contradiction eps_1 h_eps h_spec
 
 /--
-  Refutación Estructural Directa de Caso B para f = 5:
-  Si los puntos fijos forman un 5-coclique, la topología fija ε₁ = 15,
-  lo cual refuta inmediatamente la existencia bajo la ley espectral ε₁ ≡ 6 (mod 7).
+  Direct structural refutation of Case B for f = 5:
+  If the fixed points form a 5-coclique, the topology forces ε₁ = 15,
+  which immediately refutes existence under the spectral law ε₁ ≡ 6 (mod 7).
 -/
 theorem conway_z2_f5_case_b_refutation
     (eps_1 : Nat)
@@ -1808,7 +1808,7 @@ theorem conway_z2_f5_case_b_refutation
   exact conway_z2_f5_case_b_spectral_contradiction eps_1 h_eps h_spec
 
 /--
-  Refutación de Involuciones Z_2 en Caso A (f = 5):
+  Refutation of Z_2 involutions in Case A (f = 5):
 -/
 theorem conway_no_z2_f5_case_a_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -1825,7 +1825,7 @@ theorem conway_no_z2_f5_case_a_automorphism :
   exact conway_z2_f5_case_a_spectral_contradiction eps_1 heps hspec
 
 /--
-  Refutación de Involuciones Z_2 en Caso B (f = 5):
+  Refutation of Z_2 involutions in Case B (f = 5):
 -/
 theorem conway_no_z2_f5_case_b_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -1841,10 +1841,10 @@ theorem conway_no_z2_f5_case_b_automorphism :
   exact conway_z2_f5_case_b_spectral_contradiction eps_1 heps hspec
 
 /--
-  Teorema de Refutación Total de Involuciones Z_2 con f = 5 Puntos Fijos:
-  No existe ninguna involución t en Aut(G) con exactamente 5 puntos fijos
-  satisfaciendo las leyes espectrales y topológicas de Conway's 99-Graph.
-  Demostrado formalmente con 0 sorry y axiomas estándar [propext, Quot.sound].
+  Total refutation theorem for Z_2 involutions with f = 5 fixed points:
+  There is no involution t in Aut(G) with exactly 5 fixed points
+  satisfying the spectral and topological laws of Conway's 99-graph.
+  Formally proved with 0 sorry and the standard axioms [propext, Quot.sound].
 -/
 theorem conway_no_z2_f5_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -1860,8 +1860,8 @@ theorem conway_no_z2_f5_automorphism :
   exact conway_z2_f5_spectral_arithmetic_contradiction eps_1 htopo hspec
 
 /--
-  Teorema de Refutación Total de f = 5 por Fórmula Topológica:
-  Versión alternativa que explicita la dependencia en m_edges ∈ {0, 3}.
+  Total refutation theorem for f = 5 via the topological formula:
+  Alternative version that makes the dependence on m_edges ∈ {0, 3} explicit.
 -/
 theorem conway_no_z2_f5_formula_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -1880,9 +1880,9 @@ theorem conway_no_z2_f5_formula_automorphism :
 /-! ### Universal Lemmas on Fixed Neighbors and Structural Refutation of f = 7 -/
 
 /--
-  Lema Universal de Grado de Aristas Internas (Inclusión en Co-vecindad):
-  Para cualquier vértice u con u ~ t u (arista interna) bajo un automorfismo involutivo t,
-  todo vecino fijo x ∈ Fix(t) de u es necesariamente un vecino común de la arista {u, t u}.
+  Universal degree lemma for internal edges (inclusion in the common neighborhood):
+  For every vertex u with u ~ t u (an internal edge) under an involutory automorphism t,
+  every fixed neighbor x ∈ Fix(t) of u is necessarily a common neighbor of the edge {u, t u}.
 -/
 theorem conway_internal_edge_fixed_neighbor_is_common
     (A : Matrix99 Nat) (_hA : ConwayAdj A)
@@ -1898,10 +1898,10 @@ theorem conway_internal_edge_fixed_neighbor_is_common
   exact ⟨hux, htu_x⟩
 
 /--
-  Lema Universal de Grado de Aristas Internas (Cota Superior λ = 1):
-  Por λ = 1, la arista {u, t u} tiene a lo sumo un vecino común en todo el grafo.
-  Por tanto, u puede tener a lo sumo 1 vecino en Fix(t).
-  Cualesquiera dos vecinos fijos x₁, x₂ de u deben ser idénticos.
+  Universal degree lemma for internal edges (upper bound λ = 1):
+  By λ = 1, the edge {u, t u} has at most one common neighbor in the whole graph.
+  Therefore u has at most one neighbor in Fix(t).
+  Any two fixed neighbors x₁, x₂ of u must be identical.
 -/
 theorem conway_internal_edge_fixed_neighbors_unique
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -1920,8 +1920,8 @@ theorem conway_internal_edge_fixed_neighbors_unique
   exact conway_common_neighbors_unique A hA u (t u) hu_ne h_edge x₁ x₂ hw1 hw2
 
 /--
-  Corolario: Es imposible que un vértice u con arista interna u ~ t u tenga dos
-  vecinos fijos distintos.
+  Corollary: a vertex u with an internal edge u ~ t u cannot have two
+  distinct fixed neighbors.
 -/
 theorem conway_internal_edge_no_two_fixed_neighbors
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -1937,10 +1937,10 @@ theorem conway_internal_edge_no_two_fixed_neighbors
   exact h12 heq
 
 /--
-  Lema Universal de Grado de Aristas Internas (Existencia de Vecino Fijo):
-  Para cualquier arista interna u ~ t u, existe al menos un vecino común w,
-  el cual por el Teorema de Co-vecinos de Aristas Internas es necesariamente fijo (t w = w).
-  Por tanto, |N(u) ∩ Fix(t)| ≥ 1.
+  Universal degree lemma for internal edges (existence of a fixed neighbor):
+  For every internal edge u ~ t u there is at least one common neighbor w,
+  which the internal-edge common-neighbor theorem forces to be fixed (t w = w).
+  Therefore |N(u) ∩ Fix(t)| ≥ 1.
 -/
 theorem conway_internal_edge_fixed_neighbor_exists
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -1958,9 +1958,9 @@ theorem conway_internal_edge_fixed_neighbor_exists
   exact ⟨w, hw_fix, hw.1⟩
 
 /--
-  Teorema Universal de Grado de Aristas Internas:
-  Para cualquier vértice u con u ~ t u, existe un ÚNICO vecino común en Fix(t):
-  |N(u) ∩ Fix(t)| = 1 exactamente.
+  Universal degree theorem for internal edges:
+  For every vertex u with u ~ t u there is a unique common neighbor in Fix(t):
+  |N(u) ∩ Fix(t)| = 1 exactly.
 -/
 theorem conway_internal_edge_fixed_neighbor_exists_unique
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -1977,9 +1977,9 @@ theorem conway_internal_edge_fixed_neighbor_exists_unique
   exact conway_internal_edge_fixed_neighbors_unique A hA t h_iso u h_edge y w hy_fix hw_fix hy_u hw_u
 
 /--
-  Lema de Vértices Transpuestos No Adyacentes (Inclusión en Co-vecindad):
-  Para cualquier vértice u con u ≠ t u y u !~ t u, todo vecino fijo x ∈ Fix(t)
-  de u es un vecino común del par transpuesto {u, t u}.
+  Lemma for non-adjacent transposed vertices (inclusion in the common neighborhood):
+  For every vertex u with u ≠ t u and u !~ t u, every fixed neighbor x ∈ Fix(t)
+  of u is a common neighbor of the transposed pair {u, t u}.
 -/
 theorem conway_transposed_nonadjacent_fixed_neighbor_is_common
     (A : Matrix99 Nat) (_hA : ConwayAdj A)
@@ -1995,10 +1995,10 @@ theorem conway_transposed_nonadjacent_fixed_neighbor_is_common
   exact ⟨hux, htu_x⟩
 
 /--
-  Lema de Cota Superior para Vértices Transpuestos No Adyacentes (μ = 2):
-  Para cualquier u con u ≠ t u y A u (t u) = 0, u no puede tener 3 vecinos fijos
-  distintos en Fix(t), pues cada uno contribuiría 1 a (A²)_{u, t u} = μ = 2,
-  forzando (A²)_{u, t u} ≥ 3, una contradicción.
+  Upper-bound lemma for non-adjacent transposed vertices (μ = 2):
+  For every u with u ≠ t u and A u (t u) = 0, u cannot have 3 distinct
+  fixed neighbors in Fix(t), because each would contribute 1 to (A²)_{u, t u} = μ = 2,
+  forcing (A²)_{u, t u} ≥ 3, a contradiction.
 -/
 theorem conway_transposed_nonadjacent_no_three_fixed_neighbors
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -2034,10 +2034,10 @@ theorem conway_transposed_nonadjacent_no_three_fixed_neighbors
   omega
 
 /--
-  Lema de Paridad para Vértices Transpuestos No Adyacentes:
-  Si u ≠ t u y A u (t u) = 0, cualquier vecino fijo x ∈ Fix(t) de u viene acompañado
-  de un segundo vecino fijo y ∈ Fix(t) con y ≠ x.
-  Por tanto, |N(u) ∩ Fix(t)| no puede ser 1; es decir, |N(u) ∩ Fix(t)| ∈ {0, 2}.
+  Parity lemma for non-adjacent transposed vertices:
+  If u ≠ t u and A u (t u) = 0, every fixed neighbor x ∈ Fix(t) of u is accompanied
+  by a second fixed neighbor y ∈ Fix(t) with y ≠ x.
+  Therefore |N(u) ∩ Fix(t)| cannot be 1; that is, |N(u) ∩ Fix(t)| ∈ {0, 2}.
 -/
 theorem conway_transposed_nonadjacent_fixed_neighbors_has_second
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -2110,8 +2110,8 @@ theorem conway_transposed_nonadjacent_fixed_neighbors_has_second
   refine ⟨w, hw_ne_x, htw_eq_w, huw⟩
 
 /--
-  Corolario de Paridad: Un vértice transpuesto no adyacente nunca puede tener
-  exactamente 1 vecino fijo.
+  Parity corollary: a non-adjacent transposed vertex can never have
+  exactly one fixed neighbor.
 -/
 theorem conway_transposed_nonadjacent_not_unique_fixed_neighbor
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -2128,12 +2128,12 @@ theorem conway_transposed_nonadjacent_not_unique_fixed_neighbor
   exact hy_ne heq
 
 /--
-  Teorema de Cota Superior para Vértices Transpuestos:
-  Ningún vértice transpuesto u (con u ≠ t u) puede tener 3 vecinos fijos distintos en Fix(t).
-  Deducción unificada:
-  - Si u ~ t u (arista interna), por λ = 1 tiene a lo sumo 1 vecino fijo.
-  - Si u !~ t u, por μ = 2 tiene a lo sumo 2 vecinos fijos.
-  En ambos casos, tener 3 vecinos fijos es imposible.
+  Upper-bound theorem for transposed vertices:
+  No transposed vertex u (with u ≠ t u) can have 3 distinct fixed neighbors in Fix(t).
+  Unified deduction:
+  - If u ~ t u (an internal edge), then by λ = 1 it has at most one fixed neighbor.
+  - If u !~ t u, then by μ = 2 it has at most two fixed neighbors.
+  In both cases, having 3 fixed neighbors is impossible.
 -/
 theorem conway_transposed_no_three_fixed_neighbors
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -2152,9 +2152,9 @@ theorem conway_transposed_no_three_fixed_neighbors
       x₁ x₂ h12 hx1 hx2 hux1 hux2
 
 /--
-  Lema de Exclusión de Co-vecinos en Triángulos:
-  Dos triángulos que comparten un vértice en ConwayAdj A no pueden compartir un co-vecino
-  adyacente a ambos extremos de una arista de cualquiera de los triángulos.
+  Lemma excluding common neighbors of triangles:
+  Two triangles that share a vertex in ConwayAdj A cannot share a common neighbor
+  adjacent to both endpoints of an edge of either triangle.
 -/
 theorem triangle_common_neighbor_not_adjacent_both
     (A : Matrix99 Nat) (hA : ConwayAdj A)
@@ -2173,9 +2173,9 @@ theorem triangle_common_neighbor_not_adjacent_both
   have heq := conway_common_neighbors_unique A hA u v huv h_edge x c hw1 hw2
   exact hc_ne_x heq.symm
 
-/-! ### Estructura de Involuciones con f = 7 Puntos Fijos -/
+/-! ### Structure of involutions with f = 7 fixed points -/
 
-/-- Distinción 2 a 2 de 7 vértices en Fin 99 (las 21 desigualdades). -/
+/-- Pairwise distinctness of 7 vertices in Fin 99 (the 21 inequalities). -/
 structure Distinct7 (x₀ x₁ x₂ x₃ x₄ x₅ x₆ : Fin 99) : Prop where
   d01 : x₀ ≠ x₁
   d02 : x₀ ≠ x₂
@@ -2199,7 +2199,7 @@ structure Distinct7 (x₀ x₁ x₂ x₃ x₄ x₅ x₆ : Fin 99) : Prop where
   d46 : x₄ ≠ x₆
   d56 : x₅ ≠ x₆
 
-/-- Predicado que afirma que t es una involución con exactamente 7 puntos fijos. -/
+/-- Predicate stating that t is an involution with exactly 7 fixed points. -/
 def IsFixedPoints7 (t : Fin 99 → Fin 99) (x₀ x₁ x₂ x₃ x₄ x₅ x₆ : Fin 99) : Prop :=
   Distinct7 x₀ x₁ x₂ x₃ x₄ x₅ x₆ ∧
   (∀ v, t v = v ↔ (v = x₀ ∨ v = x₁ ∨ v = x₂ ∨ v = x₃ ∨ v = x₄ ∨ v = x₅ ∨ v = x₆))
@@ -2232,7 +2232,7 @@ theorem IsFixedPoints7.fix6 {t : Fin 99 → Fin 99} {x₀ x₁ x₂ x₃ x₄ x�
     (h : IsFixedPoints7 t x₀ x₁ x₂ x₃ x₄ x₅ x₆) : t x₆ = x₆ :=
   (h.2 x₆).mpr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr rfl))))))
 
-/-- Rigidez de aristas en Fix(t) para f = 7: todo co-vecino pertenece a Fix(t). -/
+/-- Edge rigidity in Fix(t) for f = 7: every common neighbor lies in Fix(t). -/
 theorem conway_z2_f7_edge_common_neighbor_is_fixed_point
     (A : Matrix99 Nat) (hA : ConwayAdj A)
     (t : Fin 99 → Fin 99)
@@ -2249,7 +2249,7 @@ theorem conway_z2_f7_edge_common_neighbor_is_fixed_point
   have ⟨hw_ne_v, hw_ne_u⟩ := conway_common_neighbor_distinct A hA v u w hw.1 hw.2
   exact ⟨hw_in, hw_ne_u, hw_ne_v⟩
 
-/-- Todo par adyacente de puntos fijos induce un triángulo K_3 en Fix(t). -/
+/-- Every adjacent pair of fixed points induces a triangle K_3 in Fix(t). -/
 theorem conway_z2_f7_edge_forces_triangle
     (A : Matrix99 Nat) (hA : ConwayAdj A)
     (t : Fin 99 → Fin 99)
@@ -2267,12 +2267,12 @@ theorem conway_z2_f7_edge_forces_triangle
     conway_z2_f7_edge_common_neighbor_is_fixed_point A hA t h_iso x₀ x₁ x₂ x₃ x₄ x₅ x₆ h_fix u v hu hv huv h_edge w hw
   exact ⟨w, hw_in, hw_ne_u, hw_ne_v, hw.2, hw.1⟩
 
-/-! ### Refutación Espectral-Topológica de f = 7 -/
+/-! ### Spectral-topological refutation of f = 7 -/
 
 /--
-  Teorema de Incompatibilidad Aritmética para f = 7:
-  Los valores topológicamente admisibles de aristas internas ε₁ ∈ {7, 10, 13}
-  son mutuamente excluyentes con la congruencia espectral de traza ε₁ ≡ 2 (mod 7):
+  Arithmetic incompatibility theorem for f = 7:
+  The topologically admissible internal-edge counts ε₁ ∈ {7, 10, 13}
+  are mutually exclusive with the spectral trace congruence ε₁ ≡ 2 (mod 7):
   - 7 ≡ 0 (mod 7) ≠ 2
   - 10 ≡ 3 (mod 7) ≠ 2
   - 13 ≡ 6 (mod 7) ≠ 2.
@@ -2285,11 +2285,11 @@ theorem conway_z2_f7_spectral_arithmetic_contradiction
   rcases h_topo with rfl | rfl | rfl <;> omega
 
 /--
-  Teorema de Incompatibilidad por Fórmula Topológica (ε₁ = 7 + m_edges):
-  Dado que Fix(t) es localmente lineal y K₄-libre con f = 7, el número de aristas m_edges
-  en Fix(t) es necesariamente múltiplo de 3 perteneciente a {0, 3, 6}.
-  La identidad universal ε₁ = 7 + m_edges fuerza ε₁ ≡ m_edges (mod 7) ∈ {0, 3, 6} mod 7,
-  lo que contradice estrictamente ε₁ ≡ 2 (mod 7).
+  Incompatibility theorem from the topological formula (ε₁ = 7 + m_edges):
+  Since Fix(t) is locally linear and K₄-free with f = 7, the number of edges m_edges
+  in Fix(t) is necessarily a multiple of 3 belonging to {0, 3, 6}.
+  The universal identity ε₁ = 7 + m_edges forces ε₁ ≡ m_edges (mod 7) ∈ {0, 3, 6} mod 7,
+  which strictly contradicts ε₁ ≡ 2 (mod 7).
 -/
 theorem conway_z2_f7_spectral_formula_contradiction
     (m_edges : Nat)
@@ -2301,9 +2301,9 @@ theorem conway_z2_f7_spectral_formula_contradiction
   rcases hm with rfl | rfl | rfl <;> omega
 
 /--
-  Teorema de Refutación Total de Involuciones Z_2 con f = 7 Puntos Fijos:
-  No existe ninguna involución t en Aut(G) con exactamente 7 puntos fijos
-  satisfaciendo las leyes espectrales y topológicas de Conway's 99-Graph.
+  Total refutation theorem for Z_2 involutions with f = 7 fixed points:
+  There is no involution t in Aut(G) with exactly 7 fixed points
+  satisfying the spectral and topological laws of Conway's 99-graph.
 -/
 theorem conway_no_z2_f7_automorphism_full :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -2319,7 +2319,7 @@ theorem conway_no_z2_f7_automorphism_full :
   exact conway_z2_f7_spectral_arithmetic_contradiction eps_1 htopo hspec
 
 /--
-  Casos individuales de contradicción espectral para f = 7:
+  Individual spectral-contradiction cases for f = 7:
 -/
 theorem conway_z2_f7_case_0_spectral_contradiction
     (eps_1 : Nat) (h_eps : eps_1 = 7) (h_spec : eps_1 % 7 = 2) : False := by
@@ -2334,9 +2334,9 @@ theorem conway_z2_f7_case_2_spectral_contradiction
   omega
 
 /--
-  Derivación de Candidatos Topológicos para f = 7:
-  Dada la fórmula topológica ε₁ = 7 + m_edges con m_edges ∈ {0, 3, 6},
-  el conjunto de valores posibles es {7, 10, 13}.
+  Derivation of topological candidates for f = 7:
+  Given the topological formula ε₁ = 7 + m_edges with m_edges ∈ {0, 3, 6},
+  the set of possible values is {7, 10, 13}.
 -/
 theorem conway_z2_f7_eps1_candidates
     (m_edges : Nat)
@@ -2347,8 +2347,8 @@ theorem conway_z2_f7_eps1_candidates
   rcases hm with rfl | rfl | rfl <;> omega
 
 /--
-  Teorema de Refutación Total de f = 7 por Fórmula Topológica:
-  Versión alternativa que explicita la dependencia en m_edges ∈ {0, 3, 6}.
+  Total refutation theorem for f = 7 via the topological formula:
+  Alternative version that makes the dependence on m_edges ∈ {0, 3, 6} explicit.
 -/
 theorem conway_no_z2_f7_formula_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -2364,7 +2364,7 @@ theorem conway_no_z2_f7_formula_automorphism :
   intro ⟨A, _hA, t, _hbij, _hinv, _hfix7, _hiso, m_edges, eps_1, hm, heps, hspec⟩
   exact conway_z2_f7_spectral_formula_contradiction m_edges hm eps_1 heps hspec
 
-/-- Alias canónico para la refutación completa de f = 7. -/
+/-- Canonical alias for the complete refutation of f = 7. -/
 theorem conway_no_z2_f7_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
     ∃ (t : Fin 99 → Fin 99),

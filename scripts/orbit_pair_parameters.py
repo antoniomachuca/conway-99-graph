@@ -357,17 +357,17 @@ def build_report():
 
 
 def _yes(flag):
-    return "posible" if flag else "imposible"
+    return "possible" if flag else "impossible"
 
 
 def format_report(report):
     lines = [
-        "Estado: EXPLORED",
-        "Obstrucción aritmética: " + ("sí, ramas " + ",".join(report["dead_branches"]) if report["arithmetic_obstruction"] else "no"),
-        f"Máximo de vecinos comunes en N(x_0): {report['max_common_neighbors_in_N']}",
-        "Pares de órbitas: 861 = 21 + 420 + 420",
+        "Status: EXPLORED",
+        "Arithmetic obstruction: " + ("yes, branches " + ",".join(report["dead_branches"]) if report["arithmetic_obstruction"] else "no"),
+        f"Maximum common neighbors in N(x_0): {report['max_common_neighbors_in_N']}",
+        "Orbit pairs: 861 = 21 + 420 + 420",
         "",
-        "Orbital              tamaño  K22        emparejamiento  vacío       cn normalizado",
+        "Orbital              size    K22        matching        empty       normalized cn",
     ]
     for orbital in report["orbitals"]:
         lines.append(
@@ -379,24 +379,24 @@ def format_report(report):
         )
     lines.extend([
         "",
-        "Rama  pareja  soporte  fase  orbital           K22 exigido  viva  |acción|  |Stab|",
+        "Branch partner support phase orbital           K22 required alive |action| |Stab|",
     ])
     for branch in report["branches"]:
         support = "{" + ",".join(map(str, branch["support"])) + "}"
         lines.append(
             f"{branch['name']:<5} O_{branch['partner']:<5} {support:<8} {branch['phase']:<5} "
             f"{branch['orbital']:<17} {_yes(branch['k22_possible']):<12} "
-            f"{'sí' if branch['alive'] else 'no':<5} "
+            f"{'yes' if branch['alive'] else 'no':<5} "
             f"{branch['faithful_residual_order']:<8} {branch['abstract_residual_order']}"
         )
     stabilizer = report["stabilizer"]
     lines.extend([
         "",
-        "El orden |W| cuenta elementos de (Z_2)^7 rtimes S_7 que fijan la órbita 0.",
-        f"Ese grupo tiene orden {stabilizer['abstract_order']}. "
-        f"Su acción sobre las 42 etiquetas tiene núcleo de orden {stabilizer['kernel_order']} "
-        f"y orden fiel {stabilizer['faithful_order']}.",
-        "La columna |acción| es el orden fiel residual. La columna |W| es el orden abstracto residual.",
+        "The order |W| counts elements of (Z_2)^7 rtimes S_7 that fix orbit 0.",
+        f"That group has order {stabilizer['abstract_order']}. "
+        f"Its action on the 42 labels has a kernel of order {stabilizer['kernel_order']} "
+        f"and faithful order {stabilizer['faithful_order']}.",
+        "The |action| column is the residual faithful order. The |W| column is the residual abstract order.",
         report["boundary"],
     ])
     return "\n".join(lines)
