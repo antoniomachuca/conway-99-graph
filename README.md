@@ -36,7 +36,7 @@ Earlier versions overstated novelty, the completeness of the Lean formalization,
 
 For a candidate adjacency matrix $A$,
 
-$$A=A^T,\qquad \operatorname{diag}(A)=0,\qquad A\in\{0,1\}^{99\times99},\qquad A^2+A=12I+2J.$$
+$$A=A^T,\qquad \mathrm{diag}(A)=0,\qquad A\in\{0,1\}^{99\times99},\qquad A^2+A=12I+2J.$$
 
 The corresponding spectrum is $\{14^1,3^{54},(-4)^{44}\}$. Every neighborhood induces seven disjoint edges, $7K_2$, not seven triangles.
 
@@ -45,7 +45,7 @@ The following are **antecedents from the literature**, not new discoveries of th
 - **Involutions already reduce to one fixed vertex.** Theorem 1 in Makhnev's September 2009 lecture slides, attributed to Makhnev–Minakova, states that an automorphism of prime order $p=2$ fixes exactly one vertex. The slides also eliminate the other fixed-subgraph candidates using character integrality. Consequently, excluding $f=3,5,7,\ldots$ is not a new conclusion of this repository. [Makhnev, *Symmetric graphs and their automorphisms*](https://www.math.uni-bielefeld.de/~baumeist/sommerschule/makhnev.pdf).
 - **Order 7 was already excluded.** Behbahani–Lam (2011) restricted possible prime-order automorphisms to orders 2 and 3, as explicitly recalled in the introduction of [Cesarz–Woldar (2025)](https://alco.centre-mersenne.org/articles/10.5802/alco.418/).
 - **Order 3 must not be described as entirely excluded.** Crnković–Maksimović (2020) exclude the fixed-point case for order 3 and groups of orders 6 and 9. The fixed-point-free order-3 case must not be conflated with these exclusions. [Article](https://cdm.ucalgary.ca/article/view/62323).
-- **Even-order reduction is inherited from prior results.** Combining the Cesarz–Woldar implication $2\mid |\operatorname{Aut}(G)|\Rightarrow |\operatorname{Aut}(G)|\mid6$ with the exclusion of order 6 leaves order 2. The arithmetic implication is formalized here; the graph-theoretic premises are supplied as assumptions.
+- **Even-order reduction is inherited from prior results.** Combining the Cesarz–Woldar implication $2\mid |\mathrm{Aut}(G)|\Rightarrow |\mathrm{Aut}(G)|\mid6$ with the exclusion of order 6 leaves order 2. The arithmetic implication is formalized here; the graph-theoretic premises are supplied as assumptions.
 
 See [the reference index](references/README.md) for bibliographic details. Novelty of a particular implementation or search reduction remains **PENDING**; no priority claim is made.
 
