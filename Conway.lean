@@ -4,6 +4,7 @@ import Conway.Basic
 import Conway.Matrix
 import Conway.Decidable
 import Conway.Reflection
+import Conway.Z7OrbitMatrix
 import Conway.Z7NonExistence
 import Conway.Z3Fixed3NonExistence
 import Conway.Z3FpfNonExistence
