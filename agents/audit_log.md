@@ -394,3 +394,127 @@ The probability bounds, completion forecasts, and publication-readiness judgment
   - Solvers: All 16 CaDiCaL instances and supervisor `cloud_watcher.sh` (PID 896329) remained running without interruption (load average 16.06).
   - Economic impact: $+0.12\text{ €/day}$ ($+0.96\text{ €}$ across the remaining 8 days of GCP runway).
 - **Verdict:** VERIFIED (Operational & Complete). Available storage expanded by $+97\text{ GB}$, guaranteeing operational headroom through the weekend hot window.
+
+### [2026-10-02 18:05:00 CEST] - Forensic Scientific Audit: Positive Control Encoders & Z_7 Orbit Quotient Matrices
+- **Objective:** Exhaustive, independent adversarial forensic audit of deliverables across two active development branches:
+  1. `feat/encoder-positive-controls` (worktree `.worktrees/encoder-positive-controls`, commit `d904ae6`).
+  2. `feat/z7-orbit-matrices` (worktree `.worktrees/z7-orbit-matrices`, commit `d2d3bcc`).
+- **Audit Mandate:** Strict compliance with `AGENTS.md` and `GEMINI.md`: radical honesty, austere skeptical mathematician tone, zero AI-slop, four-state taxonomy enforcement (`PROVED`, `COMPILED`, `EXPLORED`, `PENDING`), and direct empirical verification.
+
+#### 1. Branch `feat/encoder-positive-controls` (Commit `d904ae6`)
+- **Deliverables Audited:**
+  1. `scripts/build_srg_positive_control.py` (604 lines):
+     - Generic parameterized block-circulant SAT encoder for strongly regular graphs under $\mathbb{Z}_p$ cyclic action.
+     - Implements exact ground-truth positive controls:
+       * Paley(9) = $\mathrm{srg}(9, 4, 1, 2)$ under $\mathbb{Z}_3$: Shares the identical $(\lambda=1, \mu=2)$ parameters as Conway's 99-graph ($\mathrm{srg}(99, 14, 1, 2)$).
+       * Petersen graph = $\mathrm{srg}(10, 3, 0, 1)$ under $\mathbb{Z}_5$ (2 orbits of length 5).
+       * Cycle $C_5 = \mathrm{srg}(5, 2, 0, 1)$ under $\mathbb{Z}_5$ (1 orbit of length 5).
+     - Adjacency validator `verify_srg_matrix`: Formally validates symmetry, zero diagonal, $k$-regularity, and the algebraic identity $A^2 = kI + \lambda A + \mu(J - I - A)$.
+     - CaDiCaL 1.9.5 solving + model decoding: All presets solve in $<0.01\text{s}$ and satisfy all SRG parameters.
+  2. `scripts/validate_encoder_planted_substructure.py` (952 lines):
+     - Part 1: Block-circulant positive controls (Paley-9, Petersen).
+     - Part 2: Planted 1-factor matchings $M_{7K_2}$ on $\Gamma_1(x_0)$:
+       * $\mathbb{Z}_7$: 2 orbits ($L, R$) of size 7; 28 clauses; 0 violations.
+       * $\mathbb{Z}_2$ ($f=1$): 7 orbits of length 2; 553 clauses; 0 violations.
+       * $\mathbb{Z}_3$ (Fixed-3): $6K_2$ matchings across $N_0, N_1, N_2$; 54 unit clauses; 0 violations.
+       * $\mathbb{Z}_2$ ($f=1$) 2-design compatibility: $CC^T = 10I_7 + 2J_7$ verified; 7 matching pairs verified.
+     - Part 3: Planted Cesarz-Woldar coordinate 2-paths in $\mathbb{Z}_7$:
+       * 84 vertices in $\Gamma_2(x_0)$ form an exact bijection with the 84 non-edges of $\Gamma_1(x_0)$.
+       * Disjointness from planted matching $M_{7K_2}$ verified.
+       * 12-fold regularity per coordinate label verified.
+       * $12 \times 12$ quotient Diophantine matrix $C$: row sums identically 22, trace = 12.
+       * Target matrix $T = B^2 + B$: row sums identically 156, trace = 276.
+     - Part 4: Relaxed feasibility consistency:
+       * Proves that relaxing unsatisfiable global parameters yields 0 clause violations across all models: $\mathbb{Z}_7$ relaxed (43,266 clauses), $\mathbb{Z}_7$ $\mu \le 2$ (29,580 clauses), $\mathbb{Z}_3$ FPF (155,640 clauses), $\mathbb{Z}_3$ Fixed-3 (260,300 clauses), $\mathbb{Z}_2$ $f=1$ (148,785 clauses).
+  3. `tests/test_encoder_positive_controls.py` (341 lines, 19 unit tests):
+     - Covers Paley-9, Petersen, $C_5$, corrupted SRG rejection, Tseitin AND-gate truth tables, parameter feasibility, planted matchings, Cesarz-Woldar coordinate bijection, and relaxed feasibility.
+- **Unit Test Execution & Determinism Check:**
+  - Suite execution: `python3 -B -m unittest discover -s tests -v`.
+  - Baseline on `main`: 44 tests.
+  - New test count on `feat/encoder-positive-controls`: Exactly 63 tests (44 baseline + 19 new).
+  - Determinism verification: Two consecutive independent runs executed in 8.743s and 8.863s.
+  - Result: 63/63 tests passing with 0 failures, 0 errors.
+- **Epistemological Classification:**
+  - `scripts/build_srg_positive_control.py`: **COMPILED**
+  - `scripts/validate_encoder_planted_substructure.py`: **COMPILED**
+  - `tests/test_encoder_positive_controls.py`: **COMPILED**
+
+#### 2. Branch `feat/z7-orbit-matrices` (Commit `d2d3bcc`)
+- **Deliverables Audited:**
+  1. `scripts/solve_z7_orbit_matrix.py` (380 lines):
+     - Formulates the 15-orbit quotient matrix system under $\mathbb{Z}_7$ (fixed point $x_0$, 2 orbits in $\Gamma_1$, 12 orbits in $\Gamma_2$).
+     - Reduces symmetries under group normalizer $\mathrm{Aut}(G) \le \mathrm{Frob}(21) = \mathbb{Z}_7 : \mathbb{Z}_3$.
+     - Encodes row sum regularity (degree 12 in $\Gamma_2$) and quadratic Diophantine equations $(B^2)_{ij} + B_{ij} = T_{ij}$.
+     - Generated CNF: 173,990 variables, 349,160 clauses.
+     - Solver execution: CaDiCaL 1.9.5 refutes in 0.2478s (exit code 20, UNSAT).
+  2. DRAT Certificate Verification:
+     - Formula: `instances/z7_orbit_matrix.cnf` (6,459,794 bytes).
+       SHA-256: `5c70a7fca0493582fb9074a3a2934eaa1687cb65e77ace4d398f0c24b34efe0d`.
+     - DRAT proof: `instances/proof_z7_orbit_matrix.drat` (296,338 bytes).
+       SHA-256: `8f15cf987fb29a913950cd66c7bd9917419150f0be3b266579686fab68fd9a4e`.
+     - Independent Proof Checker (`drat-trim`):
+       * Command: `./drat-trim/drat-trim instances/z7_orbit_matrix.cnf instances/proof_z7_orbit_matrix.drat`
+       * Mode: Backward checking mode.
+       * Core clauses: 2,659 of 349,160 (0.76%).
+       * Core lemmas: 128 of 48,688 (0.26%).
+       * Resolution steps: 6,961 steps.
+       * RAT lemmas: 0 (pure DRUP resolution core).
+       * Redundant literals eliminated: 2.
+       * Final Checker Verdict: `s VERIFIED` in 0.225 seconds.
+     - Bit-for-bit Deterministic Reproduction: Running `scripts/solve_z7_orbit_matrix.py` reproduced the exact identical CNF and DRAT files with identical SHA-256 hashes.
+     - Proof size reduction vs full-graph search:
+       * Full graph (`conway_z7_canonical.cnf`): 192 MB proof trace, 771.59s solve time, 844.01s verify time.
+       * Quotient matrix (`z7_orbit_matrix.cnf`): 0.28 MB proof trace (680x reduction), 0.25s solve time (>3,000x speedup), 0.23s verify time.
+  3. Lean 4 Formalization Audit:
+     - Kernel compilation: `lake build` executed cleanly across 34 jobs with 0 compile errors.
+     - `Conway/Z7OrbitMatrix.lean` (295 lines, 16 declarations):
+       * Formalizes `Fin15`, `z7OrbitSizes`, `mul15`, `rowSum15`, `delta15`, `topologicalTrace`, `diagSumGamma2`.
+       * Formalizes structure `Z7OrbitMatrix` (row sums = 14, equitable symmetry, SRG quotient equation, diagonal parity $B_{ii} \in \{0, 2\}$, root and $\Gamma_1$ diagonal vanishing).
+       * Proves trace decomposition: `topologicalTrace_eq_diagSumGamma2`.
+       * Proves fold preserves zero: `topologicalTrace_eq_zero_of_diag_zero`, `diagSumGamma2_eq_zero_of_diag_zero`.
+       * Proves parity preserved: `diagSumGamma2_even`.
+       * Proves spectral trace formula: `spectralTrace a = 7a - 42`.
+       * Proves modular divisibility: trace sum $S = 7a - 42$ implies $S \equiv 0 \pmod 7$.
+       * Proves candidate restriction: $0 \le S \le 24$, $S$ even, $S \equiv 0 \pmod 7 \implies S \in \{0, 14\}$.
+       * Proves unique eigenvalue multiplicity: $\mathrm{Tr}(B) = 0 \implies a = 6$.
+       * Proves unique spectrum: $\{14^1, 3^6, (-4)^8\}$.
+       * Proves Theorem (Cesarz & Woldar 2025, Lemma 4.12): `z7_orbit_unique_spectrum_of_lemma_4_12` and `z7_orbit_spectrum_forced_by_lemma_4_12`.
+       * Axiomatic Audit: `#print axioms` verifies that all 16 declarations depend strictly on `[propext, Quot.sound]` or no axioms. 0 `sorry`, 0 `sorryAx`.
+       * Classification: **PROVED**.
+     - `Conway/Z7NonExistence.lean` (176 lines):
+       * `hasZ7Symmetry_iff`: definitional equivalence, 0 axioms -> **PROVED**.
+       * `conway_no_z7_from_orbit_matrix_reduction`: formal reduction transfer theorem, depends only on `[propext]`, 0 sorry -> **PROVED**.
+       * `conway_no_z7_from_spectrum_refutation`: conditional spectral contradiction theorem, depends on `[propext, Quot.sound]`, 0 sorry -> **PROVED**.
+       * `conway_z7_induces_orbit_matrix`: equitable partition and quotient projection, contains `sorry`, depends on `[propext, sorryAx]` -> **COMPILED** (pending kernel formalization of the combinatorial quotient map).
+       * `z7_orbit_matrix_nonexistence`: matrix non-existence, contains `sorry`, depends on `[propext, sorryAx]` -> **COMPILED** (unformalized bridge between DRAT resolution proof and Lean 4 kernel).
+       * `conway_no_z7_automorphism`: aggregate theorem, depends on `[propext, sorryAx]` -> **COMPILED**.
+
+#### 3. Storage, Backup, and Infrastructure Integrity
+- **Integrity of `SHA256SUMS.txt`:**
+  - Audited against disk and confirmed 100% concordant:
+    * `5c70a7fca0493582fb9074a3a2934eaa1687cb65e77ace4d398f0c24b34efe0d  instances/z7_orbit_matrix.cnf`
+    * `8f15cf987fb29a913950cd66c7bd9917419150f0be3b266579686fab68fd9a4e  instances/proof_z7_orbit_matrix.drat`
+- **External Storage Backup Verification:**
+  - Backup directory: `/Volumes/Untitled/conway_z7_orbit_matrix/`.
+  - Both `z7_orbit_matrix.cnf` (6,459,794 bytes) and `proof_z7_orbit_matrix.drat` (296,338 bytes) are present on external media and have SHA-256 hashes matching the working tree byte-for-byte.
+- **Filesystem Capacity Audit:**
+  - Host root partition (`/dev/disk3s1s1`): 20 GiB available (safe).
+  - External NVMe volume (`/Volumes/Untitled`, `/dev/disk6s1`): 151 GiB available (68% capacity).
+- **Process Activity:**
+  - Host process audit detected background evaluation process PID 52297 executing CaDiCaL on `/tmp/review_z7/test_orbit.cnf` with explicit `-t 1200` wall-time limit, isolated to temporary storage.
+
+#### 4. Forensic Four-State Taxonomy Summary
+| Artifact / Claim | Operational State | Epistemological Basis |
+| :--- | :---: | :--- |
+| `Conway/Z7OrbitMatrix.lean` (16 theorems) | **PROVED** | Lean 4 kernel: 0 sorry, 0 sorryAx, standard axioms `[propext, Quot.sound]`. |
+| `conway_no_z7_from_orbit_matrix_reduction` | **PROVED** | Lean 4 kernel: 0 sorry, 0 sorryAx, standard axiom `[propext]`. |
+| `conway_no_z7_from_spectrum_refutation` | **PROVED** | Lean 4 kernel: 0 sorry, 0 sorryAx, standard axioms `[propext, Quot.sound]`. |
+| `instances/proof_z7_orbit_matrix.drat` | **PROVED** | SAT certification: `drat-trim` returns `s VERIFIED` (0.225s, 6,961 resolution steps). |
+| `conway_z7_induces_orbit_matrix` | **COMPILED** | Lean 4: contains `sorry`; pending formalization of quotient projection map. |
+| `z7_orbit_matrix_nonexistence` | **COMPILED** | Lean 4: contains `sorry`; verified by DRAT, bridge to Lean kernel pending. |
+| `conway_no_z7_automorphism` | **COMPILED** | Lean 4: transitively depends on `sorryAx` via orbit reduction and non-existence lemmas. |
+| `scripts/build_srg_positive_control.py` | **COMPILED** | Python SAT compiler: cleanly passes unit test suite and matrix checks. |
+| `scripts/validate_encoder_planted_substructure.py` | **COMPILED** | Python validator: cleanly passes 4 test suites with 0 clause violations. |
+| `tests/test_encoder_positive_controls.py` | **COMPILED** | 19 deterministic unit tests, 63/63 suite pass in 8.74s. |
+
+- **Verdict:** VERIFIED (Forensically Sound). All artifacts across both branches comply strictly with repository epistemological standards and the four-state taxonomy.
