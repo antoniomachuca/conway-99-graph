@@ -31,6 +31,7 @@ monitor_*_state.json
 # Native solver binaries & solver compilation directories
 cadical
 cadical-rel-1.9.5/
+drat-trim
 drat-trim/
 kissat
 
