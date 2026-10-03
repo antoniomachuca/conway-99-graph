@@ -1,0 +1,34 @@
+{
+  "status": "EXPLORED",
+  "scope": "General 15-orbit necessary conditions for Z7, not Frob(21)-restricted blocks",
+  "graph_transfer": "PENDING",
+  "base_commit": "d2d3bccb6da430477144a970b22dc4d69be9ac63",
+  "working_tree_changes": true,
+  "evidence_directory": "/Volumes/Untitled/conway_z7_general_correction_01",
+  "solver": "CaDiCaL 1.9.5",
+  "solver_returncode": 0,
+  "solver_log_result": "c UNKNOWN",
+  "terminal_sat_or_unsat_verdict": false,
+  "checker_run": false,
+  "proof_complete": false,
+  "native_timeout_seconds": 120,
+  "proof_cap_mib": 256,
+  "free_space_reserve_gib": 10,
+  "variables": 397296,
+  "clauses": 806262,
+  "partial_proof_bytes": 92993586,
+  "sha256": {
+    "z7-general.cnf": "9dde4a4ba000dcd40ee2d0e014bc672af0dfce326020a80de191af470e151e15",
+    "z7-general.drat": "2113eb9c2a340d8bda17ca9dc15efcb00c07acedea5f78b84994415ab81fdd10",
+    "solver.log": "562ece62a9fb9d2ab53358548f42105db8a8e3640e4732b27664c96e8fd93f04",
+    "orbit_matrix_encoding.py": "a2bdd40a1ff1b9f4a7338599dce8b0ab8d2f6349eb49e543922da31a2c9d6639",
+    "solve_z7_orbit_matrix.py": "20b0628079a3adae6de46a9cc4d6a117e7bd9535d121784342600ca082532184"
+  },
+  "limitations": [
+    "The solver run did not produce a completed refutation or a satisfying quotient.",
+    "The partial proof is not a certificate or a solver checkpoint.",
+    "The preserved source hashes identify the run as performed, before later CLI robustness corrections.",
+    "No runtime or proof-size comparison with the restricted or historical graph-level models is claimed.",
+    "The intended general-Z7 certificate and formal graph-level transfer remain PENDING."
+  ]
+}

@@ -4,6 +4,7 @@ import Conway.Basic
 import Conway.Matrix
 import Conway.Decidable
 import Conway.Reflection
+import Conway.Z7OrbitMatrix
 import Conway.Z7NonExistence
 import Conway.Z3Fixed3NonExistence
 import Conway.Z3FpfNonExistence
@@ -13,3 +14,5 @@ import Conway.ParityRigidity
 import Conway.GrandClassification
 import Conway.Structural
 import Conway.TestMatrix
+import Conway.TestOrbitQuotient
+import Conway.TestZ7Canonical

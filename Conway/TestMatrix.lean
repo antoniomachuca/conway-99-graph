@@ -2,6 +2,8 @@ import Conway.Matrix
 import Conway.Z2Classification
 import Conway.CesarzWoldarTheorems
 import Conway.GrandClassification
+import Conway.Z7OrbitMatrix
+import Conway.Z7NonExistence
 
 namespace Matrix99
 
@@ -55,6 +57,32 @@ def testA : Matrix99 Nat := fun _ _ => 0
 #print axioms conway_parity_rigidity_deduction
 #print axioms conway_no_order_4_group_deduction
 #print axioms conway_no_dihedral_group_deduction
+
+-- Z_7 Orbit Matrix and Trace Theorems (Conway/Z7OrbitMatrix.lean)
+#print axioms z7_orbit_sizes_sum
+#print axioms topologicalTrace_eq_diagSumGamma2
+#print axioms foldl_add_zero
+#print axioms topologicalTrace_eq_zero_of_diag_zero
+#print axioms diagSumGamma2_eq_zero_of_diag_zero
+#print axioms foldl_even
+#print axioms diagSumGamma2_even
+#print axioms spectral_trace_eq
+#print axioms z7_orbit_spectral_trace_eq_diagSum
+#print axioms trace_sum_mod7
+#print axioms trace_sum_candidates
+#print axioms unique_multiplicity_of_zero_trace
+#print axioms unique_spectrum_of_zero_trace
+#print axioms z7_orbit_multiplicities_of_zero_diagonal
+#print axioms z7_orbit_spectrum_trace_equation
+#print axioms z7_orbit_multiplicities_given_zero_diagonal
+
+-- Z_7 Non-Existence and Orbit Reduction (Conway/Z7NonExistence.lean)
+#print axioms hasZ7Symmetry_iff
+#print axioms conway_no_z7_from_orbit_matrix_reduction
+#print axioms conway_z7_induces_orbit_matrix
+#print axioms z7_orbit_matrix_nonexistence
+#print axioms conway_no_z7_automorphism
+#print axioms conway_no_z7_from_spectrum_refutation
 
 end Matrix99
 

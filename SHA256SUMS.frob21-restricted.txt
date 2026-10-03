@@ -1,0 +1,5 @@
+# Historical filenames; restricted formula only, not general Z7. Not the Zenodo graph certificate.
+5c70a7fca0493582fb9074a3a2934eaa1687cb65e77ace4d398f0c24b34efe0d  instances/z7_orbit_matrix.cnf
+8f15cf987fb29a913950cd66c7bd9917419150f0be3b266579686fab68fd9a4e  instances/proof_z7_orbit_matrix.drat
+5c70a7fca0493582fb9074a3a2934eaa1687cb65e77ace4d398f0c24b34efe0d  /Volumes/Untitled/conway_z7_orbit_matrix/z7_orbit_matrix.cnf
+8f15cf987fb29a913950cd66c7bd9917419150f0be3b266579686fab68fd9a4e  /Volumes/Untitled/conway_z7_orbit_matrix/proof_z7_orbit_matrix.drat
