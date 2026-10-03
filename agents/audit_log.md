@@ -1,5 +1,114 @@
 # Historical Audit Log (`audit_log.md`)
 
+## Canonical 15-orbit reduction — completed formal block
+
+**PROVED:** the existing statement `HasZ7Symmetry → HasZ7OrbitMatrix` is now proved in the `feat/z7-orbit-matrices` working tree. Its original interface is unchanged: the proof constructs the canonical matrix from the graph and automorphism hypotheses, without an additional partition, orbit-count, spectral-balance, or quotient-existence premise. The final `#print axioms` output is exactly `[propext, Quot.sound]`, with no `sorryAx` or `Classical.choice`. The separate matrix-nonexistence placeholder is not resolved by this block.
+
+The implementation is split into independently checked mathematical modules:
+
+1. **Prime-seven cycles:** prove orbit sizes 1/7 and fixed-point existence on 99 vertices. The modular fixed-point congruence and cardinality lemmas must be derived, not assumed.
+2. **Local graph geometry:** derive degree/common-neighbor counts, the neighborhood matching, and faithfulness of the pointwise neighborhood stabilizer from `ConwayAdj`. For a given fixed root, use seven-cycle structure and matching uniqueness to obtain exactly two neighborhood orbits and rule out another fixed vertex.
+3. **Finite reindexing:** enumerate exactly the active orbit labels, preserving row sums, weighted symmetry, and the quadratic quotient equation. Derive even internal valency for odd-size classes and entry bounds from the graph.
+4. **Rooted quotient and canonical ordering:** construct an intermediate rooted 15-orbit matrix without assuming the exterior type counts or bounds. Derive the 3/3/6 exterior-type counts from the row and diagonal equations, then reorder by an explicit finite list to obtain every field of `Z7OrbitMatrix`.
+5. **Integration gate:** replace only the orbit-reduction `sorry`, retain the unresolved nonexistence obligation, build the affected modules, and audit all transitive axioms and finite controls. Update the manuscript/memory record only to the scope established by these checks.
+
+Work remains isolated in the existing `feat/z7-orbit-matrices` worktree. The proof modules and integration have been reviewed, built, and axiom-audited, but the changes are not committed, merged, or pushed. No SAT computation or new mathematical-library dependency was used in this block. No historical certificate or other existing artifact was deleted or overwritten. Deletion would require a separate, file-specific confirmation, not merely a belief that an artifact is archived on Zenodo.
+
+Verified supporting modules:
+
+- **PROVED:** `Z7Cycles.lean` establishes one/seven orbit sizes, invariant-subset fixed-point congruence modulo seven, and a fixed point for a period-seven action on 99 vertices.
+- **PROVED:** `GraphLocalCounts.lean` derives neighborhood/common-neighbor counts and a computable matching from the original adjacency conditions. `Z7FixedGeometry.lean` proves the fixed-root neighborhood partition and uniqueness of a fixed point once one is supplied.
+- **PROVED:** `Z7GraphFrame.lean` combines these facts, deriving a unique fixed point and constructing the 15-index orbit data directly from `ConwayAdj`, a nontrivial period-seven permutation, and adjacency preservation. The indexing and neighborhood partition are outputs, not extra premises of its graph-level theorem.
+- **PROVED:** `OrbitReindex.lean` preserves the quotient equations under finite reindexing and proves entry bounds and even internal valency for odd-sized classes. `Z7OrbitEnumeration.lean` constructs the actual index map by list lookup and derives its length from `99 + 6 = 7 * number_of_orbits`.
+- **PROVED, conditional algebraic conversion:** `Z7CanonicalArithmetic.lean` derives the exterior bounds and 3/3/6 type counts from the rooted quotient equations and constructs the canonical ordering. It does not independently assert that a graph supplies the rooted input.
+- **PROVED, finite controls only:** `TestZ7Canonical.lean` checks the explicit representatives `[0,1,8,15,22,29,36,43,50,57,64,71,78,85,92]` for a permutation fixture with one fixed point and fourteen seven-cycles. An identity-action control correctly has 99 orbits. The fixture is not a Conway graph.
+
+`Z7QuotientBoundary.lean` derives the root/neighborhood entries and orbit weights from the actual graph data. `Z7RootedConstruction.lean` supplies every rooted-matrix field, and the final proof in `Z7NonExistence.lean` composes the graph frame, rooted constructor, and canonicalization. The assembled reduction, rooted constructor, canonicalization, and unique-fixed-point theorem all audit with exactly `[propext, Quot.sound]`.
+
+### Final verification and remaining boundary
+
+From `.worktrees/z7-orbit-matrices`:
+
+```text
+lake build
+lake env lean Conway/TestZ7Canonical.lean
+lake env lean Conway/TestOrbitQuotient.lean
+```
+
+The full build completed 58 jobs. The canonical control module audits the reduction under its unchanged original signature, together with the finite permutation controls. The three remaining `sorry` declarations are the general Z7 matrix nonexistence placeholder and the two pre-existing Z3 nonexistence placeholders. Existing unused-simplification warnings in the earlier generic quotient module are not proof failures.
+
+```text
+Matrix99.conway_z7_induces_orbit_matrix: [propext, Quot.sound]
+Matrix99.z7_orbit_matrix_nonexistence: [propext, sorryAx]
+Matrix99.conway_no_z7_automorphism: [propext, sorryAx, Quot.sound]
+```
+
+- **PROVED:** graph with an order-seven automorphism implies the canonical `Z7OrbitMatrix`, including the 1/7 orbit sizes, root/matching entries, 3/3/6 exterior types, diagonal alternatives, and entry bounds.
+- **PENDING:** a formal preservation-of-solutions argument from that matrix predicate to the exact generated CNF, and a checked refutation of the general model with the intended kernel-level transfer. The earlier UNKNOWN search and partial DRAT remain unchanged.
+- **COMPILED:** the aggregate Lean order-seven nonexistence declaration still depends on the unresolved matrix placeholder. No new exclusion of order seven or solution of Conway-99 is claimed.
+
+### Note for the manuscript and research memory
+
+A supportable contribution statement is: “We give a kernel-checked construction of the canonical 15-orbit quotient from a putative Conway-99 graph and an automorphism of order seven, deriving the structural constraints rather than assuming them.” Do not describe this as a verified SAT compiler, an end-to-end certified exclusion, a new graph-theoretic exclusion, or the first such formalization without a separate originality review. Before submission, freeze and integrate the actual code revision, update the manuscript and cover letter to that revision, harmonize test counts, and state the remaining matrix-to-CNF/refutation boundary explicitly. The manuscript itself has not been revised by this block.
+
+## Formal orbit-quotient follow-up — first transfer layer
+
+> Historical checkpoint. Its pending canonical-15 reduction and `sorryAx` status for `conway_z7_induces_orbit_matrix` are superseded by the completed block above.
+
+The corrective work in `feat/z7-orbit-matrices` now includes a constructive finite orbit-quotient layer in `Conway/OrbitQuotient.lean`. This is distinct from the still-incomplete canonical 15-orbit reduction and the still-unresolved general quotient CNF.
+
+- **PROVED:** `cyclicEquitableData` constructs representatives and equitable neighbor counts from a positive period `p`, `s^[p] = id`, and preservation of adjacency by `s`. It does not take an equitable partition, quotient equation, or spectral balance as an additional premise.
+- **PROVED:** the representatives label exactly the cyclic orbits. The construction is finite and computable, without an arbitrary representative-selection axiom. The generic `EquitableData.row_sum`, `weighted_symmetry`, and `quotient_equation` derive the quotient laws from the corresponding original-matrix laws. The construction and all three laws audit with `[propext, Quot.sound]`, without `sorryAx` or `Classical.choice`.
+- **PROVED:** the concrete `z7EquitableData`, `conway_z7_quotient_row_sum`, `conway_z7_quotient_weighted_symmetry`, and `conway_z7_quotient_equation` are now integrated in `Conway/Z7NonExistence.lean`. They construct the quotient from the actual order-seven automorphism and derive its laws from `ConwayAdj`; no additional equitable-partition, degree, or quotient-polynomial hypothesis is supplied. All four audit with `[propext, Quot.sound]`.
+- **PROVED, finite controls only:** `Conway/TestOrbitQuotient.lean` checks the computed quotient for the nine-vertex rook graph under a period-three translation and the eight-vertex star under a period-seven permutation. The latter exercises unequal fiber sizes 1 and 7. The two constructions and fourteen named controls, including inactive-row and identity-period checks, audit with `[propext, Quot.sound]`. These are controls for the construction, not Conway graph examples.
+- **Representation limitation:** quotient entries are indexed by the original `Fin n` labels. Active labels are canonical orbit representatives; unused labels have zero rows and empty target fibers. The quadratic equation is stated for an active source label. This is not yet an identification of the active labels with `Fin 15`.
+- **Dependency finding:** existing `Matrix99.targetRHS_diag` and `Matrix99.conway_vertex_degree` include `Classical.choice` in their axiom lists. The underlying `ConwayAdj`, `targetRHS`, `eye`, and `mul` definitions are axiom-free. The new transfer route bypasses those helper proofs: `conway_target_formula` is axiom-free and `conway_row_sum` depends only on `[propext, Quot.sound]`. No change to the graph predicate was made.
+- **PENDING:** prove the unique-fixed-vertex and orbit-size classification, construct and justify the canonical 15-orbit labeling, derive all fields of `Z7OrbitMatrix`, certify the matrix-to-CNF implication, and obtain/check the general refutation. The existing graph-level nonexistence theorem is not upgraded by these quotient lemmas. Z3-fixed3-specific encoding coverage is also still PENDING.
+
+Verification in the z7 worktree: `lake build Conway.Z7NonExistence Conway.TestOrbitQuotient` completed successfully; `lake env lean Conway/TestOrbitQuotient.lean` prints the exact generic, concrete, and finite-control axiom lists. It also prints `[propext, sorryAx]` for `conway_z7_induces_orbit_matrix` and `conway_no_z7_automorphism`, explicitly preserving their **COMPILED** status. No new `sorry` was introduced.
+
+No SAT search or dependency/toolchain change was performed for this formalization phase. This entry records working-tree changes, not a commit, merge, submission, or new graph-exclusion result.
+
+## Superseding correction of the A/B audit at `df9e455`
+
+**The claim is false according to the current state of the repository.** The October 2 entry's conclusion that all deliverables were scientifically validated is withdrawn. Successful tests, file hashes, a DRAT checker verdict, and Lean compilation do not establish that the software expresses the claimed mathematical problem. This notice supersedes that entry; the original remains below as a historical record.
+
+### A. Production positive controls — COMPILED
+
+The encoders at `d904ae6` were standalone implementations. Their successful Paley(9), Petersen, and C5 runs did not validate the production Conway compilers. The 13-variable and 49-variable planted matching encoders were isolated toy models. Relaxed subsystems did not establish that the complete Z2(f=1) or Z3 fixed-point-free models were unsatisfiable; those mathematical cases remain PENDING.
+
+The corrective, uncommitted work in `feat/encoder-positive-controls` now parameterizes the actual `ConwayZ2F1Compiler` and `ConwayZ3FPFCanonicalCompiler`, retaining lambda=1 and mu=2. `scripts/production_positive_controls.py` constructs independent known graphs and feeds their assignments through those production methods, rather than copying their constraint loops. The BvLS connection set is the explicit eleven directions and their negatives in section 3.1 of Soe Soe Zaw, arXiv:1907.02800v2. Paley(9) is represented as the 3-by-3 lattice graph.
+
+- **COMPILED:** independent integer adjacency checks verify symmetry, zero diagonal, degree, and `A^2 + A = (k-2)I + 2J`; inversion has one fixed vertex, and the tested translations are fixed-point-free of order three.
+- **COMPILED:** complete Paley(9) production CNFs solve and decode for both actions. Tests check every clause of each returned model and reject a corrupted primary assignment.
+- **COMPILED:** the planted BvLS graph is accepted by all emitted production clauses: 28,257,515 clauses for Z2(f=1), and 27,424,360 for Z3-FPF. Primary assignments and conjunction values remain fixed across batches; fresh cardinality auxiliaries are solved locally and every local clause is checked. Reuse of discarded auxiliaries is rejected. This is a software witness check, not a DRAT certificate or a proof that all graph-to-CNF reductions are sound.
+- **COMPILED:** the final encoder-worktree suite reports 76 passing tests. The two BvLS full-clause checks were separate explicit runs, not part of that test count. Timing thresholds were removed from correctness assertions.
+- **COMPILED:** default emitted DIMACS serialization is unchanged relative to the main-root production modules: Z2 has 666,309 variables / 1,508,157 clauses and SHA-256 `e697b76fbb3123339a34622e18ff6484f555dffc8b8e3b06faa9bef860758de8`; canonical Z3-FPF has 852,324 variables / 1,860,024 clauses and SHA-256 `ec2852f7b191bf7eff2a9f818e408583a2b58e496fab71914ba01e4385b92d0d`. These are before/after regression comparisons, not newly certified search results.
+- **PENDING:** formal semantic transfer and coverage of Conway-specific reductions and canonical cuts not exercised by these controls, including the full Z7 and Z3-fixed3 encodings. Positive controls do not prove universal compiler correctness.
+
+### B. Restricted certificate versus general Z7 — PENDING
+
+The generator at `d2d3bcc` explicitly imposes circulant 3-by-3 blocks, fixed diagonal blocks, and zero cross-blocks motivated by the Frob(21) case. The 296,338-byte legacy DRAT cannot establish the absence of a general Z7 quotient. The statement that only a certificate-to-Lean bridge was missing was also false: the encoded formula and the Lean predicate did not match.
+
+- The historical CNF hash `5c70a7fca0493582fb9074a3a2934eaa1687cb65e77ace4d398f0c24b34efe0d` identifies this restricted formula, not the full general Z7 model. Its proof hash is `8f15cf987fb29a913950cd66c7bd9917419150f0be3b266579686fab68fd9a4e`.
+- A matching solver UNSAT verdict and successful DRAT verification can justify **PROVED only for that exact formula**. They do not certify its interpretation as a Frob(21) graph exclusion, still less as a general Z7 exclusion.
+- The comparisons against the obsolete 192 MB / 771.59-second graph run are withdrawn. They compare different models and use the historical pre-repair graph encoding. No valid speedup or proof-size improvement for the same problem was established.
+- The arithmetic Lean lemmas prove their written implications. `spectral_balance` is an input hypothesis, not a derived spectral theorem. The zero-diagonal condition is an extra hypothesis; citing the Frob(21) section's Lemma 4.12 does not make it a general Z7 fact.
+- The graph-to-quotient declaration and matrix nonexistence declaration contain `sorry`; their composed graph theorem remains **COMPILED**, with formal obligations **PENDING**. A conditional transfer implication does not discharge either premise.
+- **PENDING:** a general quotient refutation with matching, audited semantics and a kernel-checked graph-level transfer. Behbahani–Lam's prior order-7 exclusion in the literature is not being reclassified as open; the local reproduction and formalization are incomplete.
+
+### Corrective general-model checks and bounded run
+
+- **COMPILED:** the new `scripts/orbit_matrix_encoding.py` in `feat/z7-orbit-matrices` encodes the 15-orbit quotient equation directly, with root/matching entries, weighted symmetry, row sums, and a full symmetric 12-by-12 exterior block. It does not impose Frob(21) circulant blocks or an all-zero exterior diagonal. Ten arithmetic/control tests passed, including exhaustive small mixed-size cases, signed cardinalities, and known Paley(9)/C5 quotients.
+- **EXPLORED (informal reduction justification):** for each outer orbit, the left/right neighbor counts satisfy `a+b=2`. The inner row and diagonal equations give `sum(a)=12` and `sum(a^2)=18`, so the twelve outer orbits can be labeled as three `(2,0)`, three `(0,2)`, and six `(1,1)` types. The outer diagonal equation and row sum imply `sum_j b_ij(b_ij-1)+b_ii=12`, excluding entries at least five. Even internal valency then leaves diagonal values zero or two. These restrictions are recorded in both the Python specification and the Lean structure; the graph-to-structure derivation is not kernel-verified.
+- **COMPILED:** the B-worktree full Python gate passed 60 tests at its first implementation checkpoint. `lake build` completed 34 jobs, with four existing `sorry` warnings. The targeted axiom audit returns `[propext, sorryAx]` for both missing Z7 declarations and the global Z7 theorem. The transfer implication returns `[propext]`; the checked conditional arithmetic lemmas return `[propext, Quot.sound]`.
+- **EXPLORED:** one general-model run used `/Volumes/Untitled/conway_z7_general_correction_01`, a 120-second native solver limit, a 256 MiB proof-file cap, and a 10 GiB free-space reserve. Its CNF has 397,296 variables and 806,262 clauses; SHA-256 is `9dde4a4ba000dcd40ee2d0e014bc672af0dfce326020a80de191af470e151e15`. The solver log ends with `c UNKNOWN` and exit zero, not `s UNSATISFIABLE` or `s SATISFIABLE`. No checker was run. The 92,993,586-byte DRAT artifact is partial and is not a certificate; hash `2113eb9c2a340d8bda17ca9dc15efcb00c07acedea5f78b84994415ab81fdd10` identifies it only. The manifest and source snapshots preserve this run as performed; later launcher corrections do not rewrite it.
+- **PENDING:** the intended small general-Z7 certificate has not been obtained. The bounded attempt does not complete roadmap item B, and no convergence or remaining-time estimate follows from it.
+- **COMPILED:** subsequent launcher checks cover signed SAT models, contradictory assignments, conflicting verdicts, timeout handling, interrupted checkers, overwritten inputs, and execution from archived sibling sources. Fourteen focused tests passed after the launcher review; a further targeted interrupt test passed after ensuring an interrupted run preserves an UNKNOWN/EXPLORED manifest. These results are separate from the earlier 60-test full-suite checkpoint. No general search was repeated for those launcher corrections.
+- **PROVED, exact restricted CNF only:** a fresh run in `/Volumes/Untitled/conway_frob21_restricted_correction_01` preserves both `s UNSATISFIABLE` with solver exit 20 and `s VERIFIED` with checker exit zero. The regenerated CNF and DRAT retain the historical hashes `5c70a7fca0493582fb9074a3a2934eaa1687cb65e77ace4d398f0c24b34efe0d` and `8f15cf987fb29a913950cd66c7bd9917419150f0be3b266579686fab68fd9a4e`. Input hashes match before and after checking. Solver-log hash: `eeb3c8077e23344eaa67a9a1c2fb6977bcdabb871bac7bb1055459073308b5a5`; checker-log hash: `491a9dcbabe48f1c4057c5531932652c5129ad07872604f64ffc85ea87fa3fc1`. This deliberately does not change the general-Z7 or graph-level status. The restricted checksum list is now separate from the deposited graph-certificate list.
+
+All original CNFs and proof traces are preserved. Historical backup/free-space observations below are not live telemetry. No manuscript update, merge, journal submission, or publication is implied by this correction.
+
 ## Superseding correction notice — September 21, 2026
 
 The entries below are preserved as historical reports, not as current certification or live telemetry. Their completeness and every claimed execution have not been independently re-established. For current status, use the [README](../README.md), [technical audit](../docs/technical_report.md), and [handover](handover_briefing.md).
@@ -396,6 +505,9 @@ The probability bounds, completion forecasts, and publication-readiness judgment
 - **Verdict:** VERIFIED (Operational & Complete). Available storage expanded by $+97\text{ GB}$, guaranteeing operational headroom through the weekend hot window.
 
 ### [2026-10-02 18:05:00 CEST] - Forensic Scientific Audit: Positive Control Encoders & Z_7 Orbit Quotient Matrices
+
+> Historical entry, superseded by the A/B correction at the top of this file. Its general-Z7 certificate interpretation and final scientific-validity verdict are withdrawn.
+
 - **Objective:** Exhaustive, independent adversarial forensic audit of deliverables across two active development branches:
   1. `feat/encoder-positive-controls` (worktree `.worktrees/encoder-positive-controls`, commit `d904ae6`).
   2. `feat/z7-orbit-matrices` (worktree `.worktrees/z7-orbit-matrices`, commit `d2d3bcc`).
