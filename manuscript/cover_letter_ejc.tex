@@ -1,0 +1,81 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[top=0.5in, bottom=0.5in, left=0.75in, right=0.75in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2.5pt}
+
+\begin{document}
+
+% Header / Sender Information
+\begin{minipage}[t]{0.72\textwidth}
+  {\large\textbf{Antonio Machuca}} \\[1.5pt]
+  Undergraduate Student in Mathematics and Computer Science \\
+  Universidad Rey Juan Carlos, Madrid, Spain \\[1.5pt]
+  {\small\texttt{am.machuca.2023@alumnos.urjc.es} \enspace$|$\enspace \texttt{contactoantoniomachuca@gmail.com}} \\
+  \url{https://github.com/antoniomachuca/conway-99-graph}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.26\textwidth}
+  \raggedleft
+  \textbf{Date:} October 3, 2026
+\end{minipage}
+
+\vspace{0.4em}
+\hrule height 0.6pt
+\vspace{0.4em}
+
+% Recipient Information
+\textbf{To:} \\
+The Editors-in-Chief and Editorial Board \\
+\textit{The Electronic Journal of Combinatorics}
+
+\vspace{0.4em}
+\textbf{Subject:} Submission of the manuscript ``Symmetry-Restricted SAT Encodings, Lean~4 Formalization, and Verification Limits for Conway's 99-Graph''
+\vspace{0.4em}
+
+Dear Editors,
+
+Please find enclosed the manuscript entitled \textbf{``Symmetry-Restricted SAT Encodings, Lean~4 Formalization, and Verification Limits for Conway's 99-Graph''}, which I submit for consideration for publication in \textit{The Electronic Journal of Combinatorics}.
+
+The manuscript concerns the existence of a strongly regular graph with parameters $\operatorname{srg}(99, 14, 1, 2)$, an open problem on J.~H.~Conway's list of five \$1{,}000 problems. In the cited literature, two symmetric cases remain open: an involution with exactly one fixed vertex and a fixed-point-free automorphism of order~3. The manuscript does not decide existence or rigidity. It records which combinatorial and computer-assisted checks were carried out and what each check establishes:
+
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.75pt, topsep=0.75pt]
+  \item \textbf{Mechanized structural lemmas.} Lean~4 proofs of $K_4$-freeness, the $7K_2$ decomposition of every neighborhood, diameter at most~2, and a computable checker proved equivalent to the adjacency predicate; the kernel reports only the axioms \texttt{[propext, Quot.sound]}. These facts are standard; the contribution is their mechanization. Arithmetic contradictions from character-theoretic arguments are also kernel-checked; the graph-level wrappers assume their premises and are not reported as proved.
+  \item \textbf{A mechanized order-7 reduction.} From a Conway 99-graph and a nontrivial automorphism $s$ with $s^7 = \mathrm{id}$, a Lean~4 proof constructs a canonical $15 \times 15$ orbit quotient matrix. It derives the fixed vertex, the orbits, and the quotient equations; it does not assume them. The kernel reports only \texttt{[propext, Quot.sound]}. The orbit structure is known (Behbahani--Lam, Cesarz--Woldar); the contribution is the mechanization. Lean does not prove that no such matrix exists.
+  \item \textbf{The involution case with one fixed vertex.} Every binary $7\times 42$ matrix with $CC^T = 10I_7 + 2J_7$ has column weight~2. The support labels of the three branch representatives are corrected; their classes have sizes 1, 20, and 20 under the stabilizer of a distinguished orbit.
+  \item \textbf{A checker-verified order-7 CNF refutation.} For one canonical order-7 CNF ($177{,}097$ variables, $422{,}508$ clauses), CaDiCaL~1.9.5 returns \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reports \texttt{s VERIFIED} on the $26{,}746{,}488{,}053$-byte DRAT proof. Behbahani and Lam (2011) already excluded order~7. The graph-to-CNF translation is not kernel-verified, so the manuscript claims no new proof of that exclusion. It does not decide the CP-SAT model of Thakkar and Severini (2026).
+  \item \textbf{Exterior-row CNF, separate from the Lean reduction.} The exterior-row CNF has $26{,}166$ variables and $311{,}703$ clauses. It is not the canonical order-7 CNF, and it is not in the Zenodo record. CaDiCaL~1.9.5 returned \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reported \texttt{s VERIFIED}. That refutation is \textsc{Proved} for this CNF only. The Lean derivation of the exterior equations is a different \textsc{Proved} component. The implication from \texttt{Z7OrbitMatrix} to the CNF is \textsc{Pending}. The DRAT proof is not checked inside the Lean kernel, and Lean does not prove that no orbit matrix exists.
+  \item \textbf{An inconclusive search and positive controls.} A 12.5-day CaDiCaL campaign on the open involution and order-3 encodings (more than $2.4 \times 10^9$ conflicts, recorded aggregate) found no model and no refutation; it started before a compiler repair. Positive controls apply the production compilers for these two actions to Paley(9) and to the Berlekamp--van Lint--Seidel graph $\operatorname{srg}(243,22,1,2)$. They do not prove compiler correctness.
+\end{enumerate}
+
+Every claim carries one of four labels (\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, \textsc{Pending}) defined in the manuscript. The Lean~4 library, the SAT compilers, and the regression tests are available on GitHub (\url{https://github.com/antoniomachuca/conway-99-graph}). The canonical order-7 CNF and its DRAT proof are in Zenodo record 10.5281/zenodo.22995101.
+The solver log, the checker log, and the SHA-256 digests for that CNF are in the same record.
+The exterior-row CNF is not in that record.
+
+\textbf{Declarations:} The manuscript is original, has not been published previously, and is not under consideration elsewhere. The author declares no competing interests.
+
+\textbf{Suggested Reviewers:} I suggest the following three referees:
+\begin{enumerate}[leftmargin=1.5em, itemsep=0.75pt, topsep=0.75pt]
+  \item \textbf{Prof.~Dean Crnkovi{\'c}} (University of Rijeka, \texttt{deanc@math.uniri.hr}) --- Strongly regular graphs and automorphism groups; co-author of the exclusion of automorphism groups of order 6 and 9 for $\operatorname{srg}(99,14,1,2)$.
+  \item \textbf{Prof.~Marijn J.~H.~Heule} (Carnegie Mellon University, \texttt{marijn@cmu.edu}) --- Computer-assisted proofs in combinatorics, SAT encodings, clausal proof checking.
+  \item \textbf{Prof.~Simone Severini} (University College London, \texttt{s.severini@ucl.ac.uk}) --- Algebraic graph theory; constraint formulations for Conway's 99-graph.
+\end{enumerate}
+
+Thank you for your time and consideration of this work.
+
+\vspace{0.4em}
+Sincerely,
+
+\vspace{0.4em}
+\textbf{Antonio Machuca}
+
+\end{document}

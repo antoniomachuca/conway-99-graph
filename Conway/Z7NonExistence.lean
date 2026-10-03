@@ -146,8 +146,10 @@ theorem conway_z7_induces_orbit_matrix :
   Theorem (Non-existence of Z7OrbitMatrix):
   No 15×15 orbit quotient matrix satisfying the general specification exists.
 
-  Status: COMPILED placeholder; general matrix refutation and certificate-to-kernel link are PENDING.
-  The legacy 296338-byte proof has extra Frob(21)-motivated restrictions and does not establish this declaration.
+  Status: COMPILED placeholder. The Lean derivation of the exterior equations and the
+  checked exterior-row CNF are separate certificates. This declaration is the missing
+  kernel link between them. The DRAT proof is not imported here.
+  `Z7OrbitMatrix.exterior_row_problem` derives the exterior equations and does not refute them.
 -/
 theorem z7_orbit_matrix_nonexistence :
     ¬ HasZ7OrbitMatrix := by

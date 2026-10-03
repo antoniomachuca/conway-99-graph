@@ -1,5 +1,84 @@
 # Historical Audit Log (`audit_log.md`)
 
+## Independent Z7 quotient enumeration — feasibility run, 3 October 2026
+
+**EXPLORED:** an independent Python enumerator now searches the necessary conditions of `Z7OrbitMatrix`. It does not import the SAT encoder, assume Frob(21) restrictions, force the exterior diagonal to zero, or remove candidates by symmetry. It is a feasibility prototype, not a certified decision procedure.
+
+Write the exterior block as a symmetric natural-number matrix `C` of size 12. Put `w = (1,1,1,-1,-1,-1,0,0,0,0,0,0)`. Substitution of the fixed root and neighborhood entries into the Lean predicate gives:
+
+- `C * 1 = 12 * 1` and `C * w = 0`;
+- `C^2 + C = 12 I + 12 J - 2 w w^T`;
+- entries between 0 and 4, with each diagonal entry in `{0,2}`.
+
+The right-hand side has diagonal 22 for the first six rows and 24 for the remaining six. Its off-diagonal entries are 10 within either three-element type, 14 between those two types, and 12 otherwise. Enumerating every full row with its sum, signed balance, and diagonal quadratic equation gives finite row domains. Backtracking then enforces symmetry and every off-diagonal quadratic equation. Forward checking removes a partial assignment only when some future row has no compatible candidate. Each reported matrix is reconstructed as a full 15-by-15 matrix and checked with ordinary Python integers against every field of the Lean predicate. This is a software check, not a Lean witness or graph construction.
+
+**COMPILED:** 13 targeted unittest controls pass. They compare row domains with Cartesian-product enumeration, compare complete searches with brute force (including all 12 labelled 5-cycles), retain nonzero diagonal cases, exercise signed balances and inconsistent targets, and test timeout, signal, disk-reserve, and no-overwrite behavior. A residual-equation check compares the full 15-by-15 polynomial with the reduced equations on sampled symmetric blocks. These controls do not constitute a universal completeness proof.
+
+The run started at `2026-10-03T09:40:06.707102+00:00`, with PID 96081, in `/Volumes/Untitled/conway_z7_enumeration_20261003_01`. Its command is:
+
+```text
+python3 -u -B scripts/enumerate_z7_quotient.py --output-dir /Volumes/Untitled/conway_z7_enumeration_20261003_01 --seconds 43200 --progress-seconds 30 --solution-limit 1 --output-limit-mib 256 --reserve-gib 10
+```
+
+The command runs at reduced scheduling priority with one numerical-computation thread and `caffeinate -i` to inhibit idle system sleep. It stops on exhaustion, the first checked matrix, a 12-hour elapsed-time limit, SIGINT/SIGTERM, or its storage limits. The directory contains source snapshots and their hashes, the exact row problem, a manifest, and periodic progress files. The base commit is `291c65856f39c62eaf6105f7408ff1ce75a448d3`; the prototype itself is uncommitted and identified by the source hashes, not that commit alone.
+
+Progress records count entered prefixes, attempted row assignments by depth, and fully processed first-row candidates. They are not restart checkpoints and do not estimate a percentage of total work. A stopped run does not establish nonexistence. Even software exhaustion with zero candidates would remain **EXPLORED** until the enumeration and its execution receive the required formal certification. A matrix candidate would not be a Conway graph.
+
+No existing artifact was deleted. No Lean theorem, taxonomy rule, manuscript, cover letter, or arXiv archive was changed for this experiment. This entry records the launch; it must not be read as an assertion that the PID is still active later. The authoritative completion state is the run manifest.
+
+### Terminal reading — 3 October 2026, 12:00 CEST
+
+**EXPLORED:** PID 96081 is not running, and `pgrep` finds no `enumerate_z7_quotient` process. The manifest at `/Volumes/Untitled/conway_z7_enumeration_20261003_01/manifest.json` is the completion record. It says `complete: true`, `stop_reason: "exhausted"`, `status: "EXPLORED"`, `solutions_found: 0`, and `finished_utc: 2026-10-03T09:43:40.424084+00:00`. Elapsed time in the final progress record is 213.72 seconds. The 12-hour limit, the solution limit, and the storage limits did not fire.
+
+The same record says every one of the 7,576 generated first-row candidates was processed (`root_rows_completed: 7576`). Rows 0–5 each have domain size 7,576; rows 6–11 each have domain size 10,955. `nodes_by_depth` is zero from depth 7 onward, and all 25,920 assignments attempted at depth 6 were forward-pruned. No file `matrix_*.json` exists, and `artifact_sha256` is empty.
+
+Snapshot hashes match both the manifest and the current workspace copies:
+
+- `enumerate_z7_quotient.py`: `d9db005cc7fb56c08ae7f0c9e05800f8aca39ba6d5cfc5241ea025d2637873d8`
+- `test_z7_quotient_enumeration.py`: `9b3ca9f5b1b6cdbeaf8dcacf817a0f9e18ac05f8d1b3dba4c0c477e997922a8a`
+- `Z7OrbitMatrix.lean`: `785e9c18bef38bb8bb67535f4b26e97d029f48e683fcdf31cafcad9bac59c4ca`
+
+Artifact hashes at the time of this reading:
+
+- `manifest.json`: `05f02089323086d9a34c95dc0e713ceb4e5383cc7c7c5124e83920ee93ab63f1`
+- `progress.json`: `2f2c90c8cc38231deb2d94be68c376130f8b04cd218c25f9f4661cbe718ada21`
+- `progress.jsonl`: `868c8c1f8b55470d1c55333fb18c1e5fdc2d679d8126377a47f04d3702b96ec2`
+
+Software exhaustion of this backtracker is not a kernel proof, a DRAT certificate, or an exclusion of a Conway graph with an automorphism of order seven. The 13 unittest methods exercise small instances and launcher behavior; they were not re-executed for this reading. The matrix-nonexistence placeholder in Lean remains unresolved. Query `manifest.json` for the terminal state, `progress.json` for the last diagnostic snapshot, and `progress.jsonl` for the nine timestamped records. Those progress files are not restart checkpoints.
+
+### Certificate attempt — 3 October 2026, afternoon CEST
+
+**PROVED, Lean derivation only:** `Z7OrbitMatrix.exterior_row_problem` in `Conway/Z7ExteriorBlock.lean` derives symmetry, the entry bound 4, diagonal values in `{0,2}`, exterior row sum 12, the signed balance, and the exterior quadratic targets from `Z7OrbitMatrix`. `#print axioms` reports `[propext, Quot.sound]`. This does not refute the equations. `z7_orbit_matrix_nonexistence` still contains `sorry`.
+
+**COMPILED:** `tests/test_z7_row_problem_cnf.py` has 5 passing tests. The direct one-hot encoding and the generated-row selection encoding both reproduce brute force on the weighted 3×3 example, the impossible off-diagonal target, and all 12 labelled 5-cycles. These tests do not prove that the generated 12×12 row lists are exhaustive.
+
+**EXPLORED:** two SAT attempts produced no `s UNSATISFIABLE` or `s SATISFIABLE` line, and `drat-trim` was not run.
+
+- Direct encoding, `/Volumes/Untitled/conway_z7_row_cnf_20261003_01`: 26,166 variables and 311,703 clauses, CNF SHA-256 `b746471acd527e52da4706a354fc6fd0d225bb638c121f8b7ec6f965ec5a4ee4`. The process was stopped while about 63 percent of the variables remained and the binary DRAT was about 991 MiB. The solver log has no `s` line. Manifest `stop_reason` is `interrupted_no_convergence`.
+- Selection encoding, `/Volumes/Untitled/conway_z7_row_selection_20261003_01`: 222,360 variables and 884,223 clauses, CNF SHA-256 `29590ffc61766135667386ce49bca2b1a8aced64f20b625078aa8f9e19fa2181`. Row-domain sizes are 7,576 six times and 10,955 six times. CaDiCaL 1.9.5 exited 0 after 1,824.67 seconds real time. The log says `c UNKNOWN`, with 30,790 conflicts. About 90 percent of process time was simplification and probing. The closed DRAT is 739.82 MB and is not a certificate. Manifest status is `EXPLORED`, `solver_verdict` `UNKNOWN`, `proof_complete` false.
+
+The earlier software exhaustion of the Python backtracker remains **EXPLORED**. Neither SAT log upgrades it.
+
+### Direct row-problem CNF, long run — launched 3 October 2026, 15:20 CEST
+
+**EXPLORED:** a fresh CaDiCaL run of the direct exterior-row CNF is in progress. This entry records the launch. The authoritative state is the run manifest, not this paragraph.
+
+```text
+caffeinate -i nice -n 10 python3 -u -B scripts/solve_z7_row_problem.py --encoding direct --output-dir /Volumes/Untitled/conway_z7_row_direct_long_20261003_01 --cadical ./cadical --drat-trim ./drat-trim/drat-trim --timeout 43200 --checker-timeout 14400 --proof-limit-mib 51200 --reserve-gib 20
+```
+
+The formula has 26,166 variables and 311,703 clauses. At launch the solver log contained `c setting time limit to 43200 seconds` and `c found 'p cnf 26166 311703'`. CaDiCaL was PID 10557. The CNF SHA-256 in the manifest is the artifact hash written before solving. Limits are 12 hours, 50 GiB for the proof file, and a 20 GiB free-space reserve. `drat-trim` runs only after an `s UNSATISFIABLE` line. A partial DRAT is not a certificate. `z7_orbit_matrix_nonexistence` is unchanged.
+
+#### Terminal reading — 4 October 2026, 00:16 CEST
+
+**PROVED, this CNF only:** no solver process is running. The manifest at `/Volumes/Untitled/conway_z7_row_direct_long_20261003_01/manifest.json` says `status: PROVED`, `solver_verdict: UNSATISFIABLE`, `solver_returncode: 20`, `proof_complete: true`, `checker_returncode: 0`, and `checker_stop_reason: null`. `solver.log` contains `s UNSATISFIABLE` and `exit 20`, after 9,051.98 seconds real time and 32,331,971 conflicts. `checker.log` contains `s VERIFIED` and `c verification time: 8879.590 seconds`. The checker reports 201,494 of 311,703 clauses in the core, 12,551,572 of 56,577,564 lemmas in the core, and 0 RAT lemmas. It also reports duplicate-literal warnings while parsing the binary proof; the verdict line is still `s VERIFIED`. The CNF SHA-256 is `b746471acd527e52da4706a354fc6fd0d225bb638c121f8b7ec6f965ec5a4ee4`. The DRAT file is 4.4 GB.
+
+This certificate is the unsatisfiability of that exterior-row CNF. `z7_orbit_matrix_nonexistence` still contains `sorry`. The Lean derivation `Z7OrbitMatrix.exterior_row_problem` is separate, and the Python encoder that produced the CNF is not a kernel proof. Behbahani–Lam (2011) already excluded order 7 in the literature.
+
+### Z3-fixed3 encoding coverage — 3 October 2026
+
+**COMPILED:** `tests/test_z3_fixed3_encoding_coverage.py` records the cardinalities emitted by `ConwayZ3Fixed3CanonicalCompiler.build_degree_constraints` and `build_common_neighbor_constraints`. Four tests pass in one run. They check the 54 preset one-factor entries, the circulant adjacency literal on every orbit pair, the 148 degree cardinalities, and all 1,520 common-neighbor pair orbits, including bounds 1 inside a neighborhood block and 2 otherwise. No solver was launched on the Conway formula. `conway_no_z3_fixed3_automorphism` still contains `sorry`. Crnković–Maksimović (2020) already exclude this fixed-point case in the literature; these tests do not replace that argument and do not cover the fixed-point-free order-3 encoding.
+
 ## Canonical 15-orbit reduction — completed formal block
 
 **PROVED:** the existing statement `HasZ7Symmetry → HasZ7OrbitMatrix` is now proved in the `feat/z7-orbit-matrices` working tree. Its original interface is unchanged: the proof constructs the canonical matrix from the graph and automorphism hypotheses, without an additional partition, orbit-count, spectral-balance, or quotient-existence premise. The final `#print axioms` output is exactly `[propext, Quot.sound]`, with no `sorryAx` or `Classical.choice`. The separate matrix-nonexistence placeholder is not resolved by this block.

@@ -6,6 +6,8 @@ import Conway.Decidable
 import Conway.Reflection
 import Conway.Z7OrbitMatrix
 import Conway.Z7NonExistence
+import Conway.Z7ExteriorBlock
+import Conway.Z7ExteriorEncoding
 import Conway.Z3Fixed3NonExistence
 import Conway.Z3FpfNonExistence
 import Conway.Z2Classification
