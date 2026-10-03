@@ -23,7 +23,7 @@ Theoretical Foundations:
      * Diagonal: (p_i, p_i, d) for p_i in 0..m-1, d in 1..\lfloor(p-1)/2\rfloor.
      * Off-diagonal: (p_i, p_j, d) for 0 <= p_i < p_j < m, d in 0..p-1.
 
-3. Canonical CNF Encoding Architecture (identical to scripts/build_z7_canonical_cnf.py):
+3. Canonical CNF Encoding Architecture (experimental standalone encoder; does not validate Conway-specific production reductions):
    - Variable 1 safety: Literal 1 is a variable ID, NEVER conflated with boolean True.
    - 2-path AND-gates (Tseitin encoding) for common neighbor counting.
    - PySAT CardEnc.equals (seqcounter) for exact cardinality constraints:

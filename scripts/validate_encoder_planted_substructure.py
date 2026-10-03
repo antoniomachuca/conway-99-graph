@@ -4,7 +4,7 @@ scripts/validate_encoder_planted_substructure.py
 
 Positive Control and Planted Substructure Validation Suite for SAT Encoders:
 1. Parameterized Positive Control Harness for SRG Block-Circulant Encoders:
-   - Paley(9) = srg(9, 4, 1, 2) under Z_3 (3 orbits of size 3, identical lambda=1, mu=2 as Conway-99).
+   - Paley(9) = srg(9, 4, 1, 2) under Z_3 (standalone experimental positive control).
    - Petersen = srg(10, 3, 0, 1) under Z_5 (2 orbits of size 5).
    - Solves via CaDiCaL, decodes model into full adjacency matrix, and verifies all SRG parameters.
 2. Planted 1-factor on Gamma_1(x_0) (M_{7K_2}):
@@ -16,13 +16,13 @@ Positive Control and Planted Substructure Validation Suite for SAT Encoders:
    - Verifies coordinate bijection to the 84 non-edges of Gamma_1, 12-fold regularity per coordinate,
      Tseitin 2-path definitions, and the 12x12 quotient Diophantine matrix C (row sums = 22, target T row sums = 156).
 4. Relaxed Consistency Checks:
-   - Proves that relaxing the unsatisfiable global parameter mu=2 allows the solver to find
-     SATISFIABLE assignments where every single clause is satisfied (zero violations) across Z_7, Z_3, and Z_2.
+   - Explores selected relaxed subsystems and records satisfying assignments with zero
+     violations; these checks do not resolve the open Z_2(f=1) or Z_3 fixed-point-free cases.
 
 Four-State Taxonomy:
-- Paley(9) and Petersen SRG parameter verification: PROVED.
-- Planted 1-factor and Cesarz-Woldar coordinate 2-path satisfaction: PROVED.
-- Relaxed feasibility certificates: COMPILED.
+- Standalone positive-control checks: COMPILED.
+- Isolated toy-model and coordinate checks: COMPILED.
+- Relaxed subsystem checks: EXPLORED.
 """
 
 import os
@@ -271,7 +271,7 @@ class SRGBlockCirculantEncoder:
 
 class Z7Gamma1Encoder:
     """
-    Encodes the induced subgraph on Gamma_1(x_0) (14 vertices) under Z_7 action.
+    Experimental isolated toy model for an induced 14-vertex Z_7 subgraph; it does not encode production clauses.
     Orbits: L = {1L..7L} (orbit 0), R = {1R..7R} (orbit 1).
     Variables:
       - Diagonal in L: (0, 0, d) for d in {1, 2, 3}
@@ -361,7 +361,7 @@ class Z7Gamma1Encoder:
 
 class Z2F1Gamma1Encoder:
     """
-    Encodes the induced subgraph on Gamma_1(x_0) (14 vertices) under Z_2 (f=1) action.
+    Experimental isolated toy model for an induced 14-vertex Z_2(f=1) subgraph; it does not encode production clauses.
     Neighborhood N(x_0) = {1..14} consists of 7 orbits of length 2: R_0..R_6.
     R_r = {1 + 2*r, 2 + 2*r}.
     Variables:
@@ -619,10 +619,9 @@ def validate_cesarz_woldar_coordinates_and_2paths() -> Dict[str, Any]:
 
 def validate_relaxed_z7_consistency() -> Dict[str, Any]:
     """
-    Validates that relaxing the unsatisfiable global parameter mu=2 in Z_7
-    (by compiling internal valence AMO cuts, all 84 coordinate constraints,
-    and Crawford lex-leader cuts) results in a fully SATISFIABLE instance
-    where every single clause is satisfied with zero violations.
+    Explores a selected relaxed Z_7 subsystem
+    (internal valence AMO cuts, coordinate constraints, and Crawford lex-leader cuts)
+    that admits a satisfying assignment with zero clause violations.
     """
     t0 = time.time()
     compiler = ConwayZ7CanonicalCompiler(enable_lex=True)
@@ -658,9 +657,8 @@ def validate_relaxed_z7_consistency() -> Dict[str, Any]:
 
 def validate_relaxed_z7_mu_bound(max_pairs: int = 50) -> Dict[str, Any]:
     """
-    Validates that relaxing the global SRG common neighbor constraint to
-    an upper bound (mu <= 2 and lambda <= 1 via CardEnc.atmost) is SATISFIABLE
-    with zero clause violations.
+    Explores a selected Z_7 subsystem with relaxed common-neighbor bounds
+    (mu <= 2 and lambda <= 1 via CardEnc.atmost) and checks zero clause violations.
     """
     t0 = time.time()
     compiler = ConwayZ7CanonicalCompiler(enable_lex=False)
@@ -720,8 +718,8 @@ def validate_relaxed_z7_mu_bound(max_pairs: int = 50) -> Dict[str, Any]:
 
 def validate_relaxed_z3_fpf_consistency() -> Dict[str, Any]:
     """
-    Validates Z_3 Fixed-Point-Free (fpf) under degree regularity (k=14),
-    global modular parity cut (sum t_p = 0 mod 3), and canonical orbit ordering.
+    Explores a selected Z_3 fixed-point-free subsystem under degree regularity,
+    a modular parity cut, and canonical orbit ordering.
     """
     t0 = time.time()
     compiler = ConwayZ3FPFCanonicalCompiler(num_orbits=33, enable_modular=True, enable_orbit_order=True)
@@ -785,39 +783,17 @@ def validate_relaxed_z3_fixed3_consistency() -> Dict[str, Any]:
 
 def validate_relaxed_z2_f1_consistency() -> Dict[str, Any]:
     """
-    Validates Z_2 (f=1) under zero internal edges, regularity degree 12 in Gamma_2,
-    and unique K_{2,2} partner constraints.
+    Explores a selected Z_2 (f=1) local subsystem; this does not resolve the open case.
     """
     t0 = time.time()
     compiler = z2_model.ConwayZ2F1Compiler()
-
-    # 1. Zero internal edges
-    for p in range(42):
-        compiler.cnf.append([-compiler.var_id(p, p)])
-
-    # 2. Regularity degree 12 in Gamma_2
-    for p in range(42):
-        lits = [compiler.var_id(p, q) for q in range(42) if q != p] + \
-               [compiler.var_id(q, p) for q in range(42) if q != p]
-        card = CardEnc.equals(lits=lits, bound=12, top_id=compiler.top_id, encoding=EncType.seqcounter)
-        compiler.top_id = card.nv
-        compiler.cnf.extend(card.clauses)
-
-    # 3. Unique K_{2,2} partner for each orbit
-    for p in range(42):
-        lits = [compiler.get_and_var(compiler.var_id(min(p, q), max(p, q)),
-                                      compiler.var_id(max(p, q), min(p, q)))
-                for q in range(42) if q != p]
-        card = CardEnc.equals(lits=lits, bound=1, top_id=compiler.top_id, encoding=EncType.seqcounter)
-        compiler.top_id = card.nv
-        compiler.cnf.extend(card.clauses)
-
+    compiler.build_local_constraints()
     num_clauses = len(compiler.cnf.clauses)
     num_vars = compiler.top_id
 
     with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
         sat = solver.solve()
-        assert sat, "Relaxed Z_2 (f=1) CNF must be SATISFIABLE!"
+        assert sat, "Selected Z_2 (f=1) subsystem must be SATISFIABLE!"
         model = set(solver.get_model())
 
     violations = sum(1 for cl in compiler.cnf.clauses if not any(l in model for l in cl))
@@ -825,7 +801,7 @@ def validate_relaxed_z2_f1_consistency() -> Dict[str, Any]:
     elapsed = time.time() - t0
 
     return {
-        "system": "Z_2 (f=1) Relaxed (Zero Internal Edges + Degree 12 + K_2,2 Partner)",
+        "system": "Z_2 (f=1) Selected Local Subsystem",
         "sat": True,
         "clauses": num_clauses,
         "variables": num_vars,
@@ -853,13 +829,13 @@ def main():
     print("-" * 80)
 
     # Paley(9) = srg(9, 4, 1, 2) under Z_3
-    print("1.1 Paley(9) = srg(9, 4, 1, 2) under Z_3 (identical lambda=1, mu=2 as Conway-99)...")
+    print("1.1 Paley(9) = srg(9, 4, 1, 2) under Z_3 (standalone experimental positive control)...")
     enc_paley = SRGBlockCirculantEncoder(m=3, q=3, k=4, lam=1, mu=2)
     enc_paley.build_cnf()
     sat, A_paley, diag_paley = enc_paley.solve()
     print(f"    Verdict: {'SATISFIABLE' if sat else 'UNSATISFIABLE'} in {diag_paley['solve_time']:.3f}s | "
           f"Vars: {diag_paley['variables']} | Clauses: {diag_paley['clauses']}")
-    print(f"    Graph: v={diag_paley['v']}, k={diag_paley['k']}, lambda={diag_paley['lambda']}, mu={diag_paley['mu']} -> VERIFIED PROVED")
+    print(f"    Graph: v={diag_paley['v']}, k={diag_paley['k']}, lambda={diag_paley['lambda']}, mu={diag_paley['mu']} -> COMPILED")
 
     # Petersen = srg(10, 3, 0, 1) under Z_5
     print("1.2 Petersen = srg(10, 3, 0, 1) under Z_5...")
@@ -868,10 +844,10 @@ def main():
     sat, A_petersen, diag_petersen = enc_petersen.solve()
     print(f"    Verdict: {'SATISFIABLE' if sat else 'UNSATISFIABLE'} in {diag_petersen['solve_time']:.3f}s | "
           f"Vars: {diag_petersen['variables']} | Clauses: {diag_petersen['clauses']}")
-    print(f"    Graph: v={diag_petersen['v']}, k={diag_petersen['k']}, lambda={diag_petersen['lambda']}, mu={diag_petersen['mu']} -> VERIFIED PROVED")
+    print(f"    Graph: v={diag_petersen['v']}, k={diag_petersen['k']}, lambda={diag_petersen['lambda']}, mu={diag_petersen['mu']} -> COMPILED")
 
-    # 2. Planted 1-Factor on Gamma_1(x_0)
-    print("\n[PART 2] Planted 1-Factor M_{7K_2} on Gamma_1(x_0)")
+    # 2. Experimental isolated toy-model checks
+    print("\n[PART 2] Experimental isolated toy-model checks for M_{7K_2}")
     print("-" * 80)
 
     # Z_7 Gamma_1
@@ -881,7 +857,7 @@ def main():
     planted_z7 = z7_g1.get_planted_matching_assignment()
     eval_z7 = z7_g1.evaluate_clauses(planted_z7)
     print(f"    Planted matching M_{{7K_2}}: {eval_z7['satisfied']}/{eval_z7['total_clauses']} clauses satisfied | "
-          f"Violations: {eval_z7['violations']} -> VERIFIED PROVED")
+          f"Violations: {eval_z7['violations']} -> COMPILED")
 
     # Z_2 f=1 Gamma_1
     print("2.2 Z_2 (f=1) Gamma_1(x_0) (7 orbits of length 2)...")
@@ -890,19 +866,19 @@ def main():
     planted_z2 = z2_g1.get_planted_matching_assignment()
     eval_z2 = z2_g1.evaluate_clauses(planted_z2)
     print(f"    Planted matching M_{{7K_2}}: {eval_z2['satisfied']}/{eval_z2['total_clauses']} clauses satisfied | "
-          f"Violations: {eval_z2['violations']} -> VERIFIED PROVED")
+          f"Violations: {eval_z2['violations']} -> COMPILED")
 
     # Z_3 Fixed-3 Planted Matchings
     print("2.3 Z_3 Fixed-3 Planted 1-Factors (N_0, N_1, N_2)...")
     res_z3_fix = validate_z3_fixed3_planted_matching()
     print(f"    Planted matchings 6*K_2: {res_z3_fix['satisfied']}/{res_z3_fix['fixed_clauses']} clauses satisfied | "
-          f"Violations: {res_z3_fix['violations']} -> VERIFIED PROVED")
+          f"Violations: {res_z3_fix['violations']} -> COMPILED")
 
     # Z_2 f=1 Compatibility
     print("2.4 Z_2 (f=1) Gamma_1 - Gamma_2 Compatibility (588 constraints)...")
     res_z2_compat = validate_z2_f1_gamma1_compatibility()
     print(f"    2-Design C C^T = 10*I + 2*J: {res_z2_compat['cct_verified']} | "
-          f"Matching pairs: {res_z2_compat['matching_pairs']} -> VERIFIED PROVED")
+          f"Matching pairs: {res_z2_compat['matching_pairs']} -> COMPILED")
 
     # 3. Planted Cesarz-Woldar 2-Paths
     print("\n[PART 3] Planted Cesarz-Woldar Coordinate 2-Paths in Z_7")
@@ -911,7 +887,7 @@ def main():
     print(f"    Gamma_2 vertices: {cw_diag['num_vertices_g2']} | Gamma_1 non-edges: {cw_diag['gamma1_non_edges']} (Exact Bijection)")
     print(f"    Coordinate regularity: each coordinate appears in {cw_diag['coord_regularity']} vertices")
     print(f"    Quotient matrix C: row sum = {cw_diag['c_matrix_row_sum']}, trace = {cw_diag['trace_c']}")
-    print(f"    Target matrix T: row sum = {cw_diag['t_matrix_row_sum']}, trace = {cw_diag['trace_t']} -> VERIFIED PROVED")
+    print(f"    Target matrix T: row sum = {cw_diag['t_matrix_row_sum']}, trace = {cw_diag['trace_t']} -> COMPILED")
 
     # 4. Relaxed Feasibility Consistency
     print("\n[PART 4] Relaxed Feasibility Consistency Checks")
@@ -920,30 +896,30 @@ def main():
     # Z_7 Relaxed
     res_z7 = validate_relaxed_z7_consistency()
     print(f"4.1 {res_z7['system']}:")
-    print(f"    SAT={res_z7['sat']} in {res_z7['elapsed_seconds']:.3f}s | Clauses={res_z7['clauses']:,} | Violations={res_z7['violations']} -> COMPILED")
+    print(f"    SAT={res_z7['sat']} in {res_z7['elapsed_seconds']:.3f}s | Clauses={res_z7['clauses']:,} | Violations={res_z7['violations']} -> EXPLORED")
 
     # Z_7 mu <= 2
     res_z7_mu = validate_relaxed_z7_mu_bound(max_pairs=50)
     print(f"4.2 {res_z7_mu['system']}:")
-    print(f"    SAT={res_z7_mu['sat']} in {res_z7_mu['elapsed_seconds']:.3f}s | Clauses={res_z7_mu['clauses']:,} | Violations={res_z7_mu['violations']} -> COMPILED")
+    print(f"    SAT={res_z7_mu['sat']} in {res_z7_mu['elapsed_seconds']:.3f}s | Clauses={res_z7_mu['clauses']:,} | Violations={res_z7_mu['violations']} -> EXPLORED")
 
     # Z_3 FPF Relaxed
     res_z3_fpf = validate_relaxed_z3_fpf_consistency()
     print(f"4.3 {res_z3_fpf['system']}:")
-    print(f"    SAT={res_z3_fpf['sat']} in {res_z3_fpf['elapsed_seconds']:.3f}s | Clauses={res_z3_fpf['clauses']:,} | Violations={res_z3_fpf['violations']} -> COMPILED")
+    print(f"    SAT={res_z3_fpf['sat']} in {res_z3_fpf['elapsed_seconds']:.3f}s | Clauses={res_z3_fpf['clauses']:,} | Violations={res_z3_fpf['violations']} -> EXPLORED")
 
     # Z_3 Fixed-3 Relaxed
     res_z3_fixed3 = validate_relaxed_z3_fixed3_consistency()
     print(f"4.4 {res_z3_fixed3['system']}:")
-    print(f"    SAT={res_z3_fixed3['sat']} in {res_z3_fixed3['elapsed_seconds']:.3f}s | Clauses={res_z3_fixed3['clauses']:,} | Violations={res_z3_fixed3['violations']} -> COMPILED")
+    print(f"    SAT={res_z3_fixed3['sat']} in {res_z3_fixed3['elapsed_seconds']:.3f}s | Clauses={res_z3_fixed3['clauses']:,} | Violations={res_z3_fixed3['violations']} -> EXPLORED")
 
     # Z_2 f=1 Relaxed
     res_z2 = validate_relaxed_z2_f1_consistency()
     print(f"4.5 {res_z2['system']}:")
-    print(f"    SAT={res_z2['sat']} in {res_z2['elapsed_seconds']:.3f}s | Clauses={res_z2['clauses']:,} | Violations={res_z2['violations']} -> COMPILED")
+    print(f"    SAT={res_z2['sat']} in {res_z2['elapsed_seconds']:.3f}s | Clauses={res_z2['clauses']:,} | Violations={res_z2['violations']} -> EXPLORED")
 
     print("\n" + "=" * 80)
-    print("ALL POSITIVE CONTROLS & PLANTED SUBSTRUCTURE VALIDATIONS PASSED.")
+    print("Selected positive-control and subsystem checks completed.")
     print("=" * 80)
 
 

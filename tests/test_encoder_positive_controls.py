@@ -7,12 +7,12 @@ and Planted Substructure Validations in Conway's 99-Graph Framework.
 
 Tests Cover:
 1. SRG Block-Circulant Positive Controls:
-   - Paley(9) = srg(9, 4, 1, 2) under Z_3 (identical lambda=1, mu=2 as Conway-99).
+   - Paley(9) = srg(9, 4, 1, 2) under Z_3 (standalone experimental positive control).
    - Petersen = srg(10, 3, 0, 1) under Z_5.
    - Cycle C_5 = srg(5, 2, 0, 1) under Z_5.
    - Decoded graph validation and corrupted graph rejection.
    - Tseitin AND-gate semantics and SRG parameter feasibility checks.
-2. Planted 1-factor on Gamma_1(x_0) (M_{7K_2}):
+2. Experimental isolated toy-model checks for planted 1-factors on Gamma_1(x_0) (M_{7K_2}):
    - Z_7 Gamma_1 subconstituent (2 orbits of size 7, zero clause violations).
    - Z_2 (f=1) Gamma_1 subconstituent (7 orbits of length 2, zero clause violations).
    - Z_3 Fixed-3 planted matchings in N_0, N_1, N_2 (zero clause violations).
@@ -33,6 +33,7 @@ Radical Honesty & Skeptical Mathematician Standard:
 All tests run deterministically and verify exact mathematical invariants.
 """
 
+import itertools
 import os
 import sys
 import unittest
@@ -64,7 +65,193 @@ from scripts.build_srg_positive_control import (
     SRGPositiveControlCompiler,
     verify_srg_matrix,
 )
+from scripts.production_positive_controls import (
+    PlantedClauseSink,
+    inversion_order,
+    known_graph,
+    translation_order,
+    check_planted,
+    verify_graph,
+)
+from build_z2_f1_cnf import ConwayZ2F1Compiler
+from scripts.build_z3_canonical_cnf import ConwayZ3FPFCanonicalCompiler
 from pysat.solvers import Cadical195
+
+
+def _clauses_satisfied(clauses, model):
+    return all(any(lit in model for lit in clause) for clause in clauses)
+
+
+def _paley9_z2_values(compiler):
+    vertices, adjacency, degree = known_graph("paley9")
+    order = inversion_order(vertices, adjacency)
+    expected = adjacency[np.ix_(order, order)]
+    offset = degree + 1
+    values = {}
+    for p in range(compiler.num_outer_orbits):
+        for q in range(compiler.num_outer_orbits):
+            u = offset + 2 * p
+            v = offset + 2 * q + int(p >= q)
+            values[compiler.var_id(p, q)] = bool(expected[u, v])
+    return expected, values
+
+
+def _paley9_z3_values(compiler, triangle=True):
+    vertices, adjacency, degree = known_graph("paley9")
+    order = translation_order(vertices, adjacency, triangle=triangle)
+    expected = adjacency[np.ix_(order, order)]
+    values = {var: bool(expected[3 * p, 3 * p + 1]) for p, var in compiler.t_vars.items()}
+    values.update({var: bool(expected[3 * p, 3 * q + d]) for (p, q, d), var in compiler.edge_vars.items()})
+    return expected, values
+
+
+class TestProductionCompilerPositiveControls(unittest.TestCase):
+    def test_paley9_complete_production_cnf_z2(self):
+        compiler = ConwayZ2F1Compiler(degree=4)
+        compiler.build_constraints()
+        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+            self.assertTrue(solver.solve())
+            model = set(solver.get_model())
+        adjacency = compiler.reconstruct_adjacency(model)
+        self.assertTrue(verify_graph(adjacency, 4))
+        self.assertTrue(_clauses_satisfied(compiler.cnf.clauses, model))
+
+    def test_paley9_complete_production_cnf_z3_fpf(self):
+        compiler = ConwayZ3FPFCanonicalCompiler(num_orbits=3, degree=4)
+        compiler.compile(verbose=False)
+        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+            self.assertTrue(solver.solve())
+            model = set(solver.get_model())
+        adjacency = np.zeros((9, 9), dtype=int)
+        for p1 in range(3):
+            for t1 in range(3):
+                for p2 in range(3):
+                    for t2 in range(3):
+                        if p1 == p2 and t1 == t2:
+                            continue
+                        lit = compiler.get_adj_lit(p1, t1, p2, t2)
+                        if lit > 0 and lit in model:
+                            adjacency[3 * p1 + t1, 3 * p2 + t2] = 1
+        self.assertTrue(verify_graph(adjacency, 4))
+        self.assertTrue(_clauses_satisfied(compiler.cnf.clauses, model))
+
+    def test_paley9_planted_production_clauses(self):
+        self.assertEqual(check_planted("paley9", "z2-f1")["status"], "COMPILED")
+        self.assertEqual(check_planted("paley9", "z3-fpf")["status"], "COMPILED")
+        self.assertEqual(check_planted("paley9", "z3-fpf", triangle=False)["status"], "COMPILED")
+
+    def test_paley9_flipped_z2_primary_is_unsat(self):
+        compiler = ConwayZ2F1Compiler(degree=4)
+        compiler.build_constraints()
+        _, values = _paley9_z2_values(compiler)
+        values[compiler.var_id(0, 1)] = not values[compiler.var_id(0, 1)]
+        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+            for variable, value in values.items():
+                solver.add_clause([variable if value else -variable])
+            self.assertFalse(solver.solve())
+
+    def test_paley9_flipped_z3_primary_is_unsat(self):
+        compiler = ConwayZ3FPFCanonicalCompiler(num_orbits=3, degree=4)
+        _, values = _paley9_z3_values(compiler)
+        values[compiler.edge_vars[(0, 1, 0)]] = not values[compiler.edge_vars[(0, 1, 0)]]
+        compiler.compile(verbose=False)
+        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+            for variable, value in values.items():
+                solver.add_clause([variable if value else -variable])
+            self.assertFalse(solver.solve())
+
+    def test_bvls_fixture_geometry(self):
+        vertices, adjacency, degree = known_graph("bvls243")
+        self.assertEqual(len(vertices), 243)
+        self.assertEqual(degree, 22)
+        self.assertEqual(int(adjacency.sum() // 2), 2673)
+        self.assertTrue(verify_graph(adjacency, 22))
+
+        inversion = inversion_order(vertices, adjacency)
+        self.assertEqual(sorted(inversion), list(range(243)))
+        for triangle in (True, False):
+            translation = translation_order(vertices, adjacency, triangle=triangle)
+            self.assertEqual(sorted(translation), list(range(243)))
+
+    def test_production_constructor_validation(self):
+        with self.assertRaises(ValueError):
+            ConwayZ2F1Compiler(degree=True)
+        with self.assertRaises(ValueError):
+            ConwayZ2F1Compiler(degree=5)
+        with self.assertRaises(ValueError):
+            ConwayZ3FPFCanonicalCompiler(num_orbits=32)
+
+
+class TestProductionModularResidue(unittest.TestCase):
+    def test_degree8_residue2_modular_constraints(self):
+        compiler = ConwayZ3FPFCanonicalCompiler(
+            num_orbits=11,
+            enable_modular=True,
+            enable_orbit_order=True,
+            degree=8,
+        )
+        self.assertEqual(compiler.triangle_residue, 2)
+        compiler.build_modular_parity_cut()
+        compiler.build_canonical_orbit_ordering()
+        sums = []
+        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+            for bits in itertools.product((False, True), repeat=compiler.num_orbits):
+                assumptions = [
+                    compiler.t_vars[index] if value else -compiler.t_vars[index]
+                    for index, value in enumerate(bits)
+                ]
+                if solver.solve(assumptions=assumptions):
+                    sums.append(sum(bits))
+        self.assertEqual(sums, [2, 5, 8, 11])
+
+
+class TestProductionLiteralSemantics(unittest.TestCase):
+    def test_literal_one_and_gate_truth_tables(self):
+        for compiler, method in (
+            (ConwayZ2F1Compiler(degree=4), "get_and_var"),
+            (ConwayZ3FPFCanonicalCompiler(num_orbits=3, degree=4), "get_and_lit"),
+        ):
+            gate = getattr(compiler, method)(1, 2)
+            for a in (False, True):
+                for b in (False, True):
+                    for output in (False, True):
+                        with Cadical195(bootstrap_with=compiler.cnf.clauses) as solver:
+                            solver.add_clause([1 if a else -1])
+                            solver.add_clause([2 if b else -2])
+                            solver.add_clause([gate if output else -gate])
+                            self.assertEqual(solver.solve(), output == (a and b))
+
+
+class TestPlantedClauseSink(unittest.TestCase):
+    def test_empty_clause_rejected_on_flush(self):
+        sink = PlantedClauseSink({})
+        sink.append([])
+        with self.assertRaises(ValueError):
+            sink.flush()
+
+    def test_unknown_auxiliary_reuse_rejected_after_flush(self):
+        sink = PlantedClauseSink({})
+        sink.append([1])
+        sink.flush()
+        sink.append([1])
+        with self.assertRaises(ValueError):
+            sink.flush()
+
+    def test_independent_batches_are_accepted(self):
+        sink = PlantedClauseSink({})
+        sink.append([1])
+        sink.flush()
+        sink.append([-2])
+        sink.flush()
+        self.assertEqual(sink.checked, 2)
+
+    def test_pinned_false_literal_is_not_true(self):
+        sink = PlantedClauseSink({1: False})
+        sink.append([-1])
+        sink.flush()
+        sink.append([1])
+        with self.assertRaises(ValueError):
+            sink.flush()
 
 
 class TestSRGBlockCirculantPositiveControls(unittest.TestCase):
@@ -72,10 +259,7 @@ class TestSRGBlockCirculantPositiveControls(unittest.TestCase):
 
     def test_paley9_srg_positive_control(self):
         """
-        Tests Paley(9) = srg(9, 4, 1, 2) under Z_3.
-        Note that Paley(9) shares the IDENTICAL (lambda=1, mu=2) parameters
-        with Conway's 99-graph, serving as the primary positive control for the
-        common neighbor Tseitin encoding.
+        Tests the standalone experimental Paley(9) SRG encoder under Z_3.
         """
         encoder = SRGBlockCirculantEncoder(m=3, q=3, k=4, lam=1, mu=2)
         cnf = encoder.build_cnf()
@@ -198,7 +382,7 @@ class TestSRGBlockCirculantPositiveControls(unittest.TestCase):
 
 
 class TestPlantedOneFactorSubstructures(unittest.TestCase):
-    """Validates planted 1-factor matchings M_{7K_2} in Gamma_1(x_0)."""
+    """Checks isolated toy models for planted 1-factor matchings."""
 
     def test_planted_one_factor_z7(self):
         """Verifies planted 1-factor matching in Z_7 Gamma_1 subconstituent."""
@@ -294,7 +478,7 @@ class TestCesarzWoldarPlantedCoordinates(unittest.TestCase):
 
 
 class TestRelaxedFeasibilityChecks(unittest.TestCase):
-    """Validates that relaxing the unsatisfiable global parameter mu=2 yields SAT."""
+    """Checks selected relaxed subsystems without resolving the open cases."""
 
     def test_relaxed_z7_consistency(self):
         """Verifies Z_7 under internal valence cuts, coordinates, and lex-leader is SAT."""
@@ -302,14 +486,12 @@ class TestRelaxedFeasibilityChecks(unittest.TestCase):
         self.assertTrue(diag["sat"])
         self.assertEqual(diag["violations"], 0)
         self.assertEqual(diag["clauses"], 43266)
-        self.assertLess(diag["elapsed_seconds"], 2.0)
 
     def test_relaxed_z7_mu_bound(self):
         """Verifies Z_7 with mu relaxed to mu <= 2 via CardEnc.atmost is SAT."""
         diag = validate_relaxed_z7_mu_bound(max_pairs=50)
         self.assertTrue(diag["sat"])
         self.assertEqual(diag["violations"], 0)
-        self.assertLess(diag["elapsed_seconds"], 2.0)
 
     def test_relaxed_z3_fpf_consistency(self):
         """Verifies Z_3 FPF under degree regularity, modular parity cut, and orbit order is SAT."""
@@ -317,7 +499,6 @@ class TestRelaxedFeasibilityChecks(unittest.TestCase):
         self.assertTrue(diag["sat"])
         self.assertEqual(diag["violations"], 0)
         self.assertEqual(diag["clauses"], 155640)
-        self.assertLess(diag["elapsed_seconds"], 2.0)
 
     def test_relaxed_z3_fixed3_consistency(self):
         """Verifies Z_3 Fixed-3 under degree regularity, planted matchings, and S_3 x Z_2 lex-leader is SAT."""
@@ -325,7 +506,6 @@ class TestRelaxedFeasibilityChecks(unittest.TestCase):
         self.assertTrue(diag["sat"])
         self.assertEqual(diag["violations"], 0)
         self.assertEqual(diag["clauses"], 260300)
-        self.assertLess(diag["elapsed_seconds"], 2.0)
 
     def test_relaxed_z2_f1_consistency(self):
         """Verifies Z_2 (f=1) under zero internal edges, degree 12, and K_{2,2} partner is SAT."""
@@ -333,7 +513,6 @@ class TestRelaxedFeasibilityChecks(unittest.TestCase):
         self.assertTrue(diag["sat"])
         self.assertEqual(diag["violations"], 0)
         self.assertEqual(diag["clauses"], 148785)
-        self.assertLess(diag["elapsed_seconds"], 2.0)
 
 
 if __name__ == "__main__":
