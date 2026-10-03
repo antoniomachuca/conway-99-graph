@@ -80,3 +80,7 @@ Thumbs.db
 # Scratch images
 *.png
 
+# Submission cover letters (stored outside repository)
+cover_letter*
+manuscript/cover_letter*
+
