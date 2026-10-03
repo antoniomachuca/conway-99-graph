@@ -14,3 +14,5 @@ import Conway.ParityRigidity
 import Conway.GrandClassification
 import Conway.Structural
 import Conway.TestMatrix
+import Conway.TestOrbitQuotient
+import Conway.TestZ7Canonical

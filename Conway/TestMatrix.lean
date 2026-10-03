@@ -72,9 +72,9 @@ def testA : Matrix99 Nat := fun _ _ => 0
 #print axioms trace_sum_candidates
 #print axioms unique_multiplicity_of_zero_trace
 #print axioms unique_spectrum_of_zero_trace
-#print axioms z7_orbit_unique_spectrum_of_lemma_4_12
+#print axioms z7_orbit_multiplicities_of_zero_diagonal
 #print axioms z7_orbit_spectrum_trace_equation
-#print axioms z7_orbit_spectrum_forced_by_lemma_4_12
+#print axioms z7_orbit_multiplicities_given_zero_diagonal
 
 -- Z_7 Non-Existence and Orbit Reduction (Conway/Z7NonExistence.lean)
 #print axioms hasZ7Symmetry_iff

@@ -20,22 +20,24 @@
      - Row sum regularity: ∑_j B_{ij} = k = 14.
      - Degree-weighted symmetry: n_i B_{ij} = n_j B_{ji}.
      - Strongly regular quotient equation: (B^2)_{ij} + B_{ij} = 12 δ_{ij} + 2 n_j.
-     - Diagonal parity: B_{ii} ∈ {0, 2} for all i.
+     - Diagonal parity is encoded as B_{ii} ∈ {0, 2}; all-zero diagonal is an extra hypothesis, not a generic Z_7 consequence.
      - Orbit 0 (fixed vertex): B_{00} = 0, B_{01} = 7, B_{02} = 7, B_{0j} = 0 for j ≥ 3.
      - Orbits 1, 2 (subgraph Γ_1): B_{11} = 0, B_{22} = 0, B_{12} = 1, B_{21} = 1.
 
-  3. Spectral Trace Theorem:
+  3. Spectral Trace Background (not derived here):
      The spectrum of the full adjacency matrix is {14^1, 3^54, (-4)^44}.
-     The characteristic polynomial of B divides that of A, so the spectrum of B
-     is {14^1, 3^a, (-4)^(14-a)} for some integer a with 0 ≤ a ≤ 14.
+     For an invariant-subspace restriction, the characteristic polynomial of B divides
+     that of A; the derivation of this restriction is not formalized here. Thus the
+     displayed spectrum of B is background, not a theorem of this file.
      - Spectral trace: Tr(B) = 14 + 3a - 4(14 - a) = 7a - 42.
      - Topological trace: Tr(B) = ∑_{i=0}^14 B_{ii}.
      - Since B_{00} = 0, B_{11} = 0, B_{22} = 0: Tr(B) = ∑_{i=3}^14 B_{ii}.
-     - Under Lemma 4.12 (all B_{ii} = 0): 7a - 42 = 0 ⟹ 7a = 42 ⟹ a = 6,
-       uniquely forcing the spectrum {14^1, 3^6, (-4)^8}.
+     - Under the additional all-zero-diagonal hypothesis: 7a - 42 = 0 ⟹ 7a = 42 ⟹ a = 6,
+       conditionally forcing the multiplicities {14^1, 3^6, (-4)^8}.
 
-  All theorems in this file are proved with 0 sorry, 0 sorryAx,
+  The formal arithmetic lemmas in this file use 0 sorry and 0 sorryAx,
   and depend exclusively on standard Lean 4 axioms [propext, Quot.sound].
+  They do not by themselves prove a graph spectrum.
 -/
 
 import Conway.Basic
@@ -86,13 +88,15 @@ def diagSumGamma2 (B : Fin 15 → Fin 15 → Nat) : Nat :=
 
 /-! ## 3. Definition of the Z_7 Orbit Quotient Matrix Structure -/
 
+def z7OuterLeftCount (i : Fin 15) : Nat :=
+  if i.val < 6 then 2 else if i.val < 9 then 0 else 1
+
 /--
   The 15x15 Orbit Quotient Matrix structure for Conway-99 under Z_7.
-  Encodes all algebraic and combinatorial parameters of srg(99, 14, 1, 2)
-  condensed by the action of an automorphism of order 7.
+  Records necessary quotient constraints; these are not sufficient for a graph lift.
 -/
 structure Z7OrbitMatrix where
-  /-- Matrix entries representing average edge counts from orbit i to orbit j. -/
+  /-- Matrix entries representing neighbor counts from a vertex in orbit i to orbit j. -/
   B : Fin 15 → Fin 15 → Nat
   /-- Row sum regularity: each vertex in orbit i has degree k = 14. -/
   row_sum : ∀ i : Fin 15, rowSum15 B i = 14
@@ -107,6 +111,14 @@ structure Z7OrbitMatrix where
   /-- Orbits 1 and 2 are in Γ_1(x_0): no internal edges, B_{11} = 0 and B_{22} = 0. -/
   diag_one : B 1 1 = 0
   diag_two : B 2 2 = 0
+  entry_bound : ∀ i j : Fin 15, B i j ≤ z7OrbitSizes j
+  outer_bound : ∀ i j : Fin 15, 3 ≤ i.val → 3 ≤ j.val → B i j ≤ 4
+  root_row : ∀ j : Fin 15, B 0 j = if j = 1 ∨ j = 2 then 7 else 0
+  root_column : ∀ i : Fin 15, B i 0 = if i = 1 ∨ i = 2 then 1 else 0
+  matching_forward : B 1 2 = 1
+  matching_backward : B 2 1 = 1
+  outer_left : ∀ i : Fin 15, 3 ≤ i.val → B i 1 = z7OuterLeftCount i
+  outer_right : ∀ i : Fin 15, 3 ≤ i.val → B i 2 = 2 - z7OuterLeftCount i
 
 /-! ## 4. Trace Splitting and Foldl Lemmas -/
 
@@ -195,8 +207,8 @@ theorem spectral_trace_eq (a : Int) :
   omega
 
 /--
-  Spectral trace theorem:
-  Equating the spectral trace to the topological trace when B_{00} = B_{11} = B_{22} = 0
+  Conditional spectral trace arithmetic:
+  Given an assumed spectral balance and B_{00} = B_{11} = B_{22} = 0,
   yields 7a - 42 = ∑_{i=3}^14 B_{ii}.
 -/
 theorem z7_orbit_spectral_trace_eq_diagSum (B : Fin 15 → Fin 15 → Nat) (a : Int)
@@ -249,13 +261,11 @@ theorem unique_spectrum_of_zero_trace (a : Int)
   decide
 
 /--
-  Theorem (Cesarz & Woldar 2025, Lemma 4.12):
-  If all internal orbit degrees are zero (B_{ii} = 0 for all i),
-  then the spectral trace equation forces uniquely:
-  a = 6 (multiplicity of 3) and 14 - a = 8 (multiplicity of -4).
-  Unique spectrum: {14^1, 3^6, (-4)^8}.
+  Conditional arithmetic lemma:
+  Given an all-zero-diagonal hypothesis and an assumed spectral balance,
+  the trace equation forces a = 6 and 14 - a = 8.
 -/
-theorem z7_orbit_unique_spectrum_of_lemma_4_12 (B : Fin 15 → Fin 15 → Nat) (a : Int)
+theorem z7_orbit_multiplicities_of_zero_diagonal (B : Fin 15 → Fin 15 → Nat) (a : Int)
     (h_all : ∀ i : Fin 15, B i i = 0)
     (h_bal : spectralTrace a = (topologicalTrace B : Int)) :
     a = 6 ∧ (14 - a) = 8 := by
@@ -268,8 +278,8 @@ theorem z7_orbit_unique_spectrum_of_lemma_4_12 (B : Fin 15 → Fin 15 → Nat) (
 /-! ## 6. Structural Integration with Z7OrbitMatrix -/
 
 /--
-  Spectral assignment structure for a validated Z7OrbitMatrix:
-  Associates the multiplicity `a` of eigenvalue 3 with the quotient matrix B.
+  Assumed spectral assignment for a Z7OrbitMatrix.
+  `spectral_balance` is a premise, not a derived spectral theorem.
 -/
 structure Z7OrbitSpectrum (M : Z7OrbitMatrix) (a : Int) where
   ha_bounds : 0 ≤ a ∧ a ≤ 14
@@ -282,13 +292,12 @@ theorem z7_orbit_spectrum_trace_equation (M : Z7OrbitMatrix) (a : Int)
   z7_orbit_spectral_trace_eq_diagSum M.B a M.diag_zero M.diag_one M.diag_two spec.spectral_balance
 
 /--
-  Unique spectrum theorem for a Z7OrbitMatrix satisfying Lemma 4.12:
-  The spectrum of B is uniquely forced to {14^1, 3^6, (-4)^8}.
+  Conditional multiplicity arithmetic for a Z7OrbitMatrix with an assumed all-zero diagonal.
 -/
-theorem z7_orbit_spectrum_forced_by_lemma_4_12 (M : Z7OrbitMatrix) (a : Int)
+theorem z7_orbit_multiplicities_given_zero_diagonal (M : Z7OrbitMatrix) (a : Int)
     (spec : Z7OrbitSpectrum M a)
     (h_all_zero : ∀ i : Fin 15, M.B i i = 0) :
     a = 6 ∧ (14 - a) = 8 :=
-  z7_orbit_unique_spectrum_of_lemma_4_12 M.B a h_all_zero spec.spectral_balance
+  z7_orbit_multiplicities_of_zero_diagonal M.B a h_all_zero spec.spectral_balance
 
 end Matrix99

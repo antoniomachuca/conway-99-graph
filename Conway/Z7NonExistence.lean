@@ -4,36 +4,36 @@
   ("Camino a una prueba Lean completa") for Non-Existence of Order-7 Automorphisms.
 
   Mathematical background:
-  - Behbahani & Lam (2011), "Strongly regular graphs with non-trivial automorphisms":
-    Showed that no srg(99, 14, 1, 2) admits an automorphism of order 7.
-  - Cesarz & Woldar (2025), "On the automorphism group of a Conway 99-graph":
-    Proved that any element of order 7 has a unique fixed point (Lemma 2.2),
-    inducing a 15-orbit partition with orbit sizes [1, 7, 7, ..., 7],
-    and internal orbit valencies B_{ii} = 0 (Lemma 4.12).
+  - Behbahani–Lam (2011) excludes order 7 in the literature.
+  - Cesarz–Woldar Lemma 4.12 concerns the Frob(21) section, not the general Z_7 case.
 
   Architecture of the Formal Reduction:
   1. Graph-level symmetry:
      A Conway-99 adjacency matrix A with an automorphism s of order 7.
   2. Orbit quotient reduction (`conway_z7_induces_orbit_matrix`):
-     (A, s) induces a 15x15 orbit quotient matrix M satisfying `Z7OrbitMatrix`.
+     PROVED graph-to-canonical-15-orbit construction from the explicit period-7 frame.
   3. Computational / Algebraic non-existence (`z7_orbit_matrix_nonexistence`):
-     No matrix M satisfying `Z7OrbitMatrix` exists.
+     COMPILED placeholder; general matrix refutation and certificate-to-kernel link are PENDING.
+     The legacy 296338-byte proof has extra Frob(21)-motivated restrictions and does not establish this declaration.
   4. Formal Transfer Theorem (`conway_no_z7_from_orbit_matrix_reduction`):
-     PROVED unconditionally with 0 sorry and standard axioms [propext, Quot.sound].
+     PROVED as a conditional implication. The reduction premise is proved here;
+     matrix non-existence remains PENDING.
   5. Main Non-Existence Theorem (`conway_no_z7_automorphism`):
-     Deduces the non-existence of order-7 automorphisms by combining (2), (3), and (4).
+     COMPILED; depends on the remaining matrix non-existence placeholder.
 
   Taxonomy Status:
-  - `conway_no_z7_from_orbit_matrix_reduction`: PROVED (0 sorry, [propext, Quot.sound]).
+  - `conway_no_z7_from_orbit_matrix_reduction`: PROVED as a conditional implication.
   - `hasZ7Symmetry_iff`: PROVED (0 sorry, [propext, Quot.sound]).
-  - `conway_z7_induces_orbit_matrix`: COMPILED (pending kernel-verified equitable partition construction).
-  - `z7_orbit_matrix_nonexistence`: COMPILED (verified by SAT/SMT search; DRAT certificate generated).
-  - `conway_no_z7_automorphism`: COMPILED (transitive sorryAx via reduction and matrix non-existence).
-  Zero hidden axioms.
+  - `conway_z7_induces_orbit_matrix`: PROVED graph-to-canonical-15-orbit construction.
+  - `z7_orbit_matrix_nonexistence`: COMPILED placeholder; general refutation and certificate link PENDING.
+  - `conway_no_z7_automorphism`: COMPILED and depends on sorryAx through matrix non-existence.
 -/
 
 import Conway.Matrix
 import Conway.Z7OrbitMatrix
+import Conway.OrbitQuotient
+import Conway.Z7GraphFrame
+import Conway.Z7RootedConstruction
 
 namespace Matrix99
 
@@ -74,6 +74,7 @@ theorem hasZ7Symmetry_iff :
   dsimp [HasZ7Symmetry, IsZ7Automorphism]
   rfl
 
+
 /-! ## 2. Formal Transfer Theorem (Camino a una prueba Lean completa) -/
 
 /--
@@ -83,13 +84,41 @@ theorem hasZ7Symmetry_iff :
 def HasZ7OrbitMatrix : Prop :=
   Nonempty Z7OrbitMatrix
 
+def z7EquitableData (A : Matrix99 Nat) (s : Fin 99 → Fin 99)
+    (hs : IsZ7Automorphism A s) : ConwayOrbit.EquitableData A :=
+  ConwayOrbit.cyclicEquitableData 7 (by decide) A s hs.2.1 hs.2.2.2
+
+theorem conway_z7_quotient_row_sum (A : Matrix99 Nat) (hA : ConwayAdj A)
+    (s : Fin 99 → Fin 99) (hs : IsZ7Automorphism A s) (i : Fin 99) :
+    ConwayOrbit.sumFin ((z7EquitableData A s hs).entry i) =
+      if (z7EquitableData A s hs).label i = i then 14 else 0 :=
+  (z7EquitableData A s hs).row_sum 14 (conway_row_sum A hA) i
+
+theorem conway_z7_quotient_weighted_symmetry (A : Matrix99 Nat) (hA : ConwayAdj A)
+    (s : Fin 99 → Fin 99) (hs : IsZ7Automorphism A s) (i j : Fin 99) :
+    ConwayOrbit.fiberSize (z7EquitableData A s hs).label i * (z7EquitableData A s hs).entry i j =
+      ConwayOrbit.fiberSize (z7EquitableData A s hs).label j * (z7EquitableData A s hs).entry j i :=
+  (z7EquitableData A s hs).weighted_symmetry hA.2.1 i j
+
+theorem conway_z7_quotient_equation (A : Matrix99 Nat) (hA : ConwayAdj A)
+    (s : Fin 99 → Fin 99) (hs : IsZ7Automorphism A s) (i j : Fin 99)
+    (hi : (z7EquitableData A s hs).label i = i) :
+    ConwayOrbit.sumFin (fun r => (z7EquitableData A s hs).entry i r * (z7EquitableData A s hs).entry r j) +
+      (z7EquitableData A s hs).entry i j =
+      12 * (if i = j then 1 else 0) + 2 * ConwayOrbit.fiberSize (z7EquitableData A s hs).label j := by
+  apply (z7EquitableData A s hs).quotient_equation 12 2
+  · intro u v
+    rw [sumFin_eq_foldl]
+    exact (hA.2.2.2 u v).trans (conway_target_formula u v)
+  · exact hi
+
 /--
   Formal Transfer Theorem ("Camino a una prueba Lean completa"):
   Reduces the global graph-level non-existence of Z_7 automorphisms to:
   1. The orbit matrix reduction (`conway_z7_induces_orbit_matrix`).
   2. The non-existence of `Z7OrbitMatrix` (`z7_orbit_matrix_nonexistence`).
 
-  Status: PROVED (0 sorry, standard foundational axioms [propext, Quot.sound]).
+  Status: PROVED as a conditional implication (0 sorry in this theorem body).
 -/
 theorem conway_no_z7_from_orbit_matrix_reduction
     (h_red : HasZ7Symmetry → HasZ7OrbitMatrix)
@@ -102,25 +131,23 @@ theorem conway_no_z7_from_orbit_matrix_reduction
 /-! ## 3. Orbit Quotient Reduction and Matrix Non-Existence -/
 
 /--
-  Theorem (Orbit Quotient Reduction for Z_7, Behbahani-Lam 2011, Cesarz-Woldar 2025):
-  If a Conway-99 graph exists with an automorphism of order 7,
-  then its vertex set partitions into 15 orbits (1 fixed vertex, 2 in Γ_1, 12 in Γ_2),
-  inducing a 15×15 orbit quotient matrix satisfying `Z7OrbitMatrix`.
-
-  Status: COMPILED (reduction from graph action to quotient matrix equations;
-  requires formalization of equitable partitions and orbit quotient projections).
+  Theorem (Orbit Quotient Reduction for Z_7).
+  The explicit period-7 graph frame yields the canonical rooted 15-orbit matrix.
 -/
 theorem conway_z7_induces_orbit_matrix :
     HasZ7Symmetry → HasZ7OrbitMatrix := by
-  sorry
+  intro h
+  obtain ⟨A, hA, s, hs⟩ := h
+  obtain ⟨frame⟩ := conway_period7_graph_frame A hA s hs.2.1 hs.2.2.2 hs.2.2.1
+  exact ⟨(rootedMatrixOfOrbitIndexing A hA s hs.2.1 hs.2.2.2
+    frame.indexing frame.root_fixed frame.unique_fixed frame.neighborhood).canonicalize⟩
 
 /--
   Theorem (Non-existence of Z7OrbitMatrix):
-  No 15×15 orbit quotient matrix satisfying the degree symmetry, row-sum,
-  diagonal parity, and strongly regular equation exists.
+  No 15×15 orbit quotient matrix satisfying the general specification exists.
 
-  Status: COMPILED (computational refutation verified via SAT/SMT;
-  certified via CaDiCaL DRAT proof checked with drat-trim).
+  Status: COMPILED placeholder; general matrix refutation and certificate-to-kernel link are PENDING.
+  The legacy 296338-byte proof has extra Frob(21)-motivated restrictions and does not establish this declaration.
 -/
 theorem z7_orbit_matrix_nonexistence :
     ¬ HasZ7OrbitMatrix := by
@@ -129,13 +156,13 @@ theorem z7_orbit_matrix_nonexistence :
 /-! ## 4. Main Non-Existence Theorem -/
 
 /--
-  Theorem (Behbahani-Lam 2011, Cesarz-Woldar 2025):
+  Theorem (Behbahani–Lam 2011):
   No strongly regular graph with parameters srg(99, 14, 1, 2)
   admits an automorphism of order 7.
 
-  Status: COMPILED (formally structured via orbit matrix reduction;
-  depends on `conway_z7_induces_orbit_matrix` and `z7_orbit_matrix_nonexistence`).
-  Directly applies the transfer theorem `conway_no_z7_from_orbit_matrix_reduction`.
+  Status: COMPILED; depends on `conway_z7_induces_orbit_matrix` and
+  `z7_orbit_matrix_nonexistence`, hence transitively depends on sorryAx.
+  Directly applies the conditional transfer theorem `conway_no_z7_from_orbit_matrix_reduction`.
 -/
 theorem conway_no_z7_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -155,12 +182,12 @@ theorem conway_no_z7_automorphism :
 /-! ## 5. Spectral Trace Contradiction Pipeline -/
 
 /--
-  Conditional refutation via spectral trace balance and Lemma 4.12:
-  If an orbit matrix M were to exist with all diagonal entries zero (Lemma 4.12),
-  and if the unique spectrum {14^1, 3^6, (-4)^8} is computationally refuted,
-  then no Z_7 automorphism can exist.
+  Conditional refutation via spectral trace balance:
+  If a reduction supplies an orbit matrix M with all diagonal entries zero,
+  and if the resulting multiplicity a = 6 spectrum is refuted,
+  then no Z_7 automorphism can exist. This assumes both the reduction and the refutation.
 
-  Status: PROVED (0 sorry, standard foundational axioms [propext, Quot.sound]).
+  Status: PROVED as a conditional implication; it is not a new unconditional result.
 -/
 theorem conway_no_z7_from_spectrum_refutation
     (h_red : HasZ7Symmetry → ∃ (M : Z7OrbitMatrix), (∀ i : Fin 15, M.B i i = 0) ∧ ∃ a : Int, Z7OrbitSpectrum M a)
@@ -169,7 +196,7 @@ theorem conway_no_z7_from_spectrum_refutation
   intro h_sym
   have ⟨M, h_diag, a, spec⟩ := h_red h_sym
   have h_forced : a = 6 ∧ (14 - a) = 8 :=
-    z7_orbit_spectrum_forced_by_lemma_4_12 M a spec h_diag
+    z7_orbit_multiplicities_given_zero_diagonal M a spec h_diag
   exact h_refute_spec ⟨M, h_diag, a, spec, h_forced.1⟩
 
 end Matrix99

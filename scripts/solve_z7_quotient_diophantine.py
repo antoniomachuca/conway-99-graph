@@ -7,9 +7,9 @@ Based on Cesarz & Woldar (2025, pp. 17-20).
 This script:
 1. Formulates the exact 2-path Diophantine system (equations 4 and 5) for the 12 orbits of Gamma_2(x_0).
 2. Computes the 12x12 coordinate intersection matrix C and the target matrix T = B^2 + B.
-3. Derives the complete spectral decomposition of T and B: Spec(B) = {12^1, 0^1, 3^4, (-4)^6}.
+3. Explores trace arithmetic under additional Frob(21) hypotheses.
 4. Analyzes the action of the symmetry group G_{Z_7} = Z_2 x Z_6 (order 12).
-5. Solves the Frob(21) (Z_3-invariant) branch, proving UNSAT in < 0.05 seconds.
+5. Solves the restricted Frob(21) branch using exploratory SMT, without DRAT certification.
 6. Documents the QF_NIA non-linear bottleneck for general Z_7, demonstrating why
    canonical Boolean SAT encoding (Front 2) is necessary for full resolution.
 """
@@ -159,9 +159,9 @@ def analyze_spectral_structure(T):
     print("  mu =  12 (mult 10) -> lambda in {3, -4} (from lambda^2 + lambda = 12)")
     print("\nSpectral condition from Cesarz & Woldar (p. 11):")
     print("  Tr(B) = 7a - 42 for a in [0, 14]")
-    print("  Since b_{ii} = 0 (Lemma 4.12), Tr(B) = 0 => a = 6.")
-    print("  Tr(B) = 12(1) + 0(1) + 3*k_3 + (-4)*(10 - k_3) = 7*k_3 - 28 = 0 => k_3 = 4, k_{-4} = 6.")
-    print("Unique spectrum of B: {12^1, 0^1, 3^4, (-4)^6}")
+    print("  Additional Frob(21) hypothesis, not assumed for general Z7: b_{ii} = 0, so Tr(B) = 0 => a = 6.")
+    print("  Under that restricted hypothesis: Tr(B) = 12(1) + 0(1) + 3*k_3 + (-4)*(10 - k_3) = 7*k_3 - 28 = 0 => k_3 = 4, k_{-4} = 6.")
+    print("Restricted Frob(21) multiplicities: {12^1, 0^1, 3^4, (-4)^6}")
     print(f"Spectral trace check: 12*1 + 0*1 + 3*4 + (-4)*6 = {12 + 12 - 24} (OK)")
 
 def main():
@@ -179,15 +179,15 @@ def main():
     print("MATHEMATICAL SUMMARY AND STATUS CLASSIFICATION")
     print("=" * 70)
     print("1. FROB(21) BRANCH:")
-    print("   - Status: PROVED (0 sorry, verified UNSAT in SMT and analytic parity).")
-    print("   - Admissible quotient matrices: 0.")
-    print("   - Implication: Conway-99 admits NO automorphism group isomorphic to Frob(21).")
+    print("   - Status: EXPLORED (uncertified SMT result for the restricted model).")
+    print("   - Admissible quotient matrices found by exploratory SMT: 0.")
+    print("   - No graph-level transfer is certified by this script.")
     print("2. PURE Z_7 BRANCH:")
     print("   - Status: EXPLORED in SMT; EXPLORED in SAT (cadical_tight.log interrupted by SIGTERM at 36,536s; no verified DRAT proof).")
     print("   - SMT QF_NIA bottleneck: solving 66 coupled quadratic equations over")
     print("     the integers produces exponential branching in SMT without conflict-driven learning.")
-    print("   - SAT status: the canonical compilation in build_z7_canonical_cnf.py preserves b_pp in {0, 2},")
-    print("     but a complete resolution of Z_7 remains EXPLORED / PENDING on disk.")
+    print("   - Not searched by this script; use solve_z7_orbit_matrix.py --model z7-general.")
+    print("     General refutation and formal transfer remain PENDING.")
     print(f"Total execution time: {time.time() - start_total:.4f} seconds (< 60s requirement met).")
 
 if __name__ == '__main__':
