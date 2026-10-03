@@ -9,21 +9,18 @@ Profiles:
 
 Theoretical Foundations:
 1. Fixed-Point-Free (fpf) Profile:
-   - 33 orbits O_0, ..., O_32 of size 3.
+   - num_orbits orbits O_0, ..., O_{num_orbits-1} of size 3.
    - Internal triangle indicator t_p in {0, 1} for each orbit.
    - Off-diagonal circulants c_{p, q, k} for p < q, k in {0, 1, 2}.
-   - Degree regularity k = 14, SRG parameters lambda = 1, mu = 2, K_4-free cuts.
+   - Degree regularity is parameterized by degree; SRG parameters lambda = 1, mu = 2, K_4-free cuts.
    - CANONICAL CUT 1: Global Modular Parity Cardinality Cut:
-       sum_{p=0}^{32} t_p \equiv 231 \equiv 0 \pmod 3.
-     Since the Conway 99-graph has exactly N_3 = (99 * 14 * 1) / 6 = 231 triangles,
-     and any fixed-point-free Z_3 automorphism fixes setwise only those triangles
-     that constitute entire vertex orbits of length 3, the number of triangle orbits
-     must be congruent to N_3 mod 3. Encoded via a compact modular adder automaton.
+       sum_p t_p is congruent to triangle_residue modulo 3.
+     For the default degree-14, 33-orbit Conway profile, triangle_residue = 0.
+     Encoded via a compact modular adder automaton.
    - CANONICAL CUT 2: Canonical Ordering of Triangular Orbits:
-       t_0 >= t_1 >= ... >= t_32.
-     Coupled with the modular cut, this locks the 33 variables into 11 monotonic
-     triplets t_{3k} = t_{3k+1} = t_{3k+2}, collapsing the 2^{33} search space
-     over triangle indicators down to exactly 12 configurations.
+       t_0 >= t_1 >= ... >= t_{num_orbits-1}.
+     In the default residue-0 case, this locks the variables into monotonic triplets
+     t_{3k} = t_{3k+1} = t_{3k+2}.
 
 2. 3 Fixed Points (fixed3) Profile:
    - Fix(g) = {x_0, x_1, x_2} inducing a triangle K_3.
@@ -53,10 +50,16 @@ from pysat.card import CardEnc, EncType
 # ==============================================================================
 
 class ConwayZ3FPFCanonicalCompiler:
-    def __init__(self, num_orbits: int = 33, enable_modular: bool = True, enable_orbit_order: bool = True):
+    def __init__(self, num_orbits: int = 33, enable_modular: bool = True, enable_orbit_order: bool = True, *, degree: int = 14):
+        if not isinstance(degree, int) or isinstance(degree, bool) or degree < 4 or degree % 2:
+            raise ValueError("degree must be an even integer at least four")
+        if not isinstance(num_orbits, int) or isinstance(num_orbits, bool) or 3 * num_orbits != degree * degree // 2 + 1:
+            raise ValueError("Orbit count does not match SRG(v, degree, 1, 2)")
         self.num_orbits = num_orbits
         self.enable_modular = enable_modular
         self.enable_orbit_order = enable_orbit_order
+        self.degree = degree
+        self.triangle_residue = ((3 * num_orbits * degree) // 6) % 3
         self.cnf = CNF()
         self.top_id = 0
 
@@ -81,9 +84,9 @@ class ConwayZ3FPFCanonicalCompiler:
                     self.top_id += 1
                     self.edge_vars[(p, q, k)] = self.top_id
 
-        assert len(self.t_vars) == 33
-        assert len(self.edge_vars) == 1584
-        assert self.top_id == 1617
+        assert len(self.t_vars) == self.num_orbits
+        assert len(self.edge_vars) == 3 * self.num_orbits * (self.num_orbits - 1) // 2
+        assert self.top_id == self.num_orbits + len(self.edge_vars)
 
     def get_adj_lit(self, p: int, i: int, q: int, j: int) -> int:
         if p == q:
@@ -140,8 +143,9 @@ class ConwayZ3FPFCanonicalCompiler:
 
     def build_modular_parity_cut(self) -> int:
         r"""
-        Injects the modular parity constraint:
-          \sum_{p=0}^{32} t_p \equiv 231 \equiv 0 \pmod 3.
+        Injects the modular parity constraint for the triangle-count residue:
+          \sum_p t_p \equiv triangle_residue \pmod 3.
+        The default degree-14, 33-orbit case has triangle_residue = 0.
         Encoded via a sequential modular adder automaton with states {0, 1, 2}.
         """
         if not self.enable_modular:
@@ -169,7 +173,7 @@ class ConwayZ3FPFCanonicalCompiler:
         self.cnf.append([t0, -state_vars[(0, 1)]])
         self.cnf.append([-state_vars[(0, 2)]])
 
-        # Steps 1..32 transitions
+        # Remaining state transitions
         for i in range(1, self.num_orbits):
             ti = self.t_vars[i]
             for r in range(3):
@@ -181,18 +185,20 @@ class ConwayZ3FPFCanonicalCompiler:
                 # (prev_pred and ti) => curr
                 self.cnf.append([-prev_pred, -ti, curr])
 
-        # Final assertion: total sum mod 3 == 0 (since 231 mod 3 = 0)
-        self.cnf.append([state_vars[(self.num_orbits - 1, 0)]])
-        self.cnf.append([-state_vars[(self.num_orbits - 1, 1)]])
-        self.cnf.append([-state_vars[(self.num_orbits - 1, 2)]])
+        # Final assertion: total sum mod 3 equals the triangle-count residue
+        residue = self.triangle_residue
+        self.cnf.append([state_vars[(self.num_orbits - 1, residue)]])
+        for offset in (1, 2):
+            self.cnf.append([-state_vars[(self.num_orbits - 1, (residue + offset) % 3)]])
 
         return len(self.cnf.clauses) - initial_clauses
 
     def build_canonical_orbit_ordering(self) -> int:
         r"""
         Injects canonical symmetry breaking ordering on triangular orbits:
-          t_0 >= t_1 >= ... >= t_32.
-        Coupled with sum(t_p) = 0 mod 3, this locks t_{3k} = t_{3k+1} = t_{3k+2}.
+          t_0 >= t_1 >= ... >= t_{num_orbits-1}.
+        In the default residue-0 case, coupling with the modular cut locks
+        t_{3k} = t_{3k+1} = t_{3k+2}.
         """
         if not self.enable_orbit_order:
             return 0
@@ -203,8 +209,8 @@ class ConwayZ3FPFCanonicalCompiler:
             self.cnf.append([-self.t_vars[p + 1], self.t_vars[p]])
 
         # If modular parity is also enabled, enforce equality within triplets:
-        if self.enable_modular:
-            for k in range(11):
+        if self.enable_modular and self.triangle_residue == 0:
+            for k in range(self.num_orbits // 3):
                 p0 = 3 * k
                 p1 = p0 + 1
                 p2 = p0 + 2
@@ -217,14 +223,14 @@ class ConwayZ3FPFCanonicalCompiler:
         return len(self.cnf.clauses) - initial_clauses
 
     def build_degree_constraints(self):
-        """Degree regularity k = 14 across all 33 orbits."""
+        """Degree regularity across all orbit representatives."""
         for p in range(self.num_orbits):
             lits = [self.t_vars[p], self.t_vars[p]]
             for q in range(self.num_orbits):
                 if q != p:
                     for m in range(3):
                         lits.append(self.get_adj_lit(p, 0, q, m))
-            self.add_card_equals(lits, 14)
+            self.add_card_equals(lits, self.degree)
 
     def build_structural_cuts(self):
         """Structural K_4-free cuts on orbit triangles."""
@@ -282,13 +288,13 @@ class ConwayZ3FPFCanonicalCompiler:
         t0 = time.time()
         if verbose:
             print("=" * 80)
-            print("Conway 99-Graph: Canonical Z_3 FPF Compiler (Fixed-Point-Free)")
+            print(f"SRG({3 * self.num_orbits}, {self.degree}, 1, 2): Canonical Z_3 FPF Compiler")
             print(f"Modular Parity Cut: {self.enable_modular} | Triangular Orbit Order: {self.enable_orbit_order}")
             print("=" * 80)
 
         mod_clauses = self.build_modular_parity_cut()
         if verbose:
-            print(f"[*] Modular parity cardinality cut (sum t_p = 0 mod 3): {mod_clauses} clauses.")
+            print(f"[*] Modular parity cardinality cut (sum t_p = {self.triangle_residue} mod 3): {mod_clauses} clauses.")
 
         order_clauses = self.build_canonical_orbit_ordering()
         if verbose:
@@ -296,7 +302,7 @@ class ConwayZ3FPFCanonicalCompiler:
 
         self.build_degree_constraints()
         if verbose:
-            print(f"[*] Degree regularity constraints (k=14): vars={self.top_id:,}, clauses={len(self.cnf.clauses):,}.")
+            print(f"[*] Degree regularity constraints (k={self.degree}): vars={self.top_id:,}, clauses={len(self.cnf.clauses):,}.")
 
         self.build_structural_cuts()
         if verbose:

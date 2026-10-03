@@ -1,0 +1,53 @@
+{
+  "status": "COMPILED",
+  "branch": "feat/encoder-positive-controls",
+  "base_commit": "d904ae6",
+  "working_tree_changes": true,
+  "scope": "Recorded software checks, not universal compiler correctness or a graph-exclusion certificate.",
+  "fixture_source": "https://arxiv.org/html/1907.02800v2#S3.SS1",
+  "bvls_command": "python3 -B -c 'from scripts.production_positive_controls import check_planted; print(check_planted(\"bvls243\", \"z2-f1\")); print(check_planted(\"bvls243\", \"z3-fpf\"))'",
+  "bvls_results": [
+    {
+      "action": "z2-f1",
+      "vertices": 243,
+      "degree": 22,
+      "primary_variables": 12100,
+      "clauses_checked": 28257515,
+      "variables": 12607155
+    },
+    {
+      "action": "z3-fpf",
+      "vertices": 243,
+      "degree": 22,
+      "primary_variables": 9801,
+      "clauses_checked": 27424360,
+      "variables": 12535884
+    }
+  ],
+  "default_serialization_regression": {
+    "reference": "Unmodified main-root production modules; not the historical deposited SAT inputs",
+    "z2-f1": {
+      "unchanged": true,
+      "variables": 666309,
+      "clauses": 1508157,
+      "sha256": "e697b76fbb3123339a34622e18ff6484f555dffc8b8e3b06faa9bef860758de8"
+    },
+    "z3-fpf-canonical": {
+      "unchanged": true,
+      "variables": 852324,
+      "clauses": 1860024,
+      "sha256": "ec2852f7b191bf7eff2a9f818e408583a2b58e496fab71914ba01e4385b92d0d"
+    }
+  },
+  "final_test_command": "python3 -B -m unittest discover -s tests -v",
+  "tests_passed": 76,
+  "bvls_full_clause_runs_in_default_suite": false,
+  "graph_to_cnf_formal_transfer": "PENDING",
+  "drat_generated": false,
+  "limitations": [
+    "Auxiliary extensions are checked in disjoint batches with primary and conjunction values fixed.",
+    "Both full BvLS runs use a fixed independently constructed graph, not an unconstrained graph search.",
+    "The full Z7 and Z3-fixed3 production encodings are not validated by these graph controls.",
+    "Old standalone SRG and planted matching encoders remain explicitly experimental."
+  ]
+}

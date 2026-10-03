@@ -3,14 +3,13 @@
 build_z2_f1_cnf.py
 Ultra-compact CNF Compiler for Conway's 99-Graph under Z_2 Involutions with f = 1.
 
-Mathematical Foundation:
+Mathematical Foundation (default degree 14):
   - 1 fixed point x_0 = 0.
-  - Neighborhood N(x_0) = {1..14} consists of 7 orbits of length 2: R_0..R_6.
-    Induces 7*K_2 matching: (1, 2), (3, 4), ..., (13, 14).
-  - Second subconstituent Gamma_2(x_0) = {15..98} consists of 42 orbits of length 2: O_0..O_41.
-  - Orbit incidence matrix C of size 7 x 42 satisfies C C^T = 10*I_7 + 2*J_7.
+  - Neighborhood N(x_0) consists of degree/2 orbits of length 2.
+  - The second subconstituent consists of degree/2*(degree/2-1) orbits of length 2.
+  - The orbit incidence matrix is built from two copies of all pairs of neighborhood orbits.
   - Internal edge theorem: Gamma_2(x_0) contains 0 internal edges.
-  - Primary boolean variables: 1,764 variables organized as a 42 x 42 matrix M:
+  - Primary boolean variables are organized as a square matrix M:
       * M[p, p]: internal edge in orbit p (fixed to 0).
       * M[p, q] (p < q): matching M_0 (u_p ~ u_q, u'_p ~ u'_q).
       * M[q, p] (p < q): matching M_1 (u_p ~ u'_q, u'_p ~ u_q).
@@ -28,55 +27,59 @@ from pysat.card import CardEnc, EncType
 from pysat.formula import CNF
 
 class ConwayZ2F1Compiler:
-    def __init__(self, cnf_output: str = "conway_z2_f1.cnf"):
+    def __init__(self, cnf_output: str = "conway_z2_f1.cnf", *, degree: int = 14):
+        if not isinstance(degree, int) or isinstance(degree, bool) or degree < 4 or degree % 2:
+            raise ValueError("degree must be an even integer at least four")
+        self.degree = degree
+        self.num_pairs = degree // 2
+        self.num_outer_orbits = self.num_pairs * (self.num_pairs - 1)
+        self.num_vertices = 1 + degree + 2 * self.num_outer_orbits
+        self.num_primary = self.num_outer_orbits ** 2
         self.cnf_output = cnf_output
         self.cnf = CNF()
-        self.top_id = 1764 # 42 x 42 primary boolean variables
+        self.top_id = self.num_primary
         self.aux_and: Dict[Tuple[int, int], int] = {}
-        
-        # 1. Construct the 2-design matrix C (7 x 42)
+
+        # 1. Construct the 2-design matrix C (degree/2 x num_outer_orbits)
         self._init_design_matrix()
-        
+
         # 2. Build neighborhood maps
         self._init_neighborhood_maps()
 
     def _init_design_matrix(self):
         """
-        Construct the 7 x 42 incidence matrix C = [C_1 | C_2].
-        Each column corresponds to a 2-subset of {0..6}.
-        C C^T = 10*I_7 + 2*J_7.
+        Construct the degree/2 x num_outer_orbits incidence matrix C = [C_1 | C_2].
+        Each column corresponds to a 2-subset of the neighborhood orbit indices.
         """
-        pairs = list(itertools.combinations(range(7), 2)) # 21 pairs
-        assert len(pairs) == 21
-        self.orbit_pairs = pairs + pairs # 42 columns
-        
-        self.C = np.zeros((7, 42), dtype=int)
+        pairs = list(itertools.combinations(range(self.num_pairs), 2))
+        assert len(pairs) == self.num_outer_orbits // 2
+        self.orbit_pairs = pairs + pairs
+
+        self.C = np.zeros((self.num_pairs, self.num_outer_orbits), dtype=int)
         for j, (r1, r2) in enumerate(self.orbit_pairs):
             self.C[r1, j] = 1
             self.C[r2, j] = 1
-            
+
         CCT = self.C @ self.C.T
-        expected = 10 * np.eye(7, dtype=int) + 2 * np.ones((7, 7), dtype=int)
-        assert np.array_equal(CCT, expected), "Incidence matrix C does not satisfy C C^T = 10*I_7 + 2*J_7!"
+        expected = (2 * self.num_pairs - 4) * np.eye(self.num_pairs, dtype=int) + 2 * np.ones((self.num_pairs, self.num_pairs), dtype=int)
+        assert np.array_equal(CCT, expected), "Incidence matrix C has an unexpected C C^T product"
 
     def _init_neighborhood_maps(self):
         """
         Map each vertex in Gamma_2(x_0) to its 2 neighbors in N(x_0).
-        Vertices in N(x_0):
-          For r in 0..6: a_r = 1 + 2*r, t(a_r) = 2 + 2*r.
-        Vertices in Gamma_2(x_0):
-          For p in 0..41: u_p = (p, 0), u'_p = (p, 1).
+        Vertices in N(x_0) are paired as a_r = 1 + 2*r and t(a_r) = 2 + 2*r.
+        Vertices in Gamma_2(x_0) are u_p = (p, 0), u'_p = (p, 1).
         """
         self.nbrs_N: Dict[Tuple[int, int], Set[int]] = {}
-        self.nbrs_G2_of_N: Dict[int, List[Tuple[int, int]]] = {a: [] for a in range(1, 15)}
-        
+        self.nbrs_G2_of_N: Dict[int, List[Tuple[int, int]]] = {a: [] for a in range(1, self.degree + 1)}
+
         for j, (r1, r2) in enumerate(self.orbit_pairs):
             ar1, tar1 = 1 + 2 * r1, 2 + 2 * r1
             ar2, tar2 = 1 + 2 * r2, 2 + 2 * r2
             uj = (j, 0)
             tuj = (j, 1)
             
-            if j < 21:
+            if j < self.num_outer_orbits // 2:
                 # Column in first copy: u_j ~ a_{r1}, a_{r2}
                 self.nbrs_N[uj] = {ar1, ar2}
                 self.nbrs_N[tuj] = {tar1, tar2}
@@ -93,10 +96,9 @@ class ConwayZ2F1Compiler:
                 self.nbrs_G2_of_N[tar1].append(tuj)
                 self.nbrs_G2_of_N[ar2].append(tuj)
 
-    @staticmethod
-    def var_id(p: int, q: int) -> int:
-        """Primary variable ID: 1 + 42*p + q in 1..1764."""
-        return 1 + p * 42 + q
+    def var_id(self, p: int, q: int) -> int:
+        """Primary variable ID: 1 + num_outer_orbits*p + q."""
+        return 1 + p * self.num_outer_orbits + q
 
     def get_edge(self, u_idx: Tuple[int, int], v_idx: Tuple[int, int]) -> Optional[int]:
         """
@@ -129,43 +131,46 @@ class ConwayZ2F1Compiler:
             self.aux_and[k] = y
         return self.aux_and[k]
 
-    def build_constraints(self):
-        t0 = time.time()
-        print("=" * 80)
-        print("BUILDING CNF: CONWAY 99-GRAPH UNDER Z_2 INVOLUTIONS (f = 1)")
-        print(f"Primary variables: 1,764 (42 x 42 matrix M)")
-        print(f"2-Design matrix C: 7 x 42 with C C^T = 10*I + 2*J")
-        print("=" * 80)
-
+    def build_local_constraints(self):
         # 1. Zero internal edges in Gamma_2(x_0)
-        print("[1/5] Enforcing 0 internal edges in Gamma_2(x_0) (42 unit clauses)...")
-        for p in range(42):
+        print(f"[1/5] Enforcing 0 internal edges in Gamma_2(x_0) ({self.num_outer_orbits} unit clauses)...")
+        for p in range(self.num_outer_orbits):
             self.cnf.append([-self.var_id(p, p)])
 
-        # 2. Regularity degree 14 constraints: degree inside Gamma_2(x_0) = 12
-        print("[2/5] Encoding degree 14 constraints (degree = 12 in Gamma_2 for 42 orbits)...")
-        for p in range(42):
-            lits = [self.var_id(p, q) for q in range(42) if q != p] + \
-                   [self.var_id(q, p) for q in range(42) if q != p]
-            card = CardEnc.equals(lits=lits, bound=12, top_id=self.top_id, encoding=EncType.seqcounter)
+        # 2. Regularity degree constraints: degree inside Gamma_2(x_0) = degree - 2
+        print(f"[2/5] Encoding degree {self.degree} constraints (degree = {self.degree - 2} in Gamma_2 for {self.num_outer_orbits} orbits)...")
+        for p in range(self.num_outer_orbits):
+            lits = [self.var_id(p, q) for q in range(self.num_outer_orbits) if q != p] + \
+                   [self.var_id(q, p) for q in range(self.num_outer_orbits) if q != p]
+            card = CardEnc.equals(lits=lits, bound=self.degree - 2, top_id=self.top_id, encoding=EncType.seqcounter)
             self.top_id = card.nv
             self.cnf.extend(card.clauses)
 
-        # 3. Unique K_{2,2} partner for each orbit (Internal pair common neighbors mu = 2)
+        # 3. Unique K_{2,2} partner for each orbit (internal pair common neighbors mu = 2)
         print("[3/5] Encoding unique K_{2,2} partner for each orbit (mu = 2 for {u_p, u'_p})...")
-        for p in range(42):
+        for p in range(self.num_outer_orbits):
             lits = [self.get_and_var(self.var_id(min(p, q), max(p, q)),
                                       self.var_id(max(p, q), min(p, q)))
-                    for q in range(42) if q != p]
+                    for q in range(self.num_outer_orbits) if q != p]
             card = CardEnc.equals(lits=lits, bound=1, top_id=self.top_id, encoding=EncType.seqcounter)
             self.top_id = card.nv
             self.cnf.extend(card.clauses)
 
+    def build_constraints(self):
+        t0 = time.time()
+        print("=" * 80)
+        print(f"BUILDING CNF: CONWAY SRG({self.num_vertices}, {self.degree}, 1, 2) UNDER Z_2 INVOLUTIONS (f = 1)")
+        print(f"Primary variables: {self.num_primary:,} ({self.num_outer_orbits} x {self.num_outer_orbits} matrix M)")
+        print(f"2-Design matrix C: {self.num_pairs} x {self.num_outer_orbits}")
+        print("=" * 80)
+
+        self.build_local_constraints()
+
         # 4. Compatibility constraints between N(x_0) and Gamma_2(x_0)
-        print("[4/5] Encoding compatibility constraints between N(x_0) and Gamma_2(x_0) (588 constraints)...")
-        for a in range(1, 15):
+        print(f"[4/5] Encoding compatibility constraints between N(x_0) and Gamma_2(x_0) ({self.degree * self.num_outer_orbits} constraints)...")
+        for a in range(1, self.degree + 1):
             ta = a + 1 if (a - 1) % 2 == 0 else a - 1
-            for p in range(42):
+            for p in range(self.num_outer_orbits):
                 u = (p, 0)
                 if a in self.nbrs_N[u] or ta in self.nbrs_N[u]:
                     target = 1
@@ -181,12 +186,12 @@ class ConwayZ2F1Compiler:
                 self.cnf.extend(card.clauses)
 
         # 5. Cross-orbit common neighbor constraints (lambda = 1 for adj, mu = 2 for non-adj)
-        print("[5/5] Encoding cross-orbit common neighbors for all 861 orbit pairs (1,722 pairs)...")
+        print(f"[5/5] Encoding cross-orbit common neighbors for all {self.num_outer_orbits * (self.num_outer_orbits - 1) // 2} orbit pairs ({self.num_outer_orbits * (self.num_outer_orbits - 1)} pairs)...")
         t_start_cross = time.time()
-        total_pairs = 861 * 2
+        total_pairs = self.num_outer_orbits * (self.num_outer_orbits - 1)
         pair_count = 0
-        for p in range(42):
-            for q in range(p + 1, 42):
+        for p in range(self.num_outer_orbits):
+            for q in range(p + 1, self.num_outer_orbits):
                 for tv in (0, 1):
                     pair_count += 1
                     u = (p, 0)
@@ -195,7 +200,7 @@ class ConwayZ2F1Compiler:
                     cn_N = len(self.nbrs_N[u].intersection(self.nbrs_N[v]))
                     target = 2 - cn_N
                     lits = [edge_uv] if edge_uv is not None else []
-                    for k in range(42):
+                    for k in range(self.num_outer_orbits):
                         if k == p or k == q:
                             continue
                         for tk in (0, 1):
@@ -207,14 +212,14 @@ class ConwayZ2F1Compiler:
                     card = CardEnc.equals(lits=lits, bound=target, top_id=self.top_id, encoding=EncType.seqcounter)
                     self.top_id = card.nv
                     self.cnf.extend(card.clauses)
-                    
-            if (p + 1) % 10 == 0 or p == 41:
+
+            if (p + 1) % 10 == 0 or p == self.num_outer_orbits - 1:
                 elapsed = time.time() - t_start_cross
-                print(f"      Progress: orbit {p+1}/42 ({pair_count}/{total_pairs} pairs, {elapsed:.1f}s, {len(self.cnf.clauses)} clauses)...", flush=True)
+                print(f"      Progress: orbit {p+1}/{self.num_outer_orbits} ({pair_count}/{total_pairs} pairs, {elapsed:.1f}s, {len(self.cnf.clauses)} clauses)...", flush=True)
 
         print(f"\n[+] CNF Compilation complete in {time.time() - t0:.2f}s!")
-        print(f"    Total Primary Variables: 1,764")
-        print(f"    Total Auxiliary Variables: {self.top_id - 1764}")
+        print(f"    Total Primary Variables: {self.num_primary:,}")
+        print(f"    Total Auxiliary Variables: {self.top_id - self.num_primary}")
         print(f"    Grand Total Variables: {self.top_id}")
         print(f"    Total Clauses: {len(self.cnf.clauses):,}")
 
@@ -253,29 +258,30 @@ class ConwayZ2F1Compiler:
             return None
 
     def reconstruct_adjacency(self, model: Set[int]) -> np.ndarray:
-        """Reconstruct the full 99x99 adjacency matrix from SAT model."""
-        A = np.zeros((99, 99), dtype=int)
+        """Reconstruct the full adjacency matrix from SAT model."""
+        A = np.zeros((self.num_vertices, self.num_vertices), dtype=int)
+        offset = self.degree + 1
         # x_0 = 0 to N(x_0)
-        for v in range(1, 15):
+        for v in range(1, self.degree + 1):
             A[0, v] = A[v, 0] = 1
-        # Inside N(x_0): 7*K_2
-        for r in range(7):
+        # Inside N(x_0): (degree/2)*K_2
+        for r in range(self.num_pairs):
             ar, tar = 1 + 2 * r, 2 + 2 * r
             A[ar, tar] = A[tar, ar] = 1
         # N(x_0) to Gamma_2(x_0)
-        for p in range(42):
+        for p in range(self.num_outer_orbits):
             for tp in (0, 1):
                 u_idx = (p, tp)
-                u_v = 15 + 2 * p + tp
+                u_v = offset + 2 * p + tp
                 for a in self.nbrs_N[u_idx]:
                     A[a, u_v] = A[u_v, a] = 1
         # Inside Gamma_2(x_0)
-        for p in range(42):
-            for q in range(p + 1, 42):
+        for p in range(self.num_outer_orbits):
+            for q in range(p + 1, self.num_outer_orbits):
                 for tp in (0, 1):
                     for tq in (0, 1):
-                        u_v = 15 + 2 * p + tp
-                        w_v = 15 + 2 * q + tq
+                        u_v = offset + 2 * p + tp
+                        w_v = offset + 2 * q + tq
                         var = self.get_edge((p, tp), (q, tq))
                         if var is not None and var in model:
                             A[u_v, w_v] = A[w_v, u_v] = 1
