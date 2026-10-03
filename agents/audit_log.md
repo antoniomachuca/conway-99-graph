@@ -1,5 +1,65 @@
 # Historical Audit Log (`audit_log.md`)
 
+## Independent Forensic Scientific Audit — Frentes A & B, 4 October 2026, 00:45 CEST
+
+**Audit Target:**
+- Frente A: `z7_search_specialist` (`feat/z7-lean-search`, commit `68dd832`)
+- Frente B: `z3_specialist` (`feat/z3-nonexistence`, commit `68dd832`)
+
+### 1. Epistemological and Kernel Axiom Audit
+
+All Lean 4 files in both working trees were built using `lake build` (62 jobs completed, exit code 0). Every declaration was audited via `#print axioms`:
+
+- **PROVED (Kernel Verified, 0 sorry, 0 sorryAx):**
+  - `Matrix99.conway_z7_induces_orbit_matrix`: `[propext, Quot.sound]`. Graph-to-quotient canonical 15-orbit matrix reduction is formally proved with no uncertified hypotheses.
+  - `Matrix99.Z7OrbitMatrix.exterior_row_problem`: `[propext, Quot.sound]`. Derives the exact 12×12 Diophantine row equations, entry bounds ($\le 4$), diagonal alternatives ($\in \{0, 2\}$), and signed balance from `Z7OrbitMatrix`.
+  - `Matrix99.Z7OrbitMatrix.exterior_equations`: `[propext, Quot.sound]`. Packs the exterior block equations into the `ExteriorEquations` predicate.
+  - `Matrix99.no_z7_orbit_matrix_of_no_exterior_equations`: `[propext, Quot.sound]`. Formal contrapositive bridge proving that nonexistence of solutions to the exterior Diophantine system implies nonexistence of a `Z7OrbitMatrix`.
+  - Supporting modules in `Conway/`: `Z7Cycles.lean`, `GraphLocalCounts.lean`, `Z7FixedGeometry.lean`, `Z7GraphFrame.lean`, `OrbitReindex.lean`, `Z7OrbitEnumeration.lean`, `Z7CanonicalArithmetic.lean`, `Z7QuotientBoundary.lean`, `Z7RootedConstruction.lean` all compile cleanly with axioms `[propext, Quot.sound]` and zero `sorry`.
+
+- **COMPILED (Pending Kernel Bridge / Contains `sorry`):**
+  - `Matrix99.z7_orbit_matrix_nonexistence`: depends on `[propext, sorryAx]`. Contains `sorry`. Although the exterior row problem CNF has been refuted by CaDiCaL and checked by `drat-trim`, the link lifting the DRAT certificate into the Lean 4 kernel is unformalized.
+  - `Matrix99.conway_no_z7_automorphism`: depends on `[propext, sorryAx, Quot.sound]`. Derives order-7 nonexistence from `conway_z7_induces_orbit_matrix` and `z7_orbit_matrix_nonexistence`; transitively contains `sorryAx`.
+  - `Matrix99.conway_no_z3_fixed3_automorphism`: depends on `[propext, sorryAx]`. Contains `sorry`.
+  - `Matrix99.conway_no_z3_fpf_automorphism`: depends on `[propext, sorryAx]`. Contains `sorry`.
+
+### 2. SAT Proof Verification (`drat-trim`)
+
+- **Artifact:** `/Volumes/Untitled/conway_z7_row_direct_long_20261003_01/manifest.json`
+- **Formula:** `z7_row_problem.cnf` (26,166 variables, 311,703 clauses).
+  - SHA-256: `b746471acd527e52da4706a354fc6fd0d225bb638c121f8b7ec6f965ec5a4ee4`.
+- **Solver:** CaDiCaL 1.9.5 ran for 9,051.98s real time, terminating with `s UNSATISFIABLE` (returncode 20, 32,331,971 conflicts). DRAT trace size: 4.4 GB.
+- **Checker:** Independent checker `drat-trim` executed in backward checking mode:
+  - 201,494 of 311,703 clauses in core.
+  - 12,551,572 of 56,577,564 lemmas in core using 1,425,060,916 resolution steps.
+  - 0 RAT lemmas in core.
+  - Checker verdict: `s VERIFIED` (verification time: 8,879.59s).
+- **Classification:** **PROVED, this CNF only**. The formula refutes the direct exterior row system. It is not an unconditional proof of the graph-level theorem until the CNF encoding soundness is formally verified in Lean.
+
+### 3. Test Suite and Determinism
+
+- Execution: `python3 -B -m unittest discover -s tests -v`
+- Result: **123 tests ran in 33.878s; 123 OK, 0 failures, 0 errors**.
+- Coverage includes:
+  - `test_z3_fixed3_encoding_coverage.py`: 4 tests checking 54 preset one-factor entries, 148 degree cardinalities, 1,520 common-neighbor pair orbits.
+  - `test_z7_row_problem_cnf.py`: 5 tests verifying CNF translations against brute force on 5-cycles and small models.
+  - `test_z7_quotient_enumeration.py`: 13 tests checking row domains, Cartesian products, and forward checking.
+  - `test_canonical_sat_compilers.py`: verifying Tseitin variable allocations, cardinality encodings, and Crawford lex-leader constraints for both Z7 and Z3 compilers.
+
+### 4. Worktree and Infrastructure State
+
+- Worktree `.worktrees/z7-lean-search`: clean at `68dd832`.
+- Worktree `.worktrees/z3-nonexistence`: clean at `68dd832`.
+- Host filesystem `/dev/disk3s5`: 16 GiB available (92% used).
+- Large proof traces and CNFs reside strictly on the external volume (`/Volumes/Untitled`), adhering to the storage safety invariant.
+
+### 5. Forensic Anti-Hallucination Summary
+
+- Claims of nonexistence of Conway's 99-graph remain **PENDING**; the problem remains unsolved.
+- Behbahani–Lam (2011) and Crnković–Maksimović (2020) previously established the mathematical nonexistence of orders 7 and 3 in the literature. In this repository, the formal Lean 4 kernel-level proofs for `z7_orbit_matrix_nonexistence`, `conway_no_z3_fixed3_automorphism`, and `conway_no_z3_fpf_automorphism` remain placeholders (**COMPILED**). No false claims of end-to-end kernel completion exist.
+
+---
+
 ## Independent Z7 quotient enumeration — feasibility run, 3 October 2026
 
 **EXPLORED:** an independent Python enumerator now searches the necessary conditions of `Z7OrbitMatrix`. It does not import the SAT encoder, assume Frob(21) restrictions, force the exterior diagonal to zero, or remove candidates by symmetry. It is a feasibility prototype, not a certified decision procedure.
