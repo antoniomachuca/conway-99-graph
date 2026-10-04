@@ -18,3 +18,4 @@ import Conway.Structural
 import Conway.TestMatrix
 import Conway.TestOrbitQuotient
 import Conway.TestZ7Canonical
+import Conway.TestZ3Quotient
