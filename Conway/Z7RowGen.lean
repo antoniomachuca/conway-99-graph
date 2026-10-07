@@ -42,6 +42,11 @@ def z7GenRow (fuel : Nat) (index j : Nat) (pref : List Nat)
 def z7UnaryRows (index : Fin 12) : List (List Nat) :=
   z7GenRow 12 index.val 0 [] 12 (z7ExteriorTarget index index) 0
 
+theorem z7UnaryRows_0_length : (z7UnaryRows 0).length = 7576 := by
+  decide +kernel
+
+#print axioms z7UnaryRows_0_length
+
 def rowPrefix (f : Fin 12 → Nat) (j : Nat) : List Nat :=
   ((List.finRange 12).take j).map f
 
