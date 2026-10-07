@@ -77,7 +77,7 @@ The order-7 record has two certified components. They are not one certificate.
 Component A is in Lean. From the graph and an automorphism of order 7, the kernel derives the $12 \times 12$ exterior equations (\texttt{Z7OrbitMatrix.exterior\_row\_problem}). That derivation is \textsc{Proved}. The kernel reports only \texttt{[propext, Quot.sound]}. It does not prove that no such matrix exists.
 Component B is the exterior-row CNF. It has $26{,}166$ variables and $311{,}703$ clauses. It is not the canonical order-7 CNF above. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reported \texttt{s VERIFIED}. That refutation is \textsc{Proved} for this CNF only. The file is not in Zenodo record \texttt{10.5281/zenodo.22995101}.
 The implication from \texttt{Z7OrbitMatrix} to the exterior-row CNF is \textsc{Pending}. The DRAT proof is not checked inside the Lean kernel. \texttt{z7\_orbit\_matrix\_nonexistence} still contains \texttt{sorry}.
-The note also records the column-weight identity $CC^T = 10I + 2J$ for the open involution case $f=1$, with corrected branch supports, and a 12.5-day CaDiCaL campaign that accumulated more than 2.4 billion conflicts without a satisfying assignment or a refutation. All code, Lean modules, and test suites are available at \url{https://github.com/antoniomachuca/conway-99-graph}.
+The note also records the column-weight identity $CC^T = 10I + 2J$ for the open involution case $f=1$, with corrected branch supports, and a 12.5-day CaDiCaL campaign on the $f=1$ and fixed-point-free order-3 encodings that accumulated more than 2.4 billion conflicts in aggregate without a satisfying assignment or a refutation. That campaign predates the compiler repair of 21~September~2026 and is not a difficulty bound for the corrected formulas. All code, Lean modules, and test suites are available at \url{https://github.com/antoniomachuca/conway-99-graph}.
 \end{abstract}
 
 \keywords{Conway 99-graph \and strongly regular graphs \and interactive theorem proving \and Lean 4 \and SAT solving \and DRAT certification \and symmetry breaking}
@@ -133,7 +133,7 @@ The note keeps the following items separate. The primary contents are:
  \item We implement canonical SAT compilers with Crawford symmetry-breaking predicates~\cite{crawford1996symmetry}. A 101-test regression suite checks helper truth tables, the $f=1$ coordinate model, the bounded-run supervisor, positive controls, and an orbit-matrix encoder. The positive controls apply the production compilers for the involution with one fixed vertex and for the fixed-point-free action of order 3 to Paley(9) and to the Berlekamp--van Lint--Seidel graph. These tests do not certify that a historical CNF matches the graph. They do not cover the order-7 compiler.
 A separate file has four \textsc{Compiled} tests of the fixed-3 encoding.
 The 101-test count does not include those four tests.
-Those tests are not the fixed-point exclusion of Crnkovi{\'c} and Maksimovi{\'c}.
+Those tests are not the fixed-point exclusion of Behbahani and Lam.
  \item The repaired compiler's order-7 CNF has a CaDiCaL 1.9.5 log ending \texttt{s UNSATISFIABLE} and a \texttt{drat-trim} log ending \texttt{s VERIFIED} on that file, so the formula refutation is \textsc{Proved}. The CP-SAT model of Thakkar and Severini is a separate encoding.
  \item The exterior-row CNF is a second formula, with $26{,}166$ variables and $311{,}703$ clauses. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reported \texttt{s VERIFIED}. The refutation is \textsc{Proved} for that CNF only. The implication from \texttt{Z7OrbitMatrix} to the CNF is \textsc{Pending}, and \texttt{z7\_orbit\_matrix\_nonexistence} still contains \texttt{sorry}.
  \item We prove that every column of a binary $7\times 42$ matrix satisfying $CC^T = 10I_7 + 2J_7$ has weight 2, and we correct the support labels of the three $f=1$ branch representatives. A 12.5-day campaign on the $f=1$ and fixed-point-free order-3 encodings produced no satisfying assignment and no refutation.
@@ -298,7 +298,7 @@ Those tests call no solver on the Conway fixed-3 formula.
 \texttt{conway\_no\_z3\_fixed3\_automorphism} still contains \texttt{sorry}.
 These tests do not cover the order-7 compiler.
 These tests do not cover the fixed-point-free order-3 encoding.
-Crnkovi{\'c} and Maksimovi{\'c} (2020) already exclude this fixed-point case.
+Behbahani and Lam (2011) already exclude an order-3 automorphism with fixed points.
 These tests are not that exclusion.
 The 101-test count does not include these four tests.
 
@@ -501,7 +501,7 @@ This report records the following boundary. It does not decide existence.
  \item The current SAT compilers use Crawford symmetry breaking and sequential counters. A literal-index defect was repaired on 21 September 2026. The 101-test regression suite checks the current compiler sources. It does not repair CNF files written before that date. Positive controls on Paley(9) and on the Berlekamp--van Lint--Seidel graph exercise the production compilers for the involution with one fixed vertex and for the fixed-point-free action of order 3. They are \textsc{Compiled} and do not cover the order-7 compiler.
 A separate file has four \textsc{Compiled} tests of the fixed-3 encoding.
 Those tests call no solver on the Conway fixed-3 formula.
-Those tests are not the fixed-point exclusion of Crnkovi{\'c} and Maksimovi{\'c}.
+Those tests are not the fixed-point exclusion of Behbahani and Lam.
 The 101-test count does not include those four tests.
  \item The canonical order-7 CNF from the repaired compiler is \textsc{Proved} as a formula. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE} in $58{,}054.87$\,s process time, and \texttt{drat-trim} reported \texttt{s VERIFIED} on the $26{,}746{,}488{,}053$-byte proof in $103{,}482.837$\,s. The SHA-256 digests of the canonical order-7 CNF and its DRAT proof match Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}.
 The earlier record \href{https://doi.org/10.5281/zenodo.22983776}{10.5281/zenodo.22983776} stores a $192{,}218{,}491$-byte proof from an earlier run.

@@ -15,7 +15,17 @@ import Conway.CesarzWoldarTheorems
 import Conway.ParityRigidity
 import Conway.GrandClassification
 import Conway.Structural
+import Conway.Z7ExteriorFinite
+import Conway.Z7Row0Symmetry
+import Conway.Z7RootCoverage
+import Conway.Z7Root26Bridge
+import Conway.Z7Root22Arithmetic
+import Conway.Z7Root03Arithmetic
+import Conway.Z7ComplementParity
 import Conway.TestMatrix
 import Conway.TestOrbitQuotient
 import Conway.TestZ7Canonical
 import Conway.TestZ3Quotient
+import Conway.TestZ7RootNorm
+import Conway.TestZ7RootParity
+import Conway.TestZ7ComplementParity

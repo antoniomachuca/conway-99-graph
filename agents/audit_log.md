@@ -769,3 +769,44 @@ The probability bounds, completion forecasts, and publication-readiness judgment
 | `tests/test_encoder_positive_controls.py` | **COMPILED** | 19 deterministic unit tests, 63/63 suite pass in 8.74s. |
 
 - **Verdict:** VERIFIED (Forensically Sound). All artifacts across both branches comply strictly with repository epistemological standards and the four-state taxonomy.
+
+---
+
+## 2026-10-05 — Correction pass after external review of the rigidity campaign plan
+
+**Trigger:** external review of `docs/superpowers/plans/2026-10-05-full-rigidity-campaign.md` (v1) against the repository state. All findings verified against disk and primary sources before acceptance.
+
+**Findings confirmed and corrected:**
+
+1. **Stale order-7 pair at repository root (new finding, not in the external review).** Root files `proof_z7_canonical.drat` (192,218,491 bytes), `cadical_z7.log`, and `drat_trim_z7.log` belong to a superseded 176,613-variable / 421,562-clause encoding (VERIFIED in 844.008 s on that formula). The current root `conway_z7_canonical.cnf` has 177,097 variables / 422,508 clauses and is certified only by the pair in `/Volumes/Untitled/conway_repro_z7/` (proof 26,746,488,053 bytes; `s VERIFIED` in 103,482.837 s) and Zenodo 10.5281/zenodo.22995101. Marker file `STALE_ARTIFACTS.md` created at the root. The stale files are retained, not deleted.
+2. **Wrong attribution of the order-3 fixed-point-free property.** `docs/technical_report.md` and `references/paper_makhnev_minakova_2004.md` attributed it to Crnković–Maksimović (2020). Primary source check: Behbahani's thesis 2009 (`references/thesis_behbahani_lam_2009.pdf`), Theorem 4.14, proves prime divisors ⊆ {2,3} and the order-3 fixed-point-free property; C&M (2020) exclude only groups of orders 6 and 9. Both files corrected. The manuscript's literature section already attributed that property to Behbahani and Lam. Three later sentences still named Crnković–Maksimović as the source of the fixed-point exclusion: the contributions list, the fixed-3 test discussion, and the conclusion. Those three sentences were corrected in the follow-up below.
+3. **Involution classification source upgraded.** The classification (involution ⟹ exactly one fixed vertex) is Makhnev–Minakova 2004, *Discrete Mathematics and Applications* 14(2):201–210, peer-reviewed, already in `manuscript/references.bib` (`makhnev2001automorphisms`). The 2009 lecture slides are a secondary pointer only. `docs/technical_report.md` updated.
+4. **Ambiguous 2.4×10⁹-conflict figure in the manuscript abstract.** The figure is the aggregate over the f=1 and order-3 encodings (per `README.md:32` and manuscript §"Campaign"), and the campaign predates the compiler repair of 2026-09-21. Abstract sentence now says so explicitly.
+
+**Plan document:** v1 of the rigidity campaign plan was overwritten by v2 (never committed). v2 records: dual CNF/Lean scope in the status table, the stale-pair warning, the corrected attributions, three explicit routes for kernel verification (no heap-free constraint; `native_decide` trust-base change must be recorded if used), withdrawal of the unjustified Phase-4 "weeks" estimate, and concrete execution anchors per phase.
+
+**Follow-up, same day, uncommitted:** `manuscript/conway_involutions.tex` now names Behbahani and Lam, not Crnković–Maksimović, in the three sentences above. In `docs/superpowers/plans/2026-10-05-full-rigidity-campaign.md`, `tests/test_z3_fixed3_encoding_coverage.py` was removed from the Phase 2 anchors. That file covers the fixed-3 encoding only.
+
+**Classification:** repository hygiene corrections; no theorem state changed by this pass.
+
+---
+
+## 2026-10-05 (late) — Z7 row-0 root campaign: 33/33 UNSAT, all VERIFIED
+
+**Result:** the 12x12 exterior row problem splits into exactly **33 canonical roots** under the S3xS3xS6 block symmetry of `z7_problem()` (blocks {0,1,2}, {3,4,5}, {6..11}). This resolves the 33-vs-30 discrepancy in earlier estimates: the correct count is 33.
+
+- Generator: `scripts/z7_row0_roots.py`. Validation: brute-force check that every within-block permutation preserves targets/weights; canonicalization of the full 7,576-row domain (`generate_rows`) equals the 33 enumerated roots.
+- Coverage argument (CNF scope): any solution is moved by a row-0-fixing block permutation to a solution whose row 0 is one of the 33 roots. All 33 root CNFs (base 26,166-var CNF + 12 unit clauses) refuted by CaDiCaL 1.9.5 and verified by drat-trim.
+- Artifacts: `/Volumes/Untitled/conway_z7_roots_20261005_01/` (547 MB total). 33 solver logs ending `s UNSATISFIABLE`, 33 checker logs ending `s VERIFIED`, `SHA256SUMS.txt` (67 entries), `roots_manifest.json`. Wall time approx. 7 minutes for the full campaign; per-root DRATs average ~10 MB (kernel-feasible sizes, unlike the 4.75 GB monolithic proof).
+- Runner defect found and fixed: bash variable clobbering (`f` reused in `update_status`) processed only root_32 on the first launch; fixed with `local`. root_32 result from the first launch was re-confirmed by the resumed campaign.
+
+**Taxonomy:** each root CNF is PROVED (CNF scope only). The conjunction refuting the whole row problem rests on the Python-level coverage check, which is COMPILED until formalized. Lean status unchanged: `z7_orbit_matrix_nonexistence` remains `sorry` (COMPILED). The kernel bridge (case-split reduction lemma + reflective checking of the 33 proofs) is the remaining Phase 1 work.
+
+**Classification:** EXPLORED -> PROVED at CNF scope for the 33 root formulas. Graph-level claim unchanged.
+
+### 2026-10-05 (late, cont.) — Route A measured infeasible; pivot to Route B validated
+
+- **Piece 1 PROVED:** `Conway/Z7ExteriorFinite.lean` — `exterior_equations_iff_finite` (axioms `[propext]`) and `no_z7_orbit_matrix_of_no_finite_exterior` (axioms `[propext, Quot.sound]`). 0 sorry, 0 native_decide. Builds clean.
+- **Route A measurement:** drat-trim cores extracted for all 33 roots (`root_XX.core.cnf` / `.core.lemmas`). Only 3 cores < 3k clauses (root_26: 780, root_22: 1168, root_03: 1607); the other 30 have 8k-40k core clauses and up to 24 MB lemma files. Pure-kernel whnf checking of the full set is not feasible (order 10^9 kernel ops per typical root). Per the pre-authorized instruction, Route A is abandoned and Route B is active.
+- **Route B mechanics validated:** LRAT conversion of root_26 core = 29,577 bytes, re-VERIFIED by drat-trim in 0.19 s. `Std.Tactic.BVDecide.LRAT.check_sound : check lratProof cnf = true → cnf.Unsat` is present in toolchain v4.33.1 (core Lean, no new dependency).
+- **Trust-base note:** Route B will add `Lean.ofReduceBool` to the final axiom profile. The manuscript's "no native_decide" claim must be amended when the final theorem lands; the checker soundness itself remains kernel-proved.

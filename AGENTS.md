@@ -39,3 +39,10 @@ Every reported result must be explicitly categorized into one of these four oper
 - Always remember that Conway's 99-graph is an open mathematical problem unsolved for over 50 years.
 - If the graph exists, the prevailing consensus in the literature is that it is rigid ($\mathrm{Aut}(G) = \{1\}$).
 - Searches under symmetry groups ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) only cover specific branches with automorphisms; if the graph lacks symmetries, these searches will never find it.
+
+## 5. Verification Notes for Lean 4.33.1
+- The `by_cases` macro opens `Classical`. For the restricted foundation policy above, use explicit computable `Decidable` instances and constructive case splits when needed, then inspect the final theorem's transitive axioms.
+- Library simplification lemmas can introduce `Classical.choice` even when the source contains no explicit classical command. This was observed for `Int.natCast_eq_zero`; use the axiom output, not a source-text scan, as the final gate.
+- Targeted checks for the root coverage and root-26 bridge are `lake build Conway.Z7RootCoverage Conway.Z7Root26Bridge`, followed by `lake env lean -M1536 -j1 Conway/Z7RootCoverage.lean` and the analogous command for `Conway/Z7Root26Bridge.lean`. Coverage does not certify all root refutations, and a root-specific bridge does not certify the entire Python encoder.
+- For Z7 row-norm work, verify `lake build Conway.Z7Root22Arithmetic Conway.TestZ7RootNorm`. Keep closed finite arithmetic certificate checks kernel-based (`decide +kernel`). If `omega` treats `Fin` projections and their Nat values as unrelated atoms, expose a Nat-typed lemma before changing resource limits or mathematical constraints.
+- Parity checks: `lake build Conway.Z7ComplementParity Conway.TestZ7RootParity Conway.TestZ7ComplementParity`. Write bang lookups as `xs[i]! = ...` with a space; `xs[i]!=...` parses as Boolean inequality, not a bang lookup followed by equality.
