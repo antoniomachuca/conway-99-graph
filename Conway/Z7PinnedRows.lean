@@ -46,7 +46,7 @@ theorem mem_prune {i j : Fin 12} {a b : List Nat} {dom : Domain}
   rw [List.mem_filter]
   exact ⟨hmem, hagree⟩
 
-private theorem all_of_mem {α : Type} {p : α → Bool} {l : List α} {a : α}
+theorem all_of_mem {α : Type} {p : α → Bool} {l : List α} {a : α}
     (hall : l.all p = true) (ha : a ∈ l) : p a = true := by
   have := (List.all_eq_true (p := p) (l := l)).1 hall a ha
   simpa using this

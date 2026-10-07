@@ -1,4 +1,5 @@
 import Conway.Z7PinnedRows
+import Conway.Z7Cauchy
 
 namespace Matrix99
 
@@ -41,11 +42,6 @@ def z7GenRow (fuel : Nat) (index j : Nat) (pref : List Nat)
 
 def z7UnaryRows (index : Fin 12) : List (List Nat) :=
   z7GenRow 12 index.val 0 [] 12 (z7ExteriorTarget index index) 0
-
-theorem z7UnaryRows_0_length : (z7UnaryRows 0).length = 7576 := by
-  decide +kernel
-
-#print axioms z7UnaryRows_0_length
 
 def rowPrefix (f : Fin 12 → Nat) (j : Nat) : List Nat :=
   ((List.finRange 12).take j).map f
@@ -100,6 +96,166 @@ private theorem suffixBalance_succ (f : Fin 12 → Nat) (j : Nat) (hj : j < 12) 
       z7ColWeight j * (f ⟨j, hj⟩) + suffixBalance f fuel (j + 1) := by
   simp [suffixBalance, hj]
 
+private theorem suffixTotal_le (f : Fin 12 → Nat) (hbound : ∀ i, f i ≤ 4)
+    (j : Nat) (hj : j ≤ 12) : suffixTotal f j ≤ (12 - j) * 4 := by
+  induction h : 12 - j generalizing j with
+  | zero =>
+      have hj12 : j = 12 := by omega
+      subst hj12
+      simp [suffixTotal, rowSuffix, finRange12_gen]
+  | succ n ih =>
+      have hjlt : j < 12 := by omega
+      rw [suffixTotal_succ f j hjlt]
+      have hf : f ⟨j, hjlt⟩ ≤ 4 := hbound _
+      have hrest : suffixTotal f (j + 1) ≤ n * 4 :=
+        ih (j + 1) (by omega) (by omega)
+      have hn : n = 12 - (j + 1) := by omega
+      omega
+
+private def diagAhead (index j : Nat) : Nat :=
+  if j ≤ index ∧ index < 12 then 4 else 0
+
+private theorem sq16 (x : Nat) (hx : x ≤ 4) : x * x ≤ 16 := by
+  have : x = 0 ∨ x = 1 ∨ x = 2 ∨ x = 3 ∨ x = 4 := by omega
+  rcases this with rfl | rfl | rfl | rfl | rfl <;> decide
+
+private theorem suffixSquares_le (f : Fin 12 → Nat) (hbound : ∀ i, f i ≤ 4)
+    (index j : Nat) (hj : j ≤ 12) :
+    suffixSquares f index (12 - j) j ≤ (12 - j) * 16 + diagAhead index j := by
+  induction h : 12 - j generalizing j with
+  | zero =>
+      have hj12 : j = 12 := by omega
+      subst hj12
+      simp [suffixSquares, diagAhead]
+  | succ n ih =>
+      have hjlt : j < 12 := by omega
+      have hfuel : 12 - (j + 1) = n := by omega
+      rw [show n + 1 = n.succ by rfl]
+      rw [suffixSquares_succ f index j hjlt n]
+      have hrest := ih (j + 1) (by omega) hfuel
+      have hff := sq16 _ (hbound ⟨j, hjlt⟩)
+      have hdiag : (if j = index then f ⟨j, hjlt⟩ else 0) + diagAhead index (j + 1) ≤
+          diagAhead index j := by
+        by_cases hji : j = index
+        · subst hji
+          rw [if_pos rfl]
+          have hhere : diagAhead j j = 4 := by simp [diagAhead, hjlt]
+          have hnext : diagAhead j (j + 1) = 0 := by
+            unfold diagAhead
+            have : ¬ (j + 1 ≤ j) := by omega
+            simp [this]
+          have hf : f ⟨j, hjlt⟩ ≤ 4 := hbound _
+          omega
+        · rw [if_neg hji]
+          by_cases hnext : j + 1 ≤ index
+          · by_cases hlt : index < 12
+            · have hjle : j ≤ index := Nat.le_of_succ_le hnext
+              simp [diagAhead, hnext, hlt, hjle]
+            · simp [diagAhead, hlt]
+          · simp [diagAhead, hnext]
+      refine Nat.le_trans ?_ (Nat.add_le_add_left hdiag ((n + 1) * 16))
+      have hsum : f ⟨j, hjlt⟩ * f ⟨j, hjlt⟩ +
+          (if j = index then f ⟨j, hjlt⟩ else 0) + suffixSquares f index n (j + 1) ≤
+          16 + ((if j = index then f ⟨j, hjlt⟩ else 0) + diagAhead index (j + 1)) + n * 16 := by
+        have h1 := Nat.add_le_add_right hff
+          ((if j = index then f ⟨j, hjlt⟩ else 0) + suffixSquares f index n (j + 1))
+        have h2 := Nat.add_le_add_left hrest
+          (16 + (if j = index then f ⟨j, hjlt⟩ else 0))
+        omega
+      omega
+
+private theorem cap196 (n d s : Nat) (hn : n ≤ 11) (hd : d ≤ 4) (hs : s ≤ n * 16 + d) :
+    s ≤ 196 := by omega
+
+private theorem suffixTotal_sq_le (f : Fin 12 → Nat) (hbound : ∀ i, f i ≤ 4)
+    (index j : Nat) (hj : j ≤ 12) :
+    suffixTotal f j * suffixTotal f j ≤
+      (12 - j) * suffixSquares f index (12 - j) j := by
+  induction h : 12 - j generalizing j with
+  | zero =>
+      have hj12 : j = 12 := by omega
+      subst hj12
+      simp [suffixTotal, rowSuffix, suffixSquares, finRange12_gen]
+  | succ n ih =>
+      have hjlt : j < 12 := by omega
+      have hfuel : 12 - (j + 1) = n := by omega
+      rw [suffixTotal_succ f j hjlt]
+      rw [show n + 1 = n.succ by rfl, suffixSquares_succ f index j hjlt n]
+      have hrest := ih (j + 1) (by omega) hfuel
+      have ha : f ⟨j, hjlt⟩ ≤ 4 := hbound _
+      have hsBound : suffixTotal f (j + 1) ≤ 48 := by
+        have hle := suffixTotal_le f hbound (j + 1) (by omega)
+        omega
+      have hqBound : suffixSquares f index n (j + 1) ≤ 196 := by
+        have hle := suffixSquares_le f hbound index (j + 1) (by omega)
+        have hcap : diagAhead index (j + 1) ≤ 4 := by
+          simp [diagAhead]; split <;> decide
+        have hn : n ≤ 11 := by omega
+        have hfuel' : 12 - (j + 1) = n := hfuel
+        rw [hfuel'] at hle
+        exact cap196 n _ _ hn hcap hle
+      have hk : n ≤ 12 := by omega
+      have hstep := cauchy_step (f ⟨j, hjlt⟩) (suffixTotal f (j + 1))
+        (suffixSquares f index n (j + 1)) n ha hsBound hqBound hk hrest
+      have hgrow : (n + 1) * (f ⟨j, hjlt⟩ * f ⟨j, hjlt⟩ + suffixSquares f index n (j + 1)) ≤
+          (n + 1) * (f ⟨j, hjlt⟩ * f ⟨j, hjlt⟩ +
+            (if j = index then f ⟨j, hjlt⟩ else 0) + suffixSquares f index n (j + 1)) := by
+        apply Nat.mul_le_mul_left
+        have : 0 ≤ if j = index then f ⟨j, hjlt⟩ else 0 := by split <;> omega
+        omega
+      exact Nat.le_trans hstep hgrow
+
+private theorem weightAbs (j : Nat) : (z7ColWeight j).natAbs = if j < 6 then 1 else 0 := by
+  by_cases h6 : j < 6
+  · by_cases h3 : j < 3
+    · simp [z7ColWeight, h3, h6]
+    · simp [z7ColWeight, h3, h6]
+  · have h3 : ¬ j < 3 := by omega
+    simp [z7ColWeight, h3, h6]
+
+private theorem weightLeft_succ (j : Nat) (hj : j < 12) :
+    z7WeightLeft j = (z7ColWeight j).natAbs + z7WeightLeft (j + 1) := by
+  rcases nat_lt12 j hj with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  all_goals simp [z7WeightLeft, z7ColWeight]
+
+private theorem suffixBalance_le (f : Fin 12 → Nat) (hbound : ∀ i, f i ≤ 4)
+    (j : Nat) (hj : j ≤ 12) :
+    (suffixBalance f (12 - j) j).natAbs ≤ z7WeightLeft j * 4 := by
+  induction h : 12 - j generalizing j with
+  | zero =>
+      have hj12 : j = 12 := by omega
+      subst hj12
+      simp [suffixBalance, z7WeightLeft]
+  | succ n ih =>
+      have hjlt : j < 12 := by omega
+      have hfuel : 12 - (j + 1) = n := by omega
+      rw [show n + 1 = n.succ by rfl, suffixBalance_succ f j hjlt n]
+      have hrest := ih (j + 1) (by omega) hfuel
+      have habs : (z7ColWeight j * (f ⟨j, hjlt⟩) + suffixBalance f n (j + 1)).natAbs ≤
+          (z7ColWeight j).natAbs * f ⟨j, hjlt⟩ + (suffixBalance f n (j + 1)).natAbs := by
+        have h1 := Int.natAbs_add_le (z7ColWeight j * (f ⟨j, hjlt⟩)) (suffixBalance f n (j + 1))
+        rw [Int.natAbs_mul] at h1
+        simpa using h1
+      have hw := weightLeft_succ j hjlt
+      have hf : f ⟨j, hjlt⟩ ≤ 4 := hbound _
+      have hwf : (z7ColWeight j).natAbs * f ⟨j, hjlt⟩ ≤ (z7ColWeight j).natAbs * 4 :=
+        Nat.mul_le_mul_left _ hf
+      have hsum : (z7ColWeight j).natAbs * f ⟨j, hjlt⟩ +
+          (suffixBalance f n (j + 1)).natAbs ≤
+          (z7ColWeight j).natAbs * 4 + z7WeightLeft (j + 1) * 4 :=
+        Nat.add_le_add hwf hrest
+      have hdistrib : (z7ColWeight j).natAbs * 4 + z7WeightLeft (j + 1) * 4 =
+          ((z7ColWeight j).natAbs + z7WeightLeft (j + 1)) * 4 :=
+        (Nat.add_mul (z7ColWeight j).natAbs (z7WeightLeft (j + 1)) 4).symm
+      exact Nat.le_trans habs (Nat.le_trans hsum (by
+        rw [hdistrib, hw]
+        exact Nat.le_refl _))
+
+#print axioms sq16
+#print axioms suffixTotal_le
+#print axioms suffixSquares_le
+#print axioms suffixTotal_sq_le
+#print axioms suffixBalance_le
 #print axioms rowPrefix_succ
 #print axioms suffixTotal_succ
 #print axioms suffixSquares_succ
