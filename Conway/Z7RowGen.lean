@@ -345,6 +345,171 @@ theorem z7GenRow_complete_from (index : Fin 12) (f : Fin 12 → Nat)
         Int.add_sub_cancel]
       exact hnext
 
+private theorem finLit0 (h : 0 < 12) : (⟨0, h⟩ : Fin 12) = 0 := Fin.ext rfl
+private theorem finLit1 (h : 1 < 12) : (⟨1, h⟩ : Fin 12) = 1 := Fin.ext rfl
+private theorem finLit2 (h : 2 < 12) : (⟨2, h⟩ : Fin 12) = 2 := Fin.ext rfl
+private theorem finLit3 (h : 3 < 12) : (⟨3, h⟩ : Fin 12) = 3 := Fin.ext rfl
+private theorem finLit4 (h : 4 < 12) : (⟨4, h⟩ : Fin 12) = 4 := Fin.ext rfl
+private theorem finLit5 (h : 5 < 12) : (⟨5, h⟩ : Fin 12) = 5 := Fin.ext rfl
+private theorem finLit6 (h : 6 < 12) : (⟨6, h⟩ : Fin 12) = 6 := Fin.ext rfl
+private theorem finLit7 (h : 7 < 12) : (⟨7, h⟩ : Fin 12) = 7 := Fin.ext rfl
+private theorem finLit8 (h : 8 < 12) : (⟨8, h⟩ : Fin 12) = 8 := Fin.ext rfl
+private theorem finLit9 (h : 9 < 12) : (⟨9, h⟩ : Fin 12) = 9 := Fin.ext rfl
+private theorem finLit10 (h : 10 < 12) : (⟨10, h⟩ : Fin 12) = 10 := Fin.ext rfl
+private theorem finLit11 (h : 11 < 12) : (⟨11, h⟩ : Fin 12) = 11 := Fin.ext rfl
+
+private theorem rowPrefix_zero (f : Fin 12 → Nat) : rowPrefix f 0 = [] := by
+  unfold rowPrefix
+  rw [List.take_zero, List.map_nil]
+
+private theorem rowPrefix_all (f : Fin 12 → Nat) :
+    rowPrefix f 12 = (List.finRange 12).map f := by
+  unfold rowPrefix
+  have hlen : (List.finRange 12).length = 12 := List.length_finRange
+  conv =>
+    lhs
+    arg 2
+    arg 1
+    rw [← hlen]
+  rw [List.take_length]
+
+private theorem suffixTotal_zero (f : Fin 12 → Nat) : suffixTotal f 0 = sum12 f := by
+  unfold suffixTotal rowSuffix sum12
+  rw [List.drop_zero]
+
+private theorem suffixBalance_zero (f : Fin 12 → Nat) :
+    suffixBalance f 12 0 =
+      ((f 0 + f 1 + f 2 : Nat) : Int) - (f 3 + f 4 + f 5) := by
+  rw [suffixBalance_succ f 0 (by decide) 11,
+      suffixBalance_succ f 1 (by decide) 10,
+      suffixBalance_succ f 2 (by decide) 9,
+      suffixBalance_succ f 3 (by decide) 8,
+      suffixBalance_succ f 4 (by decide) 7,
+      suffixBalance_succ f 5 (by decide) 6,
+      suffixBalance_succ f 6 (by decide) 5,
+      suffixBalance_succ f 7 (by decide) 4,
+      suffixBalance_succ f 8 (by decide) 3,
+      suffixBalance_succ f 9 (by decide) 2,
+      suffixBalance_succ f 10 (by decide) 1,
+      suffixBalance_succ f 11 (by decide) 0,
+      show suffixBalance f 0 12 = 0 from rfl,
+      show z7ColWeight 0 = 1 by decide,
+      show z7ColWeight 1 = 1 by decide,
+      show z7ColWeight 2 = 1 by decide,
+      show z7ColWeight 3 = -1 by decide,
+      show z7ColWeight 4 = -1 by decide,
+      show z7ColWeight 5 = -1 by decide,
+      show z7ColWeight 6 = 0 by decide,
+      show z7ColWeight 7 = 0 by decide,
+      show z7ColWeight 8 = 0 by decide,
+      show z7ColWeight 9 = 0 by decide,
+      show z7ColWeight 10 = 0 by decide,
+      show z7ColWeight 11 = 0 by decide,
+      finLit0, finLit1, finLit2, finLit3, finLit4, finLit5,
+      finLit6, finLit7, finLit8, finLit9, finLit10, finLit11]
+  omega
+
+private def suffixSq (f : Fin 12 → Nat) : Nat → Nat → Nat
+  | 0, _ => 0
+  | fuel + 1, j =>
+    if h : j < 12 then
+      f ⟨j, h⟩ * f ⟨j, h⟩ + suffixSq f fuel (j + 1)
+    else 0
+
+private def suffixDiag (f : Fin 12 → Nat) (index : Nat) : Nat → Nat → Nat
+  | 0, _ => 0
+  | fuel + 1, j =>
+    if h : j < 12 then
+      (if j = index then f ⟨j, h⟩ else 0) + suffixDiag f index fuel (j + 1)
+    else 0
+
+private theorem suffixSq_succ (f : Fin 12 → Nat) (j : Nat) (hj : j < 12) (fuel : Nat) :
+    suffixSq f (fuel + 1) j = f ⟨j, hj⟩ * f ⟨j, hj⟩ + suffixSq f fuel (j + 1) := by
+  simp [suffixSq, hj]
+
+private theorem squares_split (f : Fin 12 → Nat) (index fuel j : Nat) :
+    suffixSquares f index fuel j = suffixSq f fuel j + suffixDiag f index fuel j := by
+  induction fuel generalizing j with
+  | zero => rfl
+  | succ fuel ih =>
+      by_cases hj : j < 12
+      · simp [suffixSquares, suffixSq, suffixDiag, hj, ih]
+        omega
+      · simp [suffixSquares, suffixSq, suffixDiag, hj]
+
+private theorem suffixDiag_after (f : Fin 12 → Nat) (index fuel j : Nat)
+    (hj : index < j) : suffixDiag f index fuel j = 0 := by
+  induction fuel generalizing j with
+  | zero => rfl
+  | succ fuel ih =>
+      by_cases hlt : j < 12
+      · have hne : j ≠ index := by omega
+        simp [suffixDiag, hlt, hne, ih (j + 1) (by omega)]
+      · simp [suffixDiag, hlt]
+
+private theorem suffixDiag_hit (f : Fin 12 → Nat) (index fuel j : Nat)
+    (hle : j ≤ index) (hlt : index < j + fuel) (hindex : index < 12) :
+    suffixDiag f index fuel j = f ⟨index, hindex⟩ := by
+  induction fuel generalizing j with
+  | zero => omega
+  | succ fuel ih =>
+      have hj : j < 12 := by omega
+      by_cases heq : j = index
+      · unfold suffixDiag
+        rw [dif_pos hj, if_pos heq, suffixDiag_after f index fuel (j + 1) (by omega)]
+        rw [show (⟨j, hj⟩ : Fin 12) = ⟨index, hindex⟩ from Fin.ext heq]
+        exact Nat.add_zero _
+      · simp [suffixDiag, hj, heq, ih (j + 1) (by omega) (by omega)]
+
+private theorem suffixSq_expand (f : Fin 12 → Nat) :
+    suffixSq f 12 0 =
+      f 0 * f 0 + (f 1 * f 1 + (f 2 * f 2 + (f 3 * f 3 +
+      (f 4 * f 4 + (f 5 * f 5 + (f 6 * f 6 + (f 7 * f 7 +
+      (f 8 * f 8 + (f 9 * f 9 + (f 10 * f 10 + (f 11 * f 11 + 0))))))))))) := by
+  rw [suffixSq_succ f 0 (by decide) 11,
+      suffixSq_succ f 1 (by decide) 10,
+      suffixSq_succ f 2 (by decide) 9,
+      suffixSq_succ f 3 (by decide) 8,
+      suffixSq_succ f 4 (by decide) 7,
+      suffixSq_succ f 5 (by decide) 6,
+      suffixSq_succ f 6 (by decide) 5,
+      suffixSq_succ f 7 (by decide) 4,
+      suffixSq_succ f 8 (by decide) 3,
+      suffixSq_succ f 9 (by decide) 2,
+      suffixSq_succ f 10 (by decide) 1,
+      suffixSq_succ f 11 (by decide) 0,
+      show suffixSq f 0 12 = 0 from rfl,
+      finLit0, finLit1, finLit2, finLit3, finLit4, finLit5,
+      finLit6, finLit7, finLit8, finLit9, finLit10, finLit11]
+
+private theorem squareSum_expand (f : Fin 12 → Nat) :
+    sum12 (fun k => f k * f k) =
+      f 0 * f 0 + (f 1 * f 1 + (f 2 * f 2 + (f 3 * f 3 +
+      (f 4 * f 4 + (f 5 * f 5 + (f 6 * f 6 + (f 7 * f 7 +
+      (f 8 * f 8 + (f 9 * f 9 + (f 10 * f 10 + (f 11 * f 11 + 0))))))))))) := by
+  unfold sum12
+  rw [finRange12_gen]
+  rfl
+
+private theorem suffixSquares_zero (f : Fin 12 → Nat) (index : Fin 12) :
+    suffixSquares f index.val 12 0 = sum12 (fun k => f k * f k) + f index := by
+  rw [squares_split, suffixSq_expand, squareSum_expand,
+    suffixDiag_hit f index.val 12 0 (Nat.zero_le _) (by omega) index.isLt,
+    show (⟨index.val, index.isLt⟩ : Fin 12) = index from Fin.ext rfl]
+
+theorem z7UnaryRows_of_row (index : Fin 12) (f : Fin 12 → Nat)
+    (hbound : ∀ i, f i ≤ 4) (hdiag : f index = 0 ∨ f index = 2)
+    (hsum : sum12 f = 12)
+    (hbal : f 0 + f 1 + f 2 = f 3 + f 4 + f 5)
+    (hsq : sum12 (fun k => f k * f k) + f index = z7ExteriorTarget index index) :
+    (List.finRange 12).map f ∈ z7UnaryRows index := by
+  have hmem := z7GenRow_complete_from index f hbound hdiag 0 (Nat.zero_le _)
+  have hzero : ((f 0 + f 1 + f 2 : Nat) : Int) - (↑(f 3) + ↑(f 4) + ↑(f 5)) = 0 := by
+    omega
+  rw [rowPrefix_all, rowPrefix_zero, suffixTotal_zero, hsum, suffixSquares_zero, hsq,
+    suffixBalance_zero, hzero, Nat.sub_zero] at hmem
+  exact hmem
+
 #print axioms sq16
 #print axioms suffixTotal_le
 #print axioms suffixSquares_le
@@ -355,5 +520,6 @@ theorem z7GenRow_complete_from (index : Fin 12) (f : Fin 12 → Nat)
 #print axioms suffixSquares_succ
 #print axioms suffixBalance_succ
 #print axioms z7GenRow_complete_from
+#print axioms z7UnaryRows_of_row
 
 end Matrix99
