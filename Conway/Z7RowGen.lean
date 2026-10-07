@@ -251,6 +251,100 @@ private theorem suffixBalance_le (f : Fin 12 → Nat) (hbound : ∀ i, f i ≤ 4
         rw [hdistrib, hw]
         exact Nat.le_refl _))
 
+private theorem diagAhead_le (index j : Nat) : diagAhead index j ≤ 4 := by
+  unfold diagAhead
+  split <;> decide
+
+private theorem squares_cap (n d s : Nat) (hd : d ≤ 4) (hs : s ≤ n * 16 + d) :
+    s ≤ n * 16 + 4 := by omega
+
+theorem z7GenRow_complete_from (index : Fin 12) (f : Fin 12 → Nat)
+    (hbound : ∀ i, f i ≤ 4) (hdiag : f index = 0 ∨ f index = 2)
+    (j : Nat) (hj : j ≤ 12) :
+    rowPrefix f 12 ∈ z7GenRow (12 - j) index.val j (rowPrefix f j)
+      (suffixTotal f j) (suffixSquares f index.val (12 - j) j)
+      (suffixBalance f (12 - j) j) := by
+  induction h : 12 - j generalizing j with
+  | zero =>
+      have hj12 : j = 12 := by omega
+      subst hj12
+      have hsq : suffixSquares f index.val 0 12 = 0 := rfl
+      have hbal0 : suffixBalance f 0 12 = 0 := rfl
+      have htot : suffixTotal f 12 = 0 := by
+        unfold suffixTotal rowSuffix
+        rw [finRange12_gen]
+        rfl
+      rw [hsq, hbal0, htot]
+      unfold z7GenRow
+      rw [if_pos rfl]
+      have hcond : (0 == 0 && 0 == 0 && (0 : Int) == 0) = true := by decide
+      rw [hcond, if_pos rfl]
+      exact List.mem_cons_self
+  | succ n ih =>
+      have hjlt : j < 12 := by omega
+      have hfuel : 12 - (j + 1) = n := by omega
+      let v : Nat := f ⟨j, hjlt⟩
+      have hv : v ≤ 4 := hbound _
+      have hvals : v ∈ z7ColVals j index.val := by
+        by_cases hji : j = index.val
+        · rcases hdiag with h0 | h2
+          · simp [v, z7ColVals, hji, h0]
+          · simp [v, z7ColVals, hji, h2]
+        · have : v = 0 ∨ v = 1 ∨ v = 2 ∨ v = 3 ∨ v = 4 := by omega
+          simp [v, z7ColVals, hji]
+          omega
+      have htotal := suffixTotal_succ f j hjlt
+      have hsqEq := suffixSquares_succ f index.val j hjlt n
+      have hbalEq := suffixBalance_succ f j hjlt n
+      have hpref := rowPrefix_succ f j hjlt
+      have hnext := ih (j + 1) (by omega) hfuel
+      have hpos : z7RowPossible j (suffixTotal f j)
+          (suffixSquares f index.val (n + 1) j) (suffixBalance f (n + 1) j) = true := by
+        have htot := suffixTotal_le f hbound j hj
+        have hsqle := suffixTotal_sq_le f hbound index.val j hj
+        have hcap0 := suffixSquares_le f hbound index.val j hj
+        have hcap := squares_cap (12 - j) (diagAhead index.val j)
+          (suffixSquares f index.val (12 - j) j) (diagAhead_le _ _) hcap0
+        have hbal := suffixBalance_le f hbound j hj
+        rw [h] at htot hsqle hcap hbal
+        unfold z7RowPossible
+        simp only [h]
+        rw [Bool.and_eq_true]
+        constructor
+        · rw [Bool.and_eq_true]
+          constructor
+          · rw [Bool.and_eq_true]
+            constructor
+            · rw [Bool.and_eq_true]
+              constructor
+              · exact decide_eq_true (Nat.zero_le _)
+              · exact decide_eq_true htot
+            · exact decide_eq_true hsqle
+          · exact decide_eq_true hcap
+        · exact decide_eq_true hbal
+      have hdec : decide (v ≤ suffixTotal f j ∧
+          v * v + (if j = index.val then v else 0) ≤
+            suffixSquares f index.val (n + 1) j) = true := by
+        apply decide_eq_true
+        refine ⟨?_, ?_⟩
+        · rw [htotal]
+          exact Nat.le_add_right _ _
+        · rw [hsqEq]
+          exact Nat.le_add_right _ _
+      rw [show n + 1 = Nat.succ n from rfl]
+      unfold z7GenRow
+      rw [if_neg (show ¬ j = 12 by omega), hpos, Bool.not_true]
+      dsimp only
+      rw [if_neg Bool.false_ne_true]
+      refine List.mem_flatMap.2 ⟨v, hvals, ?_⟩
+      rw [hdec]
+      simp only [ite_true]
+      rw [← hpref, htotal, hsqEq, hbalEq]
+      simp only [v, Nat.add_sub_cancel_left]
+      rw [Int.add_comm (z7ColWeight j * ↑(f ⟨j, hjlt⟩)) (suffixBalance f n (j + 1)),
+        Int.add_sub_cancel]
+      exact hnext
+
 #print axioms sq16
 #print axioms suffixTotal_le
 #print axioms suffixSquares_le
@@ -260,5 +354,6 @@ private theorem suffixBalance_le (f : Fin 12 → Nat) (hbound : ∀ i, f i ≤ 4
 #print axioms suffixTotal_succ
 #print axioms suffixSquares_succ
 #print axioms suffixBalance_succ
+#print axioms z7GenRow_complete_from
 
 end Matrix99
