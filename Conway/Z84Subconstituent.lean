@@ -38,18 +38,39 @@ def K_val (i j : Fin 84) : Nat :=
 /-- Block decomposition of the adjacency matrix. -/
 def block_A (X : Matrix 84 84) : Matrix99 Nat :=
   fun i j =>
-    if i.val == 0 then
-      if j.val == 0 then 0
-      else if j.val <= 14 then 1
+    if h1 : i.val = 0 then
+      if h2 : j.val = 0 then 0
+      else if h3 : j.val ≤ 14 then 1
       else 0
-    else if i.val <= 14 then
-      if j.val == 0 then 1
-      else if j.val <= 14 then M_val ⟨i.val - 1, by sorry⟩ ⟨j.val - 1, by sorry⟩
-      else B_val ⟨i.val - 1, by sorry⟩ ⟨j.val - 15, by sorry⟩
+    else if h4 : i.val ≤ 14 then
+      if h5 : j.val = 0 then 1
+      else if h6 : j.val ≤ 14 then 
+        M_val ⟨i.val - 1, by have : i.val < 99 := i.isLt; omega⟩ ⟨j.val - 1, by have : j.val < 99 := j.isLt; omega⟩
+      else 
+        B_val ⟨i.val - 1, by have : i.val < 99 := i.isLt; omega⟩ ⟨j.val - 15, by have : j.val < 99 := j.isLt; omega⟩
     else
-      if j.val == 0 then 0
-      else if j.val <= 14 then B_val ⟨j.val - 1, by sorry⟩ ⟨i.val - 15, by sorry⟩
-      else X ⟨i.val - 15, by sorry⟩ ⟨j.val - 15, by sorry⟩
+      if h7 : j.val = 0 then 0
+      else if h8 : j.val ≤ 14 then 
+        B_val ⟨j.val - 1, by have : j.val < 99 := j.isLt; omega⟩ ⟨i.val - 15, by have : i.val < 99 := i.isLt; omega⟩
+      else 
+        X ⟨i.val - 15, by have : i.val < 99 := i.isLt; omega⟩ ⟨j.val - 15, by have : j.val < 99 := j.isLt; omega⟩
+
+theorem block_A_diag (X : Matrix 84 84) (hX : ∀ i : Fin 84, X i i = 0) (i : Fin 99) : block_A X i i = 0 := by
+  sorry
+
+theorem block_A_symm (X : Matrix 84 84) (hX : ∀ i j : Fin 84, X i j = X j i) (i j : Fin 99) : block_A X i j = block_A X j i := by
+  sorry
+
+theorem block_A_binary (X : Matrix 84 84) (hX : ∀ i j : Fin 84, X i j = 0 ∨ X i j = 1) (i j : Fin 99) : block_A X i j = 0 ∨ block_A X i j = 1 := by
+  sorry
+
+theorem block_A_srg_0_0 (X : Matrix 84 84) :
+  (List.finRange 99).foldl (fun acc j => acc + block_A X ⟨0, by omega⟩ j) 0 = 14 := by
+  sorry
+
+theorem block_A_srg_0_j (X : Matrix 84 84) (j : Fin 99) (hj : j.val > 0) :
+  (List.finRange 99).foldl (fun acc k => acc + block_A X ⟨0, by omega⟩ k * block_A X k j) 0 + block_A X ⟨0, by omega⟩ j = 14 := by
+  sorry
 
 theorem second_subconstituent_reduction (X : Matrix 84 84) :
   (ConwayAdj (block_A X)) ↔
