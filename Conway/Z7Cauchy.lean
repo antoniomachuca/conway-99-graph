@@ -5,16 +5,43 @@ namespace Matrix99
 set_option maxHeartbeats 200000000
 
 /-- The Cauchy step on the range that occurs for a 12-entry row with entries at most 4. -/
+private def cauchyCheckA (a : Nat) : Bool :=
+  (List.range 49).all fun s =>
+    (List.range 13).all fun k =>
+      (List.range 197).all fun q =>
+        !decide (s * s ≤ k * q) ||
+          decide ((a + s) * (a + s) ≤ (k + 1) * (a * a + q))
+
 private def cauchyCheck : Bool :=
-  (List.range 5).all fun a =>
-    (List.range 49).all fun s =>
-      (List.range 13).all fun k =>
-        (List.range 197).all fun q =>
-          !decide (s * s ≤ k * q) ||
-            decide ((a + s) * (a + s) ≤ (k + 1) * (a * a + q))
+  (List.range 5).all cauchyCheckA
+
+private theorem cauchyCheck_ok_0 : cauchyCheckA 0 = true := by
+  decide +kernel
+
+private theorem cauchyCheck_ok_1 : cauchyCheckA 1 = true := by
+  decide +kernel
+
+private theorem cauchyCheck_ok_2 : cauchyCheckA 2 = true := by
+  decide +kernel
+
+private theorem cauchyCheck_ok_3 : cauchyCheckA 3 = true := by
+  decide +kernel
+
+private theorem cauchyCheck_ok_4 : cauchyCheckA 4 = true := by
+  decide +kernel
 
 private theorem cauchyCheck_ok : cauchyCheck = true := by
-  decide +kernel
+  unfold cauchyCheck
+  rw [List.all_eq_true]
+  intro a ha
+  rw [List.mem_range] at ha
+  have hc : a = 0 ∨ a = 1 ∨ a = 2 ∨ a = 3 ∨ a = 4 := by omega
+  rcases hc with rfl | rfl | rfl | rfl | rfl
+  · exact cauchyCheck_ok_0
+  · exact cauchyCheck_ok_1
+  · exact cauchyCheck_ok_2
+  · exact cauchyCheck_ok_3
+  · exact cauchyCheck_ok_4
 
 theorem cauchy_step (a s q k : Nat) (ha : a ≤ 4) (hsb : s ≤ 48) (hq : q ≤ 196)
     (hk : k ≤ 12) (hs : s * s ≤ k * q) :
