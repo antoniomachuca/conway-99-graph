@@ -1,0 +1,60 @@
+import Conway.Z7Root29Close
+import Conway.Z7Root30Search
+
+namespace Matrix99
+
+theorem exterior_root30_false (C : Fin 12 → Fin 12 → Nat) (hC : ExteriorEquations C)
+    (hrow : ∀ j, C 0 j = z7Root30Row j) : False :=
+  exterior_pinned_false_of_search z7Root30Row z7Root30_noExtension C hC hrow
+
+theorem no_exterior_root30 : ¬ ∃ C : Fin 12 → Fin 12 → Nat,
+    ExteriorEquations C ∧ (∀ j, C 0 j = z7Root30Row j) := by
+  intro h
+  obtain ⟨C, hC, hrow⟩ := h
+  exact exterior_root30_false C hC hrow
+
+def z7AfterRoot30Remaining : List (List Nat) :=
+  z7AfterRoot29Remaining.filter fun r => !(r == pinnedList z7Root30Row)
+
+theorem z7AfterRoot30Remaining_length : z7AfterRoot30Remaining.length = 1 := by
+  decide +kernel
+
+theorem exterior_row_not_root30 (C : Fin 12 → Fin 12 → Nat) (hC : ExteriorEquations C) :
+    (List.finRange 12).map (C 0) ≠ pinnedList z7Root30Row := by
+  intro hlist
+  apply exterior_root30_false C hC
+  intro j
+  have hentry := congrArg (fun row => rowEntry row j) hlist
+  rw [rowEntry_map] at hentry
+  unfold pinnedList at hentry
+  rw [rowEntry_map] at hentry
+  exact hentry
+
+theorem exterior_row_mem_after_root30 (C : Fin 12 → Fin 12 → Nat) (hC : ExteriorEquations C)
+    (hr : (List.finRange 12).map (C 0) ∈ z7AfterRoot29Remaining) :
+    (List.finRange 12).map (C 0) ∈ z7AfterRoot30Remaining := by
+  unfold z7AfterRoot30Remaining
+  rw [List.mem_filter]
+  refine ⟨hr, ?_⟩
+  have hne := exterior_row_not_root30 C hC
+  have hb : ((List.finRange 12).map (C 0) == pinnedList z7Root30Row) = false := by
+    cases h : ((List.finRange 12).map (C 0) == pinnedList z7Root30Row) with
+    | false => rfl
+    | true => exact absurd ((beq_iff_eq).1 h) hne
+  rw [hb]
+  decide
+
+theorem conway_z7_has_after_root30_root (h : HasZ7Symmetry) :
+    ∃ C : Fin 12 → Fin 12 → Nat, ExteriorEquations C ∧
+      (List.finRange 12).map (C 0) ∈ z7AfterRoot30Remaining := by
+  obtain ⟨C, hC, hr⟩ := conway_z7_has_after_root29_root h
+  exact ⟨C, hC, exterior_row_mem_after_root30 C hC hr⟩
+
+#print axioms exterior_root30_false
+#print axioms no_exterior_root30
+#print axioms exterior_row_not_root30
+#print axioms exterior_row_mem_after_root30
+#print axioms z7AfterRoot30Remaining_length
+#print axioms conway_z7_has_after_root30_root
+
+end Matrix99
