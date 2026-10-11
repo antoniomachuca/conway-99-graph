@@ -355,7 +355,8 @@ theorem conway_exists_triangle (A : Matrix99 Nat) (h : ConwayAdj A) :
   have ⟨u, _, hf_pos⟩ := foldl_pos_exists f (List.finRange 99) hpos
   dsimp [f] at hf_pos
   rcases h.2.2.1 0 u with hu0 | hu1
-  · rw [hu0, Nat.zero_mul] at hf_pos; omega
+  · rw [hu0, Nat.zero_mul] at hf_pos
+    exact absurd hf_pos (Nat.lt_irrefl 0)
   · have ⟨w, hclique⟩ := conway_triangle_of_edge A h 0 u hu1
     exact ⟨0, u, w, hclique⟩
 
