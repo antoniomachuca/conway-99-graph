@@ -1,6 +1,7 @@
 import Conway.Matrix
 import Conway.Structural
 import Conway.Z7NonExistence
+import Conway.Z7Main
 
 namespace Matrix99
 

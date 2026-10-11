@@ -30,3 +30,4 @@ import Conway.TestZ7RootNorm
 import Conway.TestZ7RootParity
 import Conway.TestZ7ComplementParity
 import Conway.Z7FinalClosure
+import Conway.Z7Main

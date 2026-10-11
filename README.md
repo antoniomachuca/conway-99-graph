@@ -4,7 +4,7 @@
 
 **Contact:** [am.machuca.2023@alumnos.urjc.es](mailto:am.machuca.2023@alumnos.urjc.es) / [contactoantoniomachuca@gmail.com](mailto:contactoantoniomachuca@gmail.com)
 
-**Documentation audit:** September 21, 2026
+**Documentation audit:** September 21, 2026 (order-7 and literature status updated October 11, 2026)
 
 **Technical note:** [LaTeX source](manuscript/conway_involutions.tex) · [PDF](manuscript/conway_involutions.pdf)
 
@@ -44,7 +44,8 @@ The following are **antecedents from the literature**, not new discoveries of th
 
 - **Involutions already reduce to one fixed vertex.** Theorem 1 in Makhnev's September 2009 lecture slides, attributed to Makhnev–Minakova, states that an automorphism of prime order $p=2$ fixes exactly one vertex. The slides also eliminate the other fixed-subgraph candidates using character integrality. Consequently, excluding $f=3,5,7,\ldots$ is not a new conclusion of this repository. [Makhnev, *Symmetric graphs and their automorphisms*](https://www.math.uni-bielefeld.de/~baumeist/sommerschule/makhnev.pdf).
 - **Order 7 was already excluded.** Behbahani–Lam (2011) restricted possible prime-order automorphisms to orders 2 and 3, as explicitly recalled in the introduction of [Cesarz–Woldar (2025)](https://alco.centre-mersenne.org/articles/10.5802/alco.418/).
-- **Order 3 must not be described as entirely excluded.** Crnković–Maksimović (2020) exclude the fixed-point case for order 3 and groups of orders 6 and 9. The fixed-point-free order-3 case must not be conflated with these exclusions. [Article](https://cdm.ucalgary.ca/article/view/62323).
+- **Order 3 must not be described as entirely excluded.** Behbahani–Lam prove that an order-3 automorphism has no fixed points (thesis 2009, Theorem 4.14). Their orbit-matrix search for the fixed-point-free case did not finish: the entry is `?` in thesis Table 21. Crnković–Maksimović (2020) exclude groups of orders 6 and 9; they cite the fixed-point-free property from Behbahani–Lam and do not exclude the fixed-point-free order-3 action. [Article](https://cdm.ucalgary.ca/article/view/62323).
+- **Consequence of the cited results (not formalized here):** $|G|$ divides $2\cdot3^3\cdot7\cdot11$ (Makhnev–Minakova), the only primes are 2 and 3 (Behbahani–Lam), $2\mid|G|\Rightarrow|G|\mid6$ (Cesarz–Woldar), and orders 6 and 9 are excluded (Crnković–Maksimović). Together these give $|\mathrm{Aut}(G)|\in\{1,2,3\}$. The open symmetric cases are an involution fixing exactly one vertex and a fixed-point-free automorphism of order 3.
 - **Even-order reduction is inherited from prior results.** Combining the Cesarz–Woldar implication $2\mid |\mathrm{Aut}(G)|\Rightarrow |\mathrm{Aut}(G)|\mid6$ with the exclusion of order 6 leaves order 2. The arithmetic implication is formalized here; the graph-theoretic premises are supplied as assumptions.
 
 See [the reference index](references/README.md) for bibliographic details. Novelty of a particular implementation or search reduction remains **PENDING**; no priority claim is made.
@@ -59,12 +60,28 @@ The operational labels follow [AGENTS.md](AGENTS.md). A label applies to the sta
 | Audited structural lemmas | **PROVED** | `conway_k4_free`, `conway_neighborhood_one_factor`, `conway_diameter_at_most_two`, and the three-fixed-point dichotomy have only the standard audited axioms. These are not claimed as new mathematical facts. |
 | Arithmetic contradiction lemmas | **PROVED** | Statements such as the impossibility of $7a=62$, or of specified incompatible residues. This does not certify the derivation of their premises from a graph action. |
 | Graph-level conclusions packaged with external spectral, counting, or group-order premises | **COMPILED** | Includes the advertised $f=5$, $f=7$, parity-rigidity, and Cesarz–Woldar wrappers. Complete graph-to-premise formalization remains **PENDING**. |
-| `GrandClassification.lean` and order-3/order-7 nonexistence stubs | **COMPILED** | The build succeeds, but the aggregate theorem depends on `sorryAx`. It is not a proof that the automorphism group has order 1 or 2. |
+| Exclusion of order-7 automorphisms: `conway_no_z7_automorphism` (`Z7Main.lean`) and `conway_no_z7_automorphism_kernel` (`Z7FinalClosure.lean`) | **PROVED** | Kernel-checked from `ConwayAdj` with axioms `[propext, Quot.sound]`; no SAT certificate or external premise is used. This formalizes Behbahani–Lam's known exclusion of order 7; it is not a new mathematical result. See [Section 2.1](#21-order-7-formalization). |
+| `GrandClassification.lean` and the order-3 nonexistence stubs | **COMPILED** | The build succeeds, but `z3_fpf_orbit_matrix_nonexistence` and `z3_fixed3_orbit_matrix_nonexistence` are `sorry`, so the aggregate theorem depends on `sorryAx`. It is not a proof that the automorphism group has order 1 or 2. |
 | Compiler-helper regression suite | **COMPILED** | All 20 tests pass, including the repaired legacy Z3-FPF route. Full graph-to-CNF certification remains pending; the additional 11 input-audit and 8 runner tests have narrower stated scopes. |
 | Stored $f=3$ and order-7 SAT verification records | **PROVED**, at recorded formula level only | Solver logs contain `s UNSATISFIABLE` and checker logs contain `s VERIFIED`. Encoding correctness, branch coverage, and input provenance are separate obligations. These checks were inspected, not rerun during the documentation audit. |
 | Incidence and stabilizer calculations for $f=1$ | **EXPLORED** | The Python calculation reproduces stabilizer suborbit sizes $1,1,20,20$, including the distinguished orbit; the other 41 labels split as $1+20+20$. This is not an audited end-to-end proof of CNF branch coverage. |
 | Inconclusive SAT runs and uncertified Python/SMT analyses | **EXPLORED** | No conclusion follows from timeout, conflict count, proof-file size, or the mere presence of a `.drat` file. |
 | Remaining searches, full rigidity, and graph existence | **PENDING** | A rigid graph, if one exists, is outside all searches imposing a nontrivial automorphism. Even proving rigidity would not decide existence. |
+
+### 2.1 Order-7 formalization
+
+The kernel proof follows this chain; every step is a Lean theorem with axioms `[propext, Quot.sound]`.
+
+1. An order-7 automorphism yields a 15×15 orbit matrix (`conway_z7_induces_orbit_matrix`). Its 12×12 exterior block satisfies `ExteriorEquations`.
+2. Any solution can be relabelled so that its first row is one of 33 canonical rows (`exterior_has_canonical_root`).
+3. Five rows are excluded by short arithmetic arguments (`Z7Root22Arithmetic`, `Z7Root03Arithmetic`, `Z7ComplementParity`). The other 28 are excluded by kernel-checked pinned searches (`Z7RootNN*.lean`).
+4. `no_exterior_equations` then gives `z7_orbit_matrix_nonexistence` and `conway_no_z7_automorphism` (`Z7Main.lean`).
+
+The searches rely on two engineering steps that keep each kernel check small. The root-independent row lists are proved once and stored (`Z7UnaryCache*.lean`). Each search is split into chunks (`scripts/z7_search_template.py`). A sequential rebuild of all modules fits within a 4.5 GiB physical-memory footprint.
+
+The Zenodo DRAT certificate above refutes a CNF whose graph-to-CNF link is only **COMPILED**. The kernel proof does not depend on it.
+
+On a separate branch, `feat/conway84-subconstituent`, `conway_exists_iff_residual` (**PROVED**) reduces existence to the existence of an 84×84 matrix satisfying the second-subconstituent equations. This is a reformulation, not progress on existence.
 
 ## 3. Known limitations
 
