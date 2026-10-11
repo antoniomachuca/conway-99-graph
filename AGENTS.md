@@ -39,3 +39,35 @@ Every reported result must be explicitly categorized into one of these four oper
 - Always remember that Conway's 99-graph is an open mathematical problem unsolved for over 50 years.
 - If the graph exists, the prevailing consensus in the literature is that it is rigid ($\mathrm{Aut}(G) = \{1\}$).
 - Searches under symmetry groups ($\mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_7$) only cover specific branches with automorphisms; if the graph lacks symmetries, these searches will never find it.
+
+---
+
+## 5. Z84 second-subconstituent reduction (feat/conway84-subconstituent)
+
+`Conway/Z84Subconstituent.lean` proves `Matrix99.second_subconstituent_reduction`
+(a *conditional* structural reduction, not a proof the 99-graph exists).
+
+Verification commands used (all Lean runs under the 300 s / 2 GiB wrapper
+`scratch/lead_bounded_20261007.py` with scratch stem dir `scratch/z84_block_20261011/`):
+
+```bash
+python3 -I -B scratch/lead_bounded_20261007.py scratch/z84_block_20261011/<stem> \
+  /bin/sh -c 'cd "$1" && shift && exec "$@"' sh "<worktree>" \
+  lake build Conway.Z84Subconstituent Conway.TestZ84Subconstituent
+python3 -I -B scratch/lead_bounded_20261007.py scratch/z84_block_20261011/<stem> \
+  /bin/sh -c 'cd "$1" && shift && exec "$@"' sh "<worktree>" \
+  lake env lean Conway/Z84Subconstituent.lean
+python3 -I -B scratch/lead_bounded_20261007.py scratch/z84_block_20261011/<stem> \
+  /bin/sh -c 'cd "$1" && shift && exec "$@"' sh "<worktree>" \
+  lake env lean Conway/TestZ84Subconstituent.lean
+python3 -m pytest tests/test_z84_constants.py -q
+```
+
+Status: all `#print axioms` outputs for the six theorems are a subset of
+`[propext, Quot.sound]` (no `sorryAx`, no `Classical.choice`). Note: on `Nat`,
+`beq_self_eq_true n` pulls in `Classical.choice` (through the instance it is
+applied at; the constant alone is axiom-free), while `beq_iff_eq.mpr rfl` is clean.
+This tainted `targetRHS_diag` and `conway_vertex_degree` on `main`; it is fixed on
+this branch. Kernel `decide` must not range over `∀ x : Fin n` with `B_val`/`K_val`
+in the body (indexed `getElem!` exhausts 2 GiB); check the arrays against the
+structural generators `genM`/`genB`/`genK` in one pass instead.

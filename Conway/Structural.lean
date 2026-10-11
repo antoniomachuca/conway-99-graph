@@ -95,9 +95,9 @@ theorem targetRHS_off_diag (u v : Fin 99) (huv : u ≠ v) : targetRHS u v = 2 :=
 /-- For identical vertices u = v, targetRHS u u = 14 (reflecting k = 14). -/
 theorem targetRHS_diag (u : Fin 99) : targetRHS u u = 14 := by
   unfold targetRHS add smul eye allOnes
-  have heq : (u.val == u.val) = true := beq_self_eq_true u.val
-  rw [heq]
-  rfl
+  cases h : (u.val == u.val)
+  · exact Bool.noConfusion (h ▸ beq_iff_eq.mpr rfl)
+  · rfl
 
 /-- Adjacent vertices are necessarily distinct due to zero diagonal. -/
 theorem adjacent_ne (A : Matrix99 Nat) (h : ConwayAdj A) (u v : Fin 99) (hadj : A u v = 1) : u ≠ v := by
