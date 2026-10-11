@@ -71,3 +71,10 @@ This tainted `targetRHS_diag` and `conway_vertex_degree` on `main`; it is fixed 
 this branch. Kernel `decide` must not range over `∀ x : Fin n` with `B_val`/`K_val`
 in the body (indexed `getElem!` exhausts 2 GiB); check the arrays against the
 structural generators `genM`/`genB`/`genK` in one pass instead.
+
+`Conway/Z84Relabel.lean` proves `conway_relabel_block`, `conway_exists_iff_block` and
+`conway_exists_iff_residual` (every Conway adjacency matrix is a relabelling of some
+`block_A X`). Check with `lake build Conway.Z84Relabel Conway.TestZ84Subconstituent` and
+`lake env lean Conway/Z84Relabel.lean`. In Lean 4.33.1 the core lemmas
+`List.perm_ext_iff_of_nodup`, `List.mem_erase_of_ne` and `List.length_erase_of_mem` depend
+on `Classical.choice`; the module uses its own choice-free replacements.

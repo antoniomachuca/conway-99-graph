@@ -20,4 +20,5 @@ import Conway.TestOrbitQuotient
 import Conway.TestZ7Canonical
 import Conway.TestZ3Quotient
 import Conway.Z84Subconstituent
+import Conway.Z84Relabel
 import Conway.TestZ84Subconstituent

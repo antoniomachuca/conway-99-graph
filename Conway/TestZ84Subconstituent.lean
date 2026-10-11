@@ -1,6 +1,7 @@
 import Conway.Matrix
 import Conway.Structural
 import Conway.Z84Subconstituent
+import Conway.Z84Relabel
 
 namespace Matrix99
 
@@ -49,3 +50,6 @@ theorem not_conwayAdj_block_A_zero :
 #print axioms Matrix99.K_val_eq
 
 end Matrix99
+#print axioms Matrix99.conway_relabel_block
+#print axioms Matrix99.conway_exists_iff_block
+#print axioms Matrix99.conway_exists_iff_residual
