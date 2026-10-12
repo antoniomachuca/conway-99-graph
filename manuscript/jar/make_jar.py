@@ -13,7 +13,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SRC = HERE.parent / "conway_involutions.tex"
 OUT = HERE / "conway_order7_jar.tex"
-TAG = "jar-submission-2026-10-12"
+TAG = "v1.0.0"
 COMMIT = "de9a5349552f6ebc3b989e1235f605d2a87b4ab8"
 
 src = SRC.read_text()
@@ -90,7 +90,7 @@ The author thanks the developers of CaDiCaL, \texttt{{drat-trim}}, PySAT, and Le
 \section*{{Declarations}}
 
 \begin{{itemize}}
-\item \textbf{{Funding.}} \textbf{{[The author must complete this statement before submission.]}}
+\item \textbf{{Funding.}} No funding was received for this work.
 \item \textbf{{Competing interests.}} The author has no competing financial or non-financial interests.
 \item \textbf{{Ethics approval and consent to participate.}} Not applicable.
 \item \textbf{{Consent for publication.}} Not applicable.
