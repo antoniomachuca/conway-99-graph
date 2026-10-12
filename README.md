@@ -4,15 +4,17 @@
 
 **Contact:** [am.machuca.2023@alumnos.urjc.es](mailto:am.machuca.2023@alumnos.urjc.es) / [contactoantoniomachuca@gmail.com](mailto:contactoantoniomachuca@gmail.com)
 
-**Documentation audit:** September 21, 2026 (order-7 and literature status updated October 11, 2026)
+**Documentation audit:** September 21, 2026 (order-7 and literature status updated October 11, 2026; article, release and build figures updated October 12, 2026)
 
-**Technical note:** [LaTeX source](manuscript/conway_involutions.tex) · [PDF](manuscript/conway_involutions.pdf)
+**Article (submitted to the *Journal of Automated Reasoning*, October 2026):** *A Kernel-Checked Lean 4 Proof That Conway's 99-Graph Has No Automorphism of Order 7, with Certified SAT Cross-Checks.* Journal version in the Springer Nature template: [LaTeX source](manuscript/jar/conway_order7_jar.tex) · [PDF](manuscript/jar/conway_order7_jar.pdf). Preprint version: [LaTeX source](manuscript/conway_involutions.tex) · [PDF](manuscript/conway_involutions.pdf) · Zenodo [10.5281/zenodo.23307120](https://doi.org/10.5281/zenodo.23307120). `manuscript/jar/make_jar.py` builds the journal version from the preprint, so both have the same text.
+
+**Release for the article:** tag [`v1.0.0`](https://github.com/antoniomachuca/conway-99-graph/tree/v1.0.0), archived on Zenodo as [10.5281/zenodo.23307118](https://doi.org/10.5281/zenodo.23307118). The archive leaves out the copies of third-party papers that earlier commits kept in `references/`.
 
 ## Certificate deposit
 
 CNF files, DRAT traces, and solver logs are gitignored. Cloning this repository does not reproduce the order-7 certificate.
 
-Zenodo concept DOI: [10.5281/zenodo.22983775](https://doi.org/10.5281/zenodo.22983775).
+Zenodo concept DOI of the certificate record: [10.5281/zenodo.22983775](https://doi.org/10.5281/zenodo.22983775).
 
 - Published record [10.5281/zenodo.22995101](https://doi.org/10.5281/zenodo.22995101) (27 September 2026, version v2). It stores `conway_z7_canonical.cnf` (`p cnf 177097 422508`), the 26,746,488,053-byte `proof_z7_canonical.drat`, the CaDiCaL 1.9.5 log, the `drat-trim` log ending in `s VERIFIED`, and `SHA256SUMS.txt`. Zenodo reports MD5 `f8ec9e423465f4a28ca21402ab00718d` for that proof.
 - Earlier published record [10.5281/zenodo.22983776](https://doi.org/10.5281/zenodo.22983776). It stores the same CNF next to a 192,218,491-byte proof from an earlier run. That record is not the verified certificate.
@@ -22,6 +24,8 @@ That formula is **PROVED** only together with `s UNSATISFIABLE` and `s VERIFIED`
 ## Scope and correction notice
 
 This repository contains a partial Lean 4 formalization, Python SAT encoders, structural calculations, and records of symmetry-restricted searches for a strongly regular graph with parameters $(99,14,1,2)$. The existence problem remains open. No new mathematical restriction beyond the cited literature is established by this documentation audit.
+
+Work on the fixed-point-free order-3 case continues outside the repository. It is **EXPLORED**, it is not part of the submitted article, and no result from it is claimed here.
 
 Earlier versions overstated novelty, the completeness of the Lean formalization, and what the SAT certificates establish. In particular, the claim that the repository contains an unconditional, end-to-end kernel proof excluding involutions with five or seven fixed points is incorrect: **The claim is false according to the current state of the repository.** The corresponding declarations include additional arithmetic premises that are not derived from the graph in those proofs.
 
@@ -116,14 +120,14 @@ Run from the repository root with the toolchain specified in `lean-toolchain` an
 lake build
 lake env lean Conway/TestMatrix.lean
 
-# Run the 39 deterministic regression tests
+# Run the deterministic regression tests
 python3 -B -m unittest discover -s tests -v
 
 # Run the algebraic validation of the f=1 coordinate model
 python3 -B scripts/validate_z2_f1_inputs.py
 ```
 
-On September 23, 2026, the Lean build completed with 32 jobs and three `sorry` warnings. The full test discovery suite passes all 39 tests in ~5 seconds. Additional targeted axiom checks were run:
+On October 12, 2026, at commit `8387e28`, `lake build` reports all 1004 jobs up to date. The only `sorry` warnings are the two order-3 stubs in `Conway/Z3Fixed3NonExistence.lean` and `Conway/Z3FpfNonExistence.lean`. The test discovery suite runs 123 tests in about 37 seconds, and all pass. Additional targeted axiom checks were run:
 
 ```bash
 lake env lean --stdin <<'LEAN'
@@ -134,11 +138,13 @@ import Conway
 #print axioms Matrix99.conway_neighborhood_one_factor
 #print axioms Matrix99.conway_diameter_at_most_two
 #print axioms Matrix99.conway_z2_f3_fixed_points_dichotomy
+#print axioms Matrix99.conway_no_z7_automorphism
+#print axioms Matrix99.z7_orbit_matrix_nonexistence
 #print axioms Matrix99.conway_automorphism_group_restricted
 LEAN
 ```
 
-The first six declarations report `[propext, Quot.sound]`; the last reports `[sorryAx, Quot.sound]`.
+On October 12, 2026, the first eight declarations report `[propext, Quot.sound]`; the last reports `[propext, sorryAx, Quot.sound]` because it depends on the two order-3 stubs.
 
 For the retained $f=3$ formula/proof files, independent checker commands are:
 
@@ -152,11 +158,13 @@ For the retained $f=3$ formula/proof files, independent checker commands are:
 
 These check the specified formulas only. The documentation audit read the existing terminal verdicts; it did not run these commands again.
 
-To rebuild the revised technical note:
+To rebuild the preprint and the journal version:
 
 ```bash
 cd manuscript
 latexmk -pdf -interaction=nonstopmode -halt-on-error conway_involutions.tex
+cd jar && python3 make_jar.py
+latexmk -pdf -interaction=nonstopmode -halt-on-error conway_order7_jar.tex
 ```
 
 ### Controlled local sessions
