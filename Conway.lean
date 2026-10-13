@@ -22,3 +22,5 @@ import Conway.TestZ3Quotient
 import Conway.Z84Subconstituent
 import Conway.Z84Relabel
 import Conway.TestZ84Subconstituent
+import Conway.Z84Symmetry
+import Conway.TestZ84Symmetry
