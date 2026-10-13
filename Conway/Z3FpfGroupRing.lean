@@ -373,10 +373,11 @@ end Z3FpfGroupRing
 
 open Z3FpfOrbitMatrix
 
-/-- The group-ring frame induced by a fixed-point-free order-3 automorphism. -/
-theorem conway_z3_fpf_induces_group_ring :
-    HasZ3FpfSymmetry → Nonempty Z3FpfGroupRing := by
-  rintro ⟨A, hA, g, hg⟩
+/-- The group-ring frame constructed from a fixed-point-free order-3
+automorphism: the witness of `conway_z3_fpf_induces_group_ring`, kept as a
+definition so that its shift sets unfold for counting lemmas. -/
+def fpfGroupRing (A : Matrix99 Nat) (hA : ConwayAdj A) (g : Fin 99 → Fin 99)
+    (hg : IsZ3FpfAutomorphism A g) : Z3FpfGroupRing := by
   have h3 : g^[3] = id := hg.2.1
   have hfpf : ∀ v, g v ≠ v := hg.2.2.1
   have hpres : ∀ u v, A (g u) (g v) = A u v := hg.2.2.2
@@ -384,8 +385,8 @@ theorem conway_z3_fpf_induces_group_ring :
   let e := enumerateZ3FpfOrbits g h3 hfpf
   have hinj := Z3FpfGroupRing.pairMap_injective g h3 hfpf e
   have hsum := Z3FpfGroupRing.sumFin_pair g h3 hfpf e
-  refine ⟨⟨fun i j t => decide (A (e.rep i) (g^[t.val] (e.rep j)) = 1),
-    ?_, ?_, ?_, ?_, ?_⟩⟩
+  refine ⟨fun i j t => decide (A (e.rep i) (g^[t.val] (e.rep j)) = 1),
+    ?_, ?_, ?_, ?_, ?_⟩
   · -- sym
     intro i j s
     show decide (A (e.rep j) (g^[s.val] (e.rep i)) = 1) =
@@ -507,6 +508,79 @@ theorem conway_z3_fpf_induces_group_ring :
     rw [hL, hS, hpoly, Z3FpfGroupRing.if_congr_prop hdelta]
     omega
 
+/-- The group-ring frame induced by a fixed-point-free order-3 automorphism. -/
+theorem conway_z3_fpf_induces_group_ring :
+    HasZ3FpfSymmetry → Nonempty Z3FpfGroupRing := by
+  rintro ⟨A, hA, g, hg⟩
+  exact ⟨fpfGroupRing A hA g hg⟩
+
+/-- Refined WP3: the number of automorphism edges `x → g x` equals `3` times
+the number of triangle orbits of the induced group-ring frame (each orbit
+contributes its three shifted copies). -/
+theorem conway_z3_fpf_triangle_edge_count
+    (A : Matrix99 Nat) (hA : ConwayAdj A) (g : Fin 99 → Fin 99)
+    (hg : IsZ3FpfAutomorphism A g) :
+    sumFin (fun x : Fin 99 => if A x (g x) = 1 then (1 : Nat) else 0) =
+      3 * sumFin (fun k : Fin 33 =>
+        if (fpfGroupRing A hA g hg).S k k 1 = true then (1 : Nat) else 0) := by
+  have h3 : g^[3] = id := hg.2.1
+  have hfpf : ∀ v, g v ≠ v := hg.2.2.1
+  have hpres : ∀ u v, A (g u) (g v) = A u v := hg.2.2.2
+  let e := enumerateZ3FpfOrbits g h3 hfpf
+  have hsum := Z3FpfGroupRing.sumFin_pair g h3 hfpf e
+  have hS : ∀ k : Fin 33, ((fpfGroupRing A hA g hg).S k k 1 = true) ↔
+      A (e.rep k) (g (e.rep k)) = 1 := by
+    intro k
+    show (decide (A (e.rep k) (g (e.rep k)) = 1) = true) ↔ _
+    exact decide_eq_true_iff
+  have hstep : ∀ k : Fin 33,
+      sumFin (fun u : Fin 3 =>
+          (if A (g^[u.val] (e.rep k)) (g (g^[u.val] (e.rep k))) = 1
+            then (1 : Nat) else 0)) =
+        sumFin (fun _ : Fin 3 =>
+          (if A (e.rep k) (g (e.rep k)) = 1 then (1 : Nat) else 0)) := by
+    intro k
+    apply sumFin_congr
+    intro u
+    have hinv : A (g^[u.val] (e.rep k)) (g (g^[u.val] (e.rep k))) =
+        A (e.rep k) (g (e.rep k)) := by
+      have h2 : g (g^[u.val] (e.rep k)) = g^[u.val] (g (e.rep k)) := by
+        calc g (g^[u.val] (e.rep k))
+            = g^[u.val + 1] (e.rep k) := rfl
+          _ = g^[u.val] (g^[1] (e.rep k)) :=
+              ConwayOrbit.iterate_add_apply g u.val 1 (e.rep k)
+          _ = g^[u.val] (g (e.rep k)) := rfl
+      rw [h2]
+      exact ConwayOrbit.iterate_preserves A g hpres u.val (e.rep k) (g (e.rep k))
+    rw [hinv]
+  have hconv : ∀ k : Fin 33,
+      (if (fpfGroupRing A hA g hg).S k k 1 = true then (1 : Nat) else 0) =
+        (if A (e.rep k) (g (e.rep k)) = 1 then 1 else 0) :=
+    fun k => Z3FpfGroupRing.if_congr_prop (hS k) _ _
+  have hconst : ∀ c : Nat,
+      sumFin (fun _ : Fin 3 => c) = 3 * c := by
+    intro c
+    rw [Z3FpfGroupRing.sumFin_fin3]
+    omega
+  calc sumFin (fun x : Fin 99 => if A x (g x) = 1 then (1 : Nat) else 0)
+      = sumFin (fun k : Fin 33 => sumFin (fun u : Fin 3 =>
+          if A (g^[u.val] (e.rep k)) (g (g^[u.val] (e.rep k))) = 1
+            then (1 : Nat) else 0)) := (hsum _).symm
+    _ = sumFin (fun k : Fin 33 => sumFin (fun _ : Fin 3 =>
+          if A (e.rep k) (g (e.rep k)) = 1 then (1 : Nat) else 0)) :=
+        sumFin_congr hstep
+    _ = sumFin (fun k : Fin 33 => 3 *
+          (if A (e.rep k) (g (e.rep k)) = 1 then (1 : Nat) else 0)) :=
+        sumFin_congr (fun k => hconst _)
+    _ = 3 * sumFin (fun k : Fin 33 =>
+          if A (e.rep k) (g (e.rep k)) = 1 then (1 : Nat) else 0) :=
+        sumFin_mul_left 3 _
+    _ = 3 * sumFin (fun k : Fin 33 =>
+          if (fpfGroupRing A hA g hg).S k k 1 = true then (1 : Nat) else 0) :=
+        (congrArg (3 * ·) (sumFin_congr hconv)).symm
+
+#print axioms fpfGroupRing
+#print axioms conway_z3_fpf_triangle_edge_count
 #print axioms conway_z3_fpf_induces_group_ring
 #print axioms Z3FpfGroupRing.toOrbitMatrix
 #print axioms Z3FpfGroupRing.toOrbitMatrix_B
