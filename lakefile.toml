@@ -8,3 +8,7 @@ name = "Conway"
 [[lean_exe]]
 name = "conway"
 root = "Main"
+
+[[lean_exe]]
+name = "z3t27cnf"
+root = "Z3T27Cnf"
