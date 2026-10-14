@@ -190,7 +190,7 @@ $(v,k,\lambda,\mu)$ & $p$ & $(v,k,\lambda,\mu)$ & $p$\\
 \end{tabular}
 \end{center}
 
-\begin{corollary}[conditional on the literature check]\label{cor:88}
+\begin{corollary}\label{cor:88}
 An $\srg(88,27,6,9)$ has no automorphism of order $11$.
 \end{corollary}
 \begin{proof}
@@ -309,12 +309,30 @@ with a single fixed point for $\{11,10,4;1,1,5\}$ ($v=210$). Neither array appea
 DistanceRegular.org; their existence status has not been checked.
 
 \section{Literature status}\label{sec:lit}
-Behbahani--Lam (2011) list $2,3,5,11$ as the possible primes for $\srg(88,27,6,9)$, with the fixed-point-free order-11 case
-unresolved (5 orbit matrices). Efimov--Makhnev, \emph{On automorphisms of a strongly regular graph with parameters
-(88,27,6,9)}, Dokl.\ Math.\ 86 (2012) 488--491, has not been accessed. Kazarina--Makhnev, \emph{On automorphisms of strongly
-regular graphs with $\lambda=2$ and $\mu=3$}, Izv.\ UGTU 17 (2005) 174--194, probably treats $\srg(364,33,2,3)$ and has not been
-accessed. No work on automorphisms of $\srg(342,33,4,3)$, $\srg(561,60,9,6)$ or $\srg(650,55,0,5)$ was found in a first search.
-Ishida (arXiv:2606.29183, \S8) treats other parameter sets. Until these sources are read, the items of Corollary~\ref{cor:full}
-other than the second are candidates, not established new results.
+
+A bibliographic audit of the candidate exclusions in Section~\ref{sec:app} and Section~\ref{sec:fix} clarifies the status of these parameter sets across the known literature:
+
+\paragraph{The parameters $\srg(88,27,6,9)$ and order $11$.}
+Behbahani (Ph.D.\ thesis, Concordia Univ., 2009, Table~16) and Behbahani--Lam (Discrete Math.\ 311 (2011) 132--144) restricted the possible prime divisors of the automorphism group of an $\srg(88,27,6,9)$ to $p \in \{2,3,5,11\}$.
+For $p = 11$, an automorphism must have $f \equiv 88 \equiv 0 \pmod{11}$ fixed points, leaving candidate fixed-point numbers $f \in \{0, 11, 22\}$.
+Behbahani and Lam proved the nonexistence of orbit matrices for $f = 11$ and $f = 22$, leaving only the fixed-point-free case $f = 0$ unresolved (with 5 feasible orbit matrices).
+(Independently, Lemma~\ref{lem:bigp} yields $f \le 88/12 = 7$, directly eliminating $f \ge 11$.)
+A paper previously cited as potentially relevant, Efimov--Makhnev (Dokl.\ Math.\ 91 (2015) 80--83), in fact investigates graphs whose local subgraphs are strongly regular with parameters $(88,27,6,9)$, rather than automorphisms of the strongly regular graph itself.
+Therefore, the exclusion of $f = 0$ by the discriminant obstruction (Theorem~\ref{thm:main} and Theorem~\ref{thm:fix}) completes the classification: an $\srg(88,27,6,9)$ has no automorphism of order~$11$, and the prime divisors of its automorphism group are restricted to $\{2, 3, 5\}$.
+
+\paragraph{The parameters $\srg(364,33,2,3)$ and order $5$.}
+Kazarina--Makhnev, \emph{On automorphisms of strongly regular graphs with $\lambda=2$ and $\mu=3$}, Izv.\ UGTU 17 (2005) 174--194 (see also Fundam.\ Prikl.\ Mat.\ 15 (2009) 65--79, Theorem~2.12), treated edge-regular and strongly regular graphs with $\lambda = 2$ and $\mu = 3$.
+They proved that if an automorphism of order~$5$ exists, its fixed subgraph must be a $4$-clique $K_4$; however, they could not exclude the existence of order-$5$ automorphisms.
+Under Theorem~\ref{thm:fix}, condition~(F) is satisfied for $\Gamma_F = K_4$ and the discriminant obstruction excludes this configuration.
+The exclusion of order-$5$ automorphisms remains an open candidate result pending external peer review or end-to-end formalization.
+
+\paragraph{Genuinely new candidate exclusions.}
+For the other parameter sets in Corollary~\ref{cor:full}---namely $\srg(342,33,4,3)$ ($p = 7$), $\srg(561,60,9,6)$ ($p = 11$), and $\srg(650,55,0,5)$ ($p = 11$)---no prior literature investigating or excluding automorphisms of these prime orders was found.
+These candidate exclusions appear to be genuinely new.
+Ishida (arXiv:2606.29183, \S8) treats different parameter sets.
+
+\paragraph{Epistemological status.}
+While the arithmetic certificates, spectra, condition~(F) evaluations, and Legendre character calculations have been verified with independent scripts and checked without external axioms in the Lean~4 kernel, the spectral-algebraic framework of Theorems~\ref{thm:main} and~\ref{thm:fix} has not yet been externally reviewed or formalized end-to-end.
+Accordingly, in line with the project's verification standards, the exclusions in Corollary~\ref{cor:full} (other than Djematene's established result for $\srg(99,14,1,2)$) should be regarded as candidate results.
 
 \end{document}
