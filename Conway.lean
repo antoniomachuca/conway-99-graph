@@ -31,3 +31,8 @@ import Conway.TestZ7RootParity
 import Conway.TestZ7ComplementParity
 import Conway.Z7FinalClosure
 import Conway.Z7Main
+import Conway.Z84Subconstituent
+import Conway.Z84Relabel
+import Conway.TestZ84Subconstituent
+import Conway.Z84Symmetry
+import Conway.TestZ84Symmetry
