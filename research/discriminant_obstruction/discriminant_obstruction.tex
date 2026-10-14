@@ -284,6 +284,30 @@ Djematene's theorem (fixed-point-free and triangle cases). For several values of
 any admissible fixed subgraph rather than from (F).
 \end{corollary}
 
+\section{Regular graphs with more eigenvalues}\label{sec:gen}
+
+Nothing above uses that $\Gamma$ has only three eigenvalues except through the identity $(A-rI)(A-sI)=\mu J$. Let $\Gamma$ be a
+connected $k$-regular graph with distinct eigenvalues $k=\theta_0>\theta_1>\dots>\theta_d$ and Hoffman polynomial
+$H(x)=\prod_{i\ge1}(x-\theta_i)\in\Z[x]$, so that $H(A)=cJ$ with $c=H(k)/v\in\Z$ (an entry of the integer matrix $H(A)$). For an
+integral eigenvalue $\theta=\theta_j$ put $P_\theta(x)=H(x)/(x-\theta)\in\Z[x]$ and $c_\theta=(k-\theta)P_\theta(\theta)$. Replace
+$N$ by $(k-\theta)P_\theta(\tilde A)-c\,\one w^{\mathsf T}$, $N'$ by $P_\theta(M)$ and $N_W$ by $\alpha P_\theta(\tilde A)-\beta\one w^{\mathsf T}$ with
+$\beta v=\alpha(P_\theta(k)-P_\theta(\theta))$. The bottom-left block of every power of $\tilde A$ is divisible by $p$, so the rows of $N$
+at fixed vertices reduce to $(k-\theta)P_\theta(A_F)-cJ_f$ on the fixed columns. The proofs go through word for word and give:
+
+\begin{theorem}\label{thm:gen}
+Let $p\le19$, $\theta$ an integral eigenvalue $\ne k$ with $p\nmid c_\theta$, and assume
+$\det\bigl((k-\theta)(P_\theta(\theta)I-P_\theta(A_F))+cJ_f\bigr)\not\equiv0\pmod p$. Then (a)--(d) of Theorem~\ref{thm:fix} hold with
+$c=c_\theta$, with $\theta-\theta'$ replaced by $P_\theta(\theta)$, and with $\alpha=v/\gcd(v,P_\theta(k)-P_\theta(\theta))$.
+\end{theorem}
+
+For strongly regular graphs this is Theorem~\ref{thm:fix}. \texttt{general.py} checks Theorem~\ref{thm:gen} on Johnson graphs
+$J(n,3)$ and Kneser graphs $K(n,3)$ (four distinct eigenvalues) with products of $p$-cycles, with and without fixed points; all
+predictions hold in the cases computed so far. Applied to the 1{,}514 feasible intersection arrays of the BCN tables (Brouwer's
+machine-readable files, which carry no existence status), the parameter test gives very little: one exclusion of a
+fixed-point-free automorphism, of order $7$ for $\{65,44,11;1,4,55\}$ ($v=924$), and one exclusion of an automorphism of order $11$
+with a single fixed point for $\{11,10,4;1,1,5\}$ ($v=210$). Neither array appears among the known graphs of the diameter-3 index of
+DistanceRegular.org; their existence status has not been checked.
+
 \section{Literature status}\label{sec:lit}
 Behbahani--Lam (2011) list $2,3,5,11$ as the possible primes for $\srg(88,27,6,9)$, with the fixed-point-free order-11 case
 unresolved (5 orbit matrices). Efimov--Makhnev, \emph{On automorphisms of a strongly regular graph with parameters
