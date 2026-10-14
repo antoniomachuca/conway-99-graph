@@ -50,3 +50,42 @@ Every reported result must be explicitly categorized into one of these four oper
 - Kernel memory: measure physical footprint (`proc_pid_rusage` `ri_phys_footprint`, as in `scratch/lead_bounded_long_20261011.py`), not `ps` RSS; RSS hid 20 GB of compressed and swapped memory. Kernel caches are per declaration, so split large `decide +kernel` checks into many theorems: `z7UnaryRows_cached_i` (depth-4 generator split), the chunked per-root Search template (`scripts/z7_search_template.py`), and the five `cauchyCheck_ok_a` lemmas. Avoid `DecidableEq`/`BEq` instances on large `List (List Nat)`; use explicit Bool comparators with soundness lemmas. Long `rw` chains over goals containing large literals grow quadratically; assemble in groups of at most 16.
 - Build heavy modules one target per `lake build`; multi-target builds run several Lean processes in parallel and exceed the memory cap.
 - `scripts/run_lean_root_closer.py` exits immediately while `scratch/closer.pause` exists. Another agent on this machine has restarted the closer before.
+
+---
+
+## 6. Z84 second-subconstituent reduction (feat/conway84-subconstituent)
+
+`Conway/Z84Subconstituent.lean` proves `Matrix99.second_subconstituent_reduction`
+(a *conditional* structural reduction, not a proof the 99-graph exists).
+
+Verification commands used (all Lean runs under the 300 s / 2 GiB wrapper
+`scratch/lead_bounded_20261007.py` with scratch stem dir `scratch/z84_block_20261011/`):
+
+```bash
+python3 -I -B scratch/lead_bounded_20261007.py scratch/z84_block_20261011/<stem> \
+  /bin/sh -c 'cd "$1" && shift && exec "$@"' sh "<worktree>" \
+  lake build Conway.Z84Subconstituent Conway.TestZ84Subconstituent
+python3 -I -B scratch/lead_bounded_20261007.py scratch/z84_block_20261011/<stem> \
+  /bin/sh -c 'cd "$1" && shift && exec "$@"' sh "<worktree>" \
+  lake env lean Conway/Z84Subconstituent.lean
+python3 -I -B scratch/lead_bounded_20261007.py scratch/z84_block_20261011/<stem> \
+  /bin/sh -c 'cd "$1" && shift && exec "$@"' sh "<worktree>" \
+  lake env lean Conway/TestZ84Subconstituent.lean
+python3 -m pytest tests/test_z84_constants.py -q
+```
+
+Status: all `#print axioms` outputs for the six theorems are a subset of
+`[propext, Quot.sound]` (no `sorryAx`, no `Classical.choice`). Note: on `Nat`,
+`beq_self_eq_true n` pulls in `Classical.choice` (through the instance it is
+applied at; the constant alone is axiom-free), while `beq_iff_eq.mpr rfl` is clean.
+This tainted `targetRHS_diag` and `conway_vertex_degree` on `main`; it is fixed on
+this branch. Kernel `decide` must not range over `∀ x : Fin n` with `B_val`/`K_val`
+in the body (indexed `getElem!` exhausts 2 GiB); check the arrays against the
+structural generators `genM`/`genB`/`genK` in one pass instead.
+
+`Conway/Z84Relabel.lean` proves `conway_relabel_block`, `conway_exists_iff_block` and
+`conway_exists_iff_residual` (every Conway adjacency matrix is a relabelling of some
+`block_A X`). Check with `lake build Conway.Z84Relabel Conway.TestZ84Subconstituent` and
+`lake env lean Conway/Z84Relabel.lean`. In Lean 4.33.1 the core lemmas
+`List.perm_ext_iff_of_nodup`, `List.mem_erase_of_ne` and `List.length_erase_of_mem` depend
+on `Classical.choice`; the module uses its own choice-free replacements.
