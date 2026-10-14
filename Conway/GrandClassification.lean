@@ -6,6 +6,7 @@ import Conway.Z3FpfNonExistence
 import Conway.Z2Classification
 import Conway.CesarzWoldarTheorems
 import Conway.ParityRigidity
+import Conway.Z7Main
 
 namespace Matrix99
 

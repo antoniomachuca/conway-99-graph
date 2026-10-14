@@ -13,20 +13,20 @@
   2. Orbit quotient reduction (`conway_z7_induces_orbit_matrix`):
      PROVED graph-to-canonical-15-orbit construction from the explicit period-7 frame.
   3. Computational / Algebraic non-existence (`z7_orbit_matrix_nonexistence`):
-     COMPILED placeholder; general matrix refutation and certificate-to-kernel link are PENDING.
-     The legacy 296338-byte proof has extra Frob(21)-motivated restrictions and does not establish this declaration.
+     PROVED in `Conway/Z7Main.lean` via `no_exterior_equations`
+     (the kernel-checked exterior-root chain in `Conway/Z7FinalClosure` and its
+     `Z7Root{NN}Close` chain).
   4. Formal Transfer Theorem (`conway_no_z7_from_orbit_matrix_reduction`):
-     PROVED as a conditional implication. The reduction premise is proved here;
-     matrix non-existence remains PENDING.
+     PROVED as a conditional implication.
   5. Main Non-Existence Theorem (`conway_no_z7_automorphism`):
-     COMPILED; depends on the remaining matrix non-existence placeholder.
+     PROVED in `Conway/Z7Main.lean` from `conway_no_z7_automorphism_kernel`.
 
   Taxonomy Status:
   - `conway_no_z7_from_orbit_matrix_reduction`: PROVED as a conditional implication.
   - `hasZ7Symmetry_iff`: PROVED (0 sorry, [propext, Quot.sound]).
   - `conway_z7_induces_orbit_matrix`: PROVED graph-to-canonical-15-orbit construction.
-  - `z7_orbit_matrix_nonexistence`: COMPILED placeholder; general refutation and certificate link PENDING.
-  - `conway_no_z7_automorphism`: COMPILED and depends on sorryAx through matrix non-existence.
+  - `z7_orbit_matrix_nonexistence`: PROVED in `Conway/Z7Main.lean`.
+  - `conway_no_z7_automorphism`: PROVED in `Conway/Z7Main.lean`.
 -/
 
 import Conway.Matrix
@@ -142,44 +142,11 @@ theorem conway_z7_induces_orbit_matrix :
   exact ⟨(rootedMatrixOfOrbitIndexing A hA s hs.2.1 hs.2.2.2
     frame.indexing frame.root_fixed frame.unique_fixed frame.neighborhood).canonicalize⟩
 
-/--
-  Theorem (Non-existence of Z7OrbitMatrix):
-  No 15×15 orbit quotient matrix satisfying the general specification exists.
+/-! ## 4. Main Non-Existence Theorem
 
-  Status: COMPILED placeholder. The Lean derivation of the exterior equations and the
-  checked exterior-row CNF are separate certificates. This declaration is the missing
-  kernel link between them. The DRAT proof is not imported here.
-  `Z7OrbitMatrix.exterior_row_problem` derives the exterior equations and does not refute them.
--/
-theorem z7_orbit_matrix_nonexistence :
-    ¬ HasZ7OrbitMatrix := by
-  sorry
-
-/-! ## 4. Main Non-Existence Theorem -/
-
-/--
-  Theorem (Behbahani–Lam 2011):
-  No strongly regular graph with parameters srg(99, 14, 1, 2)
-  admits an automorphism of order 7.
-
-  Status: COMPILED; depends on `conway_z7_induces_orbit_matrix` and
-  `z7_orbit_matrix_nonexistence`, hence transitively depends on sorryAx.
-  Directly applies the conditional transfer theorem `conway_no_z7_from_orbit_matrix_reduction`.
--/
-theorem conway_no_z7_automorphism :
-  ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
-    ∃ (s : Fin 99 → Fin 99),
-      (Function.Bijective s) ∧
-      (s^[7] = id) ∧
-      (∃ i, s i ≠ i) ∧
-      (∀ i j, A (s i) (s j) = A i j) := by
-  have h_not : ¬ HasZ7Symmetry :=
-    conway_no_z7_from_orbit_matrix_reduction
-      conway_z7_induces_orbit_matrix
-      z7_orbit_matrix_nonexistence
-  intro h_ex
-  rw [← hasZ7Symmetry_iff] at h_ex
-  exact h_not h_ex
+  The PROVED `conway_no_z7_automorphism` (Behbahani–Lam 2011) now lives in
+  `Conway/Z7Main.lean`, derived from `conway_no_z7_automorphism_kernel` in
+  `Conway/Z7FinalClosure.lean` (axioms `[propext, Quot.sound]`). -/
 
 /-! ## 5. Spectral Trace Contradiction Pipeline -/
 

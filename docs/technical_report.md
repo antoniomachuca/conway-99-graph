@@ -2,7 +2,7 @@
 
 **Author:** Antonio Machuca — Universidad Rey Juan Carlos, Madrid, Spain
 
-**Revision:** September 21, 2026
+**Revision:** September 21, 2026; Sections 2 and 3.3–3.4 updated October 11, 2026
 
 **Companion documents:** [README](../README.md), [technical-note source](../manuscript/conway_involutions.tex), [PDF](../manuscript/conway_involutions.pdf).
 
@@ -18,12 +18,14 @@ The initial documentation audit inspected source and retained logs, ran `lake bu
 
 ## 2. Prior results are not contributions of this repository
 
-- Makhnev's September 2009 presentation attributes to Makhnev–Minakova a classification of prime-order actions whose order-2 case has exactly one fixed vertex. Theorem 1 and the preceding character-integrality argument already exclude the other involution fixed-subgraph candidates. [Primary lecture slides](https://www.math.uni-bielefeld.de/~baumeist/sommerschule/makhnev.pdf).
-- Behbahani–Lam (2011) restrict prime-order automorphisms to 2 and 3. Thus the exclusion of order 7 predates this project. The introduction of [Cesarz–Woldar (2025)](https://alco.centre-mersenne.org/articles/10.5802/alco.418/) explicitly recalls this result.
-- Crnković–Maksimović (2020) exclude groups of orders 6 and 9 and require an order-3 automorphism to act without fixed points. This does not exclude the fixed-point-free order-3 action. [Article](https://cdm.ucalgary.ca/article/view/62323).
+- Makhnev–Minakova (2004), *Discrete Mathematics and Applications* 14(2):201–210 (`makhnev2001automorphisms` in `manuscript/references.bib`; local copy `references/paper_makhnev_minakova_2004.md`), classify the fixed subgraph of a prime-order automorphism of $\mathrm{srg}(99,14,1,2)$: singleton ($p\in\{2,7\}$), empty ($p\in\{3,11\}$), or triangle ($p=3$). In particular an involution fixes exactly one vertex. This is a peer-reviewed source; Makhnev's September 2009 lecture slides are only a secondary pointer and are not needed for the citation.
+- Behbahani–Lam (thesis 2009, Concordia University; published as *Discrete Mathematics* 311:132–144, 2011) restrict the prime divisors of $|\operatorname{Aut}(G)|$ to $\{2,3\}$ — this excludes order 7, predating this project — **and** prove that an order-3 automorphism acts without fixed points (thesis 2009, Theorem 4.14: "if it has an automorphism of order 3, then it has no fixed points"). The introduction of [Cesarz–Woldar (2025)](https://alco.centre-mersenne.org/articles/10.5802/alco.418/) recalls the prime-order restriction.
+- Crnković–Maksimović (2020) exclude groups of orders 6 and 9. They do **not** prove the fixed-point-free property of order-3 actions (that is Behbahani–Lam, above), and they do not exclude the fixed-point-free order-3 action. [Article](https://cdm.ucalgary.ca/article/view/62323). Correction of 2026-10-05: an earlier version of this line attributed the order-3 fixed-point-free requirement to Crnković–Maksimović; that attribution was wrong.
 - Cesarz–Woldar give computer-free proofs of $2\mid|\operatorname{Aut}(G)|\Rightarrow|\operatorname{Aut}(G)|\mid6$ and $7\mid|\operatorname{Aut}(G)|\Rightarrow\operatorname{Aut}(G)\cong\mathbb Z_7$. Their contribution is not a claim that the order-7 action was previously computationally open.
 
 Combining the even-order bound with exclusion of order 6 leaves order 2. This is a consequence of prior work, not a new parity-rigidity discovery here. Published mathematics and local formalization status must be recorded separately.
+
+Together, the cited results give $|\operatorname{Aut}(G)|\in\{1,2,3\}$. A subgroup of order 9 would contradict Crnković–Maksimović, and an even order must equal 2. Behbahani–Lam's orbit-matrix search for the fixed-point-free order-3 action did not finish: the entry for $p=3$ with 0 fixed points is `?` in thesis Table 21. The fixed-point-free order-3 action and the involution with one fixed vertex therefore remain open in these sources.
 
 ## 3. Definitions and audited Lean components
 
@@ -63,13 +65,26 @@ The kernel refutes these arithmetic conjunctions. The declarations do not derive
 
 ### 3.3 COMPILED: unfinished nonexistence and aggregate declarations
 
-`lake build` completed with 32 jobs and warnings for `sorry` in:
+As of October 11, 2026, the full `lake build` reports `sorry` warnings only in:
 
-- [Z7NonExistence.lean](../Conway/Z7NonExistence.lean);
 - [Z3Fixed3NonExistence.lean](../Conway/Z3Fixed3NonExistence.lean);
 - [Z3FpfNonExistence.lean](../Conway/Z3FpfNonExistence.lean).
 
-`#print axioms Matrix99.conway_automorphism_group_restricted` returned `[sorryAx, Quot.sound]`. Moreover, its actual statement combines exclusions for specified actions; it is not itself a theorem about the cardinality of the full automorphism group. Comments and theorem names must not be substituted for checking the statement.
+The order-7 placeholder formerly in [Z7NonExistence.lean](../Conway/Z7NonExistence.lean) was removed; see Section 3.4. The aggregate declarations in [GrandClassification.lean](../Conway/GrandClassification.lean) still depend on `sorryAx` through the order-3 stubs. Moreover, their statements combine exclusions for specified actions; they are not theorems about the cardinality of the full automorphism group. Comments and theorem names must not be substituted for checking the statement.
+
+### 3.4 PROVED: no automorphism of order 7
+
+`conway_no_z7_automorphism` ([Z7Main.lean](../Conway/Z7Main.lean)) states that no `ConwayAdj` matrix admits a non-trivial bijection `s` with `s^[7] = id` preserving adjacency. Its axioms are `[propext, Quot.sound]`.
+
+The proof is a kernel-checked chain:
+
+1. The orbit-matrix reduction and the 12×12 exterior equations.
+2. Canonical relabelling of the first exterior row to one of 33 representatives.
+3. Arithmetic exclusions for representatives 3, 22, 25, 26 and 31.
+4. Pinned kernel searches for the other 28.
+5. Assembly in `no_exterior_equations` and `z7_orbit_matrix_nonexistence`.
+
+No SAT certificate or external premise is used. The result reproduces Behbahani–Lam's exclusion of order 7; its contribution is the end-to-end machine-checked proof, not new mathematics. Building it within bounded memory required two steps: stored, split proofs of the root-independent row lists (`Z7UnaryCache*.lean`) and chunked searches (`scripts/z7_search_template.py`).
 
 ## 4. Analytical reconstructions, not new kernel-certified exclusions
 

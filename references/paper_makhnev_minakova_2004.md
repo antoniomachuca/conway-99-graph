@@ -32,8 +32,8 @@ For an involution, $\alpha_0(t)=f$ and $\alpha_1(t)=2\varepsilon_1$. This is the
 
 ## Relation to later results
 
-- Behbahani–Lam (2011) further restrict prime-order automorphisms to orders 2 and 3, excluding order 7. Cesarz–Woldar (2025) explicitly recall this result.
-- Crnković–Maksimović (2020) exclude groups of orders 6 and 9 and require order-3 actions to be fixed-point-free. This is not an exclusion of all order-3 actions.
+- Behbahani–Lam (thesis 2009; published 2011) further restrict prime-order automorphisms to orders 2 and 3, excluding order 7, and prove that an order-3 automorphism has no fixed points (thesis 2009, Theorem 4.14). Cesarz–Woldar (2025) explicitly recall the prime-order restriction.
+- Crnković–Maksimović (2020) exclude groups of orders 6 and 9. This is not an exclusion of all order-3 actions. (Corrected 2026-10-05: the fixed-point-free property of order-3 actions is Behbahani–Lam's result, not Crnković–Maksimović's; this note previously attributed it to the latter.)
 - Cesarz–Woldar (2025) give computer-free reductions including the implication that an even automorphism-group order divides 6. Combining this with the exclusion of order 6 leaves order 2; this consequence is not a new mathematical discovery of this project.
 
 ## Repository verification boundary

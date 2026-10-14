@@ -46,12 +46,12 @@
 
 \numberwithin{equation}{section}
 
-\title{Symmetry-Restricted SAT Encodings, Lean~4 Formalization, and Verification Limits for Conway's 99-Graph}
-\hypersetup{pdftitle={Symmetry-Restricted SAT Encodings, Lean 4 Formalization, and Verification Limits for Conway's 99-Graph},pdfauthor={Antonio Machuca}}
+\title{A Kernel-Checked Lean~4 Proof That Conway's 99-Graph Has No Automorphism of Order~7, with Certified SAT Cross-Checks}
+\hypersetup{pdftitle={A Kernel-Checked Lean 4 Proof That Conway's 99-Graph Has No Automorphism of Order 7, with Certified SAT Cross-Checks},pdfauthor={Antonio Machuca}}
 
-\renewcommand{\headeright}{Benchmark Report}
-\renewcommand{\undertitle}{Technical Note / Benchmark Report}
-\renewcommand{\shorttitle}{Symmetry Search for Conway's 99-Graph}
+\renewcommand{\headeright}{Preprint}
+\renewcommand{\undertitle}{Preprint}
+\renewcommand{\shorttitle}{A Kernel-Checked Order-7 Exclusion for Conway's 99-Graph}
 
 \author{
   Antonio Machuca \\
@@ -62,173 +62,278 @@
   \emph{Permanent contact:} \texttt{contactoantoniomachuca@gmail.com}
 }
 
-\date{October 3, 2026}
+\date{October 12, 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Conway's 99-graph problem asks whether a strongly regular graph with parameters $(99,14,1,2)$ exists. Cited results restrict the prime divisors of the automorphism group order to $\{2, 3\}$. This note records a Lean~4 library, SAT compilers, and solver logs, and it uses a four-state taxonomy---\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, and \textsc{Pending}---to separate kernel-checked theorems, checker-certified formula refutations, tested compilers, and open claims. A SAT claim is \textsc{Proved} only when the cited CNF is the file that was checked, its solver log ends in \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reports \texttt{s VERIFIED} on that pair.
-In Lean~4, we kernel-verify core structural invariants: $K_4$-freeness, 1-factor neighborhood decomposition $7K_2$, diameter at most 2, and decidability of the adjacency matrix equation. These proofs depend solely on the foundational axioms \texttt{[propext, Quot.sound]}. We also formalize the arithmetic contradictions that underlie character-theoretic obstructions. This distinguishes verified arithmetic deductions from unverified geometric action hypotheses.
-We also kernel-verify the first step of an orbit-matrix argument for order 7. Assume that $A$ satisfies the adjacency conditions and that a nontrivial permutation $s$ with $s^7 = \mathrm{id}$ preserves $A$. Then the Lean proof constructs a $15 \times 15$ orbit quotient matrix in a canonical order. The proof derives the fixed vertex, the orbit structure, and the quotient equations from these hypotheses; it does not assume them. Lean does not yet prove that no such matrix exists. The Lean statement that excludes order 7 therefore still depends on \texttt{sorryAx}.
-For propositional logic, we implement canonical SAT encodings with Crawford symmetry-breaking predicates. A deterministic regression suite of 101 tests checks compiler components, geometric orbits, the supervisor lifecycle, positive controls, and an orbit-matrix encoder. The positive controls apply the production compilers for two actions to two known graphs with $\lambda = 1$ and $\mu = 2$: Paley(9) and the Berlekamp--van Lint--Seidel graph on 243 vertices. These checks give \textsc{Compiled} status. They do not prove that a compiler is correct.
-CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE} on the repaired order-7 CNF ($177{,}097$ variables, $422{,}508$ clauses) in $58{,}054.87$\,s process time. It wrote a $26{,}746{,}488{,}053$-byte DRAT trace. \texttt{drat-trim} reported \texttt{s VERIFIED} in $103{,}482.837$\,s ($12{,}821{,}576{,}879$ resolution steps, $378{,}191$ core clauses, 0 RAT lemmas). That pair is \textsc{Proved}. Both files are deposited in Zenodo record \texttt{10.5281/zenodo.22995101}~\cite{conway99_zenodo}. The deposit does not decide the Thakkar--Severini CP-SAT search.
-The order-7 record has two certified components. They are not one certificate.
-Component A is in Lean. From the graph and an automorphism of order 7, the kernel derives the $12 \times 12$ exterior equations (\texttt{Z7OrbitMatrix.exterior\_row\_problem}). That derivation is \textsc{Proved}. The kernel reports only \texttt{[propext, Quot.sound]}. It does not prove that no such matrix exists.
-Component B is the exterior-row CNF. It has $26{,}166$ variables and $311{,}703$ clauses. It is not the canonical order-7 CNF above. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reported \texttt{s VERIFIED}. That refutation is \textsc{Proved} for this CNF only. The file is not in Zenodo record \texttt{10.5281/zenodo.22995101}.
-The implication from \texttt{Z7OrbitMatrix} to the exterior-row CNF is \textsc{Pending}. The DRAT proof is not checked inside the Lean kernel. \texttt{z7\_orbit\_matrix\_nonexistence} still contains \texttt{sorry}.
-The note also records the column-weight identity $CC^T = 10I + 2J$ for the open involution case $f=1$, with corrected branch supports, and a 12.5-day CaDiCaL campaign that accumulated more than 2.4 billion conflicts without a satisfying assignment or a refutation. All code, Lean modules, and test suites are available at \url{https://github.com/antoniomachuca/conway-99-graph}.
+Conway's 99-graph problem asks if a strongly regular graph with parameters $(99,14,1,2)$ exists. The problem is open.
+Behbahani and Lam used a computer search to show that such a graph has no automorphism of order~7.
+This article gives a proof of that result that the Lean~4 kernel checks.
+The theorem \texttt{conway\_no\_z7\_automorphism} has no hypotheses other than the graph conditions and the automorphism.
+For this theorem, \texttt{\#print axioms} reports only \texttt{[propext, Quot.sound]}.
+The proof uses no SAT solver, no external certificate, and no \texttt{native\_decide}.
+The proof changes an automorphism of order~7 into a $12 \times 12$ system of integer equations.
+A change of labels puts the first row of each solution in a list of 33 rows.
+Short arithmetic arguments remove 5 of these rows, and finite searches in the kernel remove the other 28 rows.
+Each kernel check stays below 3\,GB of memory.
+For this purpose, the library stores row lists that are the same for all 28 rows as checked theorems. It also divides each large search into many small theorems.
+Two CNF refutations, each checked by \texttt{drat-trim}, give independent checks of the order-7 case at the formula level.
+The article also records kernel-checked structural lemmas, a repaired defect in a SAT encoder, and positive controls. A solver campaign on the two open symmetric cases gave no result.
+Four labels (\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, \textsc{Pending}) give the status of each claim.
+The article does not decide if the graph exists.
 \end{abstract}
 
-\keywords{Conway 99-graph \and strongly regular graphs \and interactive theorem proving \and Lean 4 \and SAT solving \and DRAT certification \and symmetry breaking}
+\keywords{Conway 99-graph \and strongly regular graphs \and interactive theorem proving \and Lean 4 \and kernel computation \and SAT \and DRAT certification}
 
-\section{Introduction and Literature Attribution}
+\section{Introduction}
 
-A strongly regular graph $\mathrm{srg}(v, k, \lambda, \mu)$ is a regular graph on $v$ vertices with degree $k$. Every pair of adjacent vertices has exactly $\lambda$ common neighbors. Every pair of distinct non-adjacent vertices has exactly $\mu$ common neighbors. Whether a strongly regular graph with parameters $(99, 14, 1, 2)$ exists remains open~\cite{brouwer2011spectra,cesarz2025automorphisms}. Conway included the question among five problems carrying a \$1{,}000 prize. The circulated statement is the prize list \emph{Five \$1,000 Problems (Update 2017)}~\cite{conway1970}, Problem~2. Bill Cheswick added an update in 2014. Cheswick and Sloane added a postscript in 2017. That document is not a 1970 research article and it does not identify itself as conference proceedings.
+\subsection{The problem}
 
-Let $A \in \{0,1\}^{99 \times 99}$ denote the adjacency matrix of a Conway 99-graph. The strongly regular parameters require $A$ to satisfy the matrix equation
+A strongly regular graph $\mathrm{srg}(v, k, \lambda, \mu)$ is a $k$-regular graph on $v$ vertices.
+Two adjacent vertices have exactly $\lambda$ common neighbors.
+Two distinct vertices that are not adjacent have exactly $\mu$ common neighbors.
+It is not known if a strongly regular graph with parameters $(99, 14, 1, 2)$ exists~\cite{brouwer2011spectra,cesarz2025automorphisms}.
+Conway put this question in a list of five problems with a prize of \$1{,}000.
+The text in circulation is the prize list \emph{Five \$1,000 Problems (Update 2017)}~\cite{conway1970}, Problem~2.
+Bill Cheswick added an update in 2014, and Cheswick and Sloane added a postscript in 2017.
+That document is not a research article from 1970.
+
+Let $A \in \{0,1\}^{99 \times 99}$ be the adjacency matrix of a Conway 99-graph. Then
 \begin{equation}
  A = A^T, \qquad \operatorname{diag}(A) = 0, \qquad A^2 + A = 12I_{99} + 2J_{99},
  \label{eq:matrix}
 \end{equation}
-where $I_n$ is the $n \times n$ identity matrix and $J_n$ is the $n \times n$ all-ones matrix. Spectral graph theory gives the eigenvalues of $A$: $k = 14$ (multiplicity 1), $r = 3$ (multiplicity 54), and $s = -4$ (multiplicity 44):
+where $I_n$ is the identity matrix and $J_n$ is the all-ones matrix of size $n \times n$.
+The spectrum of $A$ is
 \begin{equation}
  \Spec(A) = \{14^1, 3^{54}, (-4)^{44}\}.
  \label{eq:spectrum}
 \end{equation}
-For each vertex $x \in V(G)$, let $\Gamma(x)$ denote its open neighborhood. Let $\Gamma_2(x) = V(G) \setminus (\{x\} \cup \Gamma(x))$ denote the second subconstituent. Because $k = 14$ and $\lambda = 1$, each vertex in $\Gamma(x)$ has exactly one neighbor in $\Gamma(x)$. The induced subgraph $G[\Gamma(x)]$ is therefore a 1-regular graph of seven disjoint edges ($7K_2$). The second subconstituent $\Gamma_2(x)$ contains $99 - 1 - 14 = 84$ vertices. Because $\mu = 2$, each vertex $y \in \Gamma_2(x)$ is adjacent to exactly two vertices in $\Gamma(x)$~\cite{brouwer2011spectra,cesarz2025automorphisms}.
+For a vertex $x$, let $\Gamma(x)$ be its set of neighbors. Let $\Gamma_2(x)$ be the set of the $84$ vertices that are not $x$ and not in $\Gamma(x)$.
+Because $\lambda = 1$, each vertex of $\Gamma(x)$ has exactly one neighbor in $\Gamma(x)$.
+As a result, $\Gamma(x)$ induces seven disjoint edges ($7K_2$).
+Because $\mu = 2$, each vertex of $\Gamma_2(x)$ has exactly two neighbors in $\Gamma(x)$.
 
-\subsection{Literature Attribution of Automorphism Group Bounds}
+\subsection{Results from the literature}
 
-An unconstrained combinatorial search on a 99-vertex graph involves $2^{\binom{99}{2}} = 2^{4851}$ possible edge configurations. Computational searches in this note therefore restrict attention to graphs that admit a nontrivial automorphism. Such a restriction cannot find a rigid graph. Prior literature establishes strict bounds on the automorphism group $\Aut(G)$:
-
+A search of all graphs on 99 vertices has $2^{\binom{99}{2}} = 2^{4851}$ edge sets. For this reason, many searches add a nontrivial automorphism. Such a search cannot find a rigid graph. Let $G$ be a Conway 99-graph. The literature gives these results for $\Aut(G)$.
 \begin{enumerate}
- \item \textbf{Involutions (order 2) fix exactly one vertex.}
- Makhnev and Minakova (2004)~\cite{makhnev2001automorphisms} classified prime-order automorphisms of strongly regular graphs with $\lambda = 1$ and $\mu = 2$. Makhnev's 2009 slides~\cite{makhnev2009symmetric}, attributing the result to Makhnev--Minakova, state that an involution of a Conway 99-graph fixes exactly one vertex.
-
- \item \textbf{Automorphisms of order 3 are fixed-point-free; orders 6 and 9 are excluded.}
- Behbahani and Lam (2011)~\cite{behbahani2011strongly} proved that an automorphism of order 3 on $\mathrm{srg}(99,14,1,2)$ has no fixed points. It acts as a fixed-point-free (FPF) permutation with 33 cycles of length 3. Crnkovi{\'c} and Maksimovi{\'c} (2020)~\cite{crnkovic2014strongly} proved that $\Aut(G)$ contains no subgroups of order 6 or 9. This result excludes $\mathbb{Z}_6, S_3, \mathbb{Z}_9$, and $\mathbb{Z}_3 \times \mathbb{Z}_3$.
-
- \item \textbf{Prime orders $p \ge 5$ are excluded.}
- Behbahani and Lam (2011)~\cite{behbahani2011strongly} showed that the only possible prime divisors of $|\Aut(G)|$ are 2 and 3. They excluded automorphisms of order 5, 7, and higher primes through computer-assisted orbit matrix enumeration. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} gave computer-free proofs that:
+ \item \textbf{An involution fixes exactly one vertex.} Makhnev and Minakova~\cite{makhnev2001automorphisms} classify the fixed subgraph of an automorphism of prime order. Makhnev's 2009 slides~\cite{makhnev2009symmetric} state the result for involutions and give it to Makhnev and Minakova.
+ \item \textbf{Only the primes 2 and 3 divide $|\Aut(G)|$, and an automorphism of order~3 has no fixed points.} Behbahani and Lam prove both statements~\cite{behbahani2009thesis,behbahani2011strongly}. In the thesis, the statement is Theorem~4.14. Their orbit-matrix search for order~3 without fixed points did not finish. Table~21 of the thesis shows ``?'' for that case~\cite{behbahani2009thesis}.
+ \item \textbf{No group of order 6 or 9 acts.} Crnkovi{\'c} and Maksimovi{\'c}~\cite{crnkovic2014strongly} exclude automorphism groups of order 6 and order 9. They cite the fixed-point result for order~3 from Behbahani and Lam. They do not exclude an automorphism of order~3 without fixed points.
+ \item \textbf{Computer-free proofs.} Cesarz and Woldar~\cite{cesarz2025automorphisms} prove these two statements without a computer:
  \begin{equation}
   2 \mid |\Aut(G)| \implies |\Aut(G)| \mid 6,
   \qquad
   7 \mid |\Aut(G)| \implies \Aut(G) \cong \mathbb{Z}_7.
   \label{eq:prior_bounds}
  \end{equation}
- Combining this even-order implication with the exclusion of order 6 gives: if $2 \mid |\Aut(G)|$, then $|\Aut(G)| = 2$. Therefore, $\Aut(G)$ contains no elements of order 4 or 6. This is a consequence of the cited papers, not a new group-order theorem.
-
- \item \textbf{Computational benchmark context.}
- Thakkar and Severini (2026)~\cite{thakkar2026forced} encode forced-structure reductions and prescribed automorphisms in Google OR-Tools CP-SAT. They report that the single-fixed-point order-7 instance returned \texttt{UNKNOWN} after 48 hours on 14 cores. Their paper still treats a $\mathbb{Z}_7$-symmetric graph as open. A CNF refutation is a certificate for that instance only when the two formulations are shown to define the same set of graphs. This note does not give that correspondence.
+ \item \textbf{CP-SAT search.} Thakkar and Severini~\cite{thakkar2026forced} encode forced structure and a prescribed automorphism in Google OR-Tools CP-SAT. Their order-7 instance with one fixed vertex returned \texttt{UNKNOWN} after 48 hours on 14 cores.
 \end{enumerate}
+Items 2 to 4 together give $|\Aut(G)| \in \{1, 2, 3\}$.
+If $|\Aut(G)|$ is even, then $|\Aut(G)|$ divides 6, and 6 is excluded.
+If $|\Aut(G)|$ is odd, then $|\Aut(G)| = 3^b$, and a group of order $3^b$ with $b \ge 2$ has a subgroup of order 9.
+As a result, two symmetric cases stay open: an involution that fixes exactly one vertex, and an automorphism of order~3 without fixed points.
+This article does not formalize this consequence.
 
-\subsection{Contributions and Scope of this Benchmark Report}
+\subsection{Contributions}
 
-The note keeps the following items separate. The primary contents are:
 \begin{itemize}
- \item We introduce a four-state taxonomy (\textsc{Proved}, \textsc{Compiled}, \textsc{Explored}, \textsc{Pending}) to clarify proof verification and modeling limits.
- \item In Lean~4, we verify structural invariants ($K_4$-freeness, 1-factor neighborhood decomposition, diameter at most 2) and the decidability of the adjacency conditions. The Lean kernel checks these proofs using only \texttt{[propext, Quot.sound]}. We also formalize the arithmetic contradictions that arise in character-theoretic analyses.
- \item In Lean~4, we prove that a Conway 99-graph with a nontrivial automorphism $s$ such that $s^7 = \mathrm{id}$ gives a canonical $15 \times 15$ orbit quotient matrix (\texttt{conway\_z7\_induces\_orbit\_matrix}). The kernel reports only \texttt{[propext, Quot.sound]}. The orbit structure is known from the literature~\cite{behbahani2011strongly,cesarz2025automorphisms}. The contribution is a mechanized derivation. The nonexistence of such a matrix remains \textsc{Pending} in Lean. \texttt{Z7OrbitMatrix.exterior\_row\_problem} derives the $12 \times 12$ exterior equations from \texttt{Z7OrbitMatrix}. That step is \textsc{Proved} and does not prove that no matrix exists.
- \item We implement canonical SAT compilers with Crawford symmetry-breaking predicates~\cite{crawford1996symmetry}. A 101-test regression suite checks helper truth tables, the $f=1$ coordinate model, the bounded-run supervisor, positive controls, and an orbit-matrix encoder. The positive controls apply the production compilers for the involution with one fixed vertex and for the fixed-point-free action of order 3 to Paley(9) and to the Berlekamp--van Lint--Seidel graph. These tests do not certify that a historical CNF matches the graph. They do not cover the order-7 compiler.
-A separate file has four \textsc{Compiled} tests of the fixed-3 encoding.
-The 101-test count does not include those four tests.
-Those tests are not the fixed-point exclusion of Crnkovi{\'c} and Maksimovi{\'c}.
- \item The repaired compiler's order-7 CNF has a CaDiCaL 1.9.5 log ending \texttt{s UNSATISFIABLE} and a \texttt{drat-trim} log ending \texttt{s VERIFIED} on that file, so the formula refutation is \textsc{Proved}. The CP-SAT model of Thakkar and Severini is a separate encoding.
- \item The exterior-row CNF is a second formula, with $26{,}166$ variables and $311{,}703$ clauses. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reported \texttt{s VERIFIED}. The refutation is \textsc{Proved} for that CNF only. The implication from \texttt{Z7OrbitMatrix} to the CNF is \textsc{Pending}, and \texttt{z7\_orbit\_matrix\_nonexistence} still contains \texttt{sorry}.
- \item We prove that every column of a binary $7\times 42$ matrix satisfying $CC^T = 10I_7 + 2J_7$ has weight 2, and we correct the support labels of the three $f=1$ branch representatives. A 12.5-day campaign on the $f=1$ and fixed-point-free order-3 encodings produced no satisfying assignment and no refutation.
+ \item \textbf{A kernel-checked proof of the order-7 exclusion (\textsc{Proved}).} Theorem~\ref{thm:no_z7} is \texttt{conway\_no\_z7\_automorphism}. It states that no matrix that satisfies the graph conditions has a nontrivial permutation $s$ with $s^7 = \mathrm{id}$ that keeps the adjacency. The axiom report is \texttt{[propext, Quot.sound]}. The result is the known theorem of Behbahani and Lam~\cite{behbahani2011strongly}. The contribution is a machine-checked proof that does not depend on a SAT solver or on an external certificate.
+ \item \textbf{A method for large kernel computations.} The proof contains 28 finite searches. Section~\ref{sec:resources} describes how we keep each kernel check below 3\,GB of memory. It also gives a measurement error that did not show the real memory use.
+ \item \textbf{Kernel-checked structural lemmas (\textsc{Proved}).} The library proves $K_4$-freeness, the $7K_2$ structure of each neighborhood, diameter at most 2, and a checker that is equivalent to the graph conditions. These facts are standard.
+ \item \textbf{Two certified CNF refutations (\textsc{Proved} as formulas).} \texttt{drat-trim} verifies a refutation of a canonical order-7 CNF and of a CNF for the exterior equations. The Lean proof does not use them. The step from the graph to each CNF is \textsc{Compiled}.
+ \item \textbf{Encoder validation and open cases.} We record a repaired defect in a SAT encoder, positive controls, and a column-weight lemma for the open involution case. A solver campaign on the two open cases gave no result (\textsc{Explored}).
 \end{itemize}
 
-\section{Lean~4 Formalization and Operational Taxonomy}
+\section{Status labels}
+\label{sec:taxonomy}
 
-To prevent ambiguity between mechanized proofs, empirical solver outputs, and open conjectures, we classify every result and artifact into one of four operational states:
-
+Each result in this article has one of four labels.
 \begin{description}
- \item[\textsc{Proved}.] A theorem verified by the Lean~4 kernel using only the foundational axioms \texttt{[propext, Quot.sound]}; or a SAT claim for which the cited CNF is the file that was checked, its solver log ends in \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reports \texttt{s VERIFIED} on that pair. A checker log for a different formula does not meet this state.
- \item[\textsc{Compiled}.] Formally typed Lean~4 code compiling with \texttt{sorryAx} stubs for open subgoals; or Python SAT compilers whose clausal outputs pass deterministic regression tests.
- \item[\textsc{Explored}.] Combinatorial searches, matrix calculations, and multi-threaded solver executions that finished without finding a satisfying assignment or producing a proof certificate.
- \item[\textsc{Pending}.] Open mathematical questions (such as graph existence or full rigidity $|\Aut(G)| = 1$) and unfinished formalizations connecting group actions to arithmetic hypotheses.
+ \item[\textsc{Proved}.] The Lean~4 kernel checks the theorem, and \texttt{\#print axioms} reports only \texttt{[propext, Quot.sound]}. For a SAT claim, the label applies to one CNF file. The solver log of that file must end in \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} must report \texttt{s VERIFIED} for that file and its proof.
+ \item[\textsc{Compiled}.] The Lean code compiles, but a theorem uses \texttt{sorry} or a premise that the kernel does not derive. The label also applies to a SAT compiler that passes deterministic regression tests.
+ \item[\textsc{Explored}.] A search or a calculation finished without a satisfying assignment and without a checked refutation.
+ \item[\textsc{Pending}.] An open mathematical question, or a formal link that is not done.
 \end{description}
+A \textsc{Proved} label applies to the stated theorem or file only. It does not apply to an interpretation that the text adds.
 
-\subsection{Kernel-Verified Structural Properties in Lean~4}
+\section{Lean definitions and structural lemmas}
 
-We formalize the adjacency definition of a Conway 99-graph in Lean~4~\cite{moura2021lean4} with the predicate \texttt{ConwayAdj}. This predicate enforces symmetry, zero diagonal, binary entries, and the matrix equation~\eqref{eq:matrix}. To support verified computation, we define a computable Boolean function \texttt{checkConway} and prove its equivalence to \texttt{ConwayAdj}:
+\subsection{The graph conditions and a checker}
+
+The library uses Lean~4.33.1~\cite{moura2021lean4} and no external Lean library.
+The predicate \texttt{ConwayAdj} states that $A$ is symmetric, has a zero diagonal and binary entries, and satisfies~\eqref{eq:matrix}.
+The Boolean function \texttt{checkConway} computes these conditions. Two theorems give the equivalence:
 \begin{equation}
  \texttt{conway\_soundness}, \texttt{conway\_complete}: \quad \forall A \in \mathbb{N}^{99 \times 99}, \quad \texttt{checkConway}(A) = \texttt{true} \iff \texttt{ConwayAdj}(A).
  \label{eq:checker}
 \end{equation}
 
-In the modules \texttt{Structural.lean} and \texttt{Z2Classification.lean}, we prove structural invariants directly from \texttt{ConwayAdj}:
+\subsection{Structural lemmas (\textsc{Proved})}
+
+The module \texttt{Structural.lean} proves these lemmas from \texttt{ConwayAdj}:
 \begin{itemize}
- \item \texttt{conway\_k4\_free} (\texttt{Structural.lean}): Every graph satisfying the matrix equation contains no complete subgraph $K_4$, because $\lambda = 1$.
- \item \texttt{conway\_neighborhood\_one\_factor} (\texttt{Structural.lean}): For each vertex $x$, the open neighborhood $G[\Gamma(x)]$ is a 1-regular graph of seven disjoint edges ($7K_2$).
- \item \texttt{conway\_diameter\_at\_most\_two} (\texttt{Structural.lean}): Any two non-adjacent vertices have common neighbors because $\mu = 2 > 0$. Therefore, $\operatorname{diam}(G) \le 2$.
- \item \texttt{conway\_z2\_f3\_fixed\_points\_dichotomy} (\texttt{Z2Classification.lean}): If an involution fixes three vertices, their induced subgraph is either a triangle $K_3$ or an independent set $3K_1$.
+ \item \texttt{conway\_k4\_free}: the graph contains no $K_4$.
+ \item \texttt{conway\_neighborhood\_one\_factor}: each neighborhood induces $7K_2$.
+ \item \texttt{conway\_diameter\_at\_most\_two}: two vertices that are not adjacent have a common neighbor.
 \end{itemize}
-The Lean kernel checked all these declarations with \texttt{\#print axioms}. They depend solely on \texttt{[propext, Quot.sound]}.
+The module \texttt{Z2Classification.lean} proves \texttt{conway\_z2\_f3\_fixed\_points\_dichotomy}. If an involution fixes three vertices, then these vertices induce $K_3$ or $3K_1$.
+For all 58 declarations in \texttt{Structural.lean}, \texttt{\#print axioms} reports only \texttt{[propext, Quot.sound]}.
+Two earlier proofs used \texttt{Classical.choice}. The source text did not show it. The axiom report showed it.
+The causes were the library lemma \texttt{beq\_self\_eq\_true} and a call of \texttt{omega} on a branch with no cases. We replaced both steps by explicit case analysis. The statements did not change.
 
-\subsection{The Boundary Between Arithmetic Refutations and Graph Hypotheses}
+\subsection{Arithmetic refutations and graph premises}
 
-Character-theoretic analyses of automorphisms impose numerical constraints on fixed edge counts and eigenspace multiplicities. In the Lean library, we kernel-verify the arithmetic refutations of these systems:
+Character-theoretic arguments give numerical conditions on fixed edges and eigenspace multiplicities. The library proves the arithmetic refutations of these conditions:
 \begin{itemize}
- \item For an involution with $f=5$ fixed vertices, the declaration \texttt{conway\_z2\_f5\_\allowbreak spectral\_\allowbreak formula\_\allowbreak contradiction} refutes the existence of an integer $\varepsilon_1$ satisfying:
+ \item For an involution with $f=5$ fixed vertices, \texttt{conway\_z2\_f5\_\allowbreak spectral\_\allowbreak formula\_\allowbreak contradiction} shows that no integer $\varepsilon_1$ satisfies
  \begin{equation}
   (\varepsilon_1 = 18 \lor \varepsilon_1 = 15) \land (\varepsilon_1 \bmod 7 = 6).
   \label{eq:f5_arith}
  \end{equation}
- \item For $f=7$, \texttt{conway\_no\_z2\_f7\_\allowbreak formula\_\allowbreak automorphism} refutes:
+ \item For $f=7$, \texttt{conway\_no\_z2\_f7\_\allowbreak formula\_\allowbreak automorphism} shows that no integer satisfies
  \begin{equation}
   \varepsilon_1 \in \{7, 10, 13\} \land (\varepsilon_1 \bmod 7 = 2).
   \label{eq:f7_arith}
  \end{equation}
- \item In \texttt{CesarzWoldarTheorems.lean}, terminal arithmetic contradictions such as $7a = 62$ or sums of even integers equaling 5 are verified using only \texttt{[propext, Quot.sound]}.
+ \item \texttt{CesarzWoldarTheorems.lean} proves final arithmetic contradictions, for example $7a = 62$ or a sum of even numbers that is equal to 5.
 \end{itemize}
+These arithmetic refutations are \textsc{Proved}.
+Their graph-level wrappers, for example \texttt{conway\_no\_z2\_f5\_\allowbreak automorphism}, take the counting identities and the spectral congruences as hypotheses. These wrappers are \textsc{Compiled}.
+A derivation of these hypotheses from \texttt{ConwayAdj} and an involution is \textsc{Pending}.
+The two order-3 statements \texttt{z3\_fpf\_orbit\_matrix\_nonexistence} and \texttt{z3\_fixed3\_orbit\_matrix\_nonexistence} contain \texttt{sorry}.
+As a result, the summary theorem \texttt{conway\_automorphism\_\allowbreak group\_\allowbreak restricted} is \textsc{Compiled}.
 
-These arithmetic refutations are \textsc{Proved}. However, their wrappers (such as \texttt{conway\_no\_z2\_f5\_\allowbreak automorphism}) take the counting identities and spectral congruences as hypotheses. Deducing these arithmetic hypotheses directly from \texttt{ConwayAdj(A)} and an involution $t$ in Lean remains \textsc{Pending}. Likewise, the classification theorem \texttt{conway\_automorphism\_\allowbreak group\_\allowbreak restricted} uses \texttt{sorryAx} for open subcases, placing its status at \textsc{Compiled}.
+\section{The order-7 proof in Lean}
+\label{sec:z7}
 
-\subsection{Kernel-Checked Reduction from an Order-7 Action to the Orbit Quotient}
+\subsection{From an automorphism to an orbit matrix}
 \label{sec:z7_reduction}
 
-Behbahani and Lam~\cite{behbahani2011strongly} excluded order 7 with orbit matrices. The Lean library now contains a kernel-checked form of the first step of such an argument: the passage from a graph and an automorphism to a quotient matrix.
-
-Let $s$ act on $V(G)$ with orbits $O_0, \dots, O_{m-1}$ of sizes $n_i = |O_i|$. For $u \in O_i$, let $B_{ij}$ be the number of neighbors of $u$ in $O_j$. Because $s$ preserves adjacency, $B_{ij}$ does not depend on the choice of $u$. The Lean structure \texttt{Z7OrbitMatrix} requires $m = 15$, $n_0 = 1$, and $n_i = 7$ for $i \ge 1$. It also requires these conditions for all indices $i$ and $j$:
+Let $s$ be a permutation of $V(G)$ with orbits $O_0, \dots, O_{m-1}$ of sizes $n_i = |O_i|$.
+For $u \in O_i$, let $B_{ij}$ be the number of neighbors of $u$ in $O_j$.
+If $s$ preserves adjacency, then $B_{ij}$ does not depend on the choice of $u$.
+In the Lean structure \texttt{Z7OrbitMatrix}, $m = 15$, $n_0 = 1$, and $n_i = 7$ for $i \ge 1$.
+The structure also has these conditions for all indices $i$ and $j$:
 \begin{enumerate}
  \item $\sum_{j} B_{ij} = 14$, $n_i B_{ij} = n_j B_{ji}$, and $(B^2)_{ij} + B_{ij} = 12\,\delta_{ij} + 2\,n_j$.
  \item $B_{ij} \le n_j$ and $B_{ii} \in \{0, 2\}$. If $i, j \ge 3$, then $B_{ij} \le 4$.
- \item $B_{0j} = 7$ if $j \in \{1, 2\}$, and $B_{0j} = 0$ otherwise. $B_{i0} = 1$ if $i \in \{1, 2\}$, and $B_{i0} = 0$ otherwise.
+ \item $B_{0j} = 7$ if $j \in \{1, 2\}$, and $B_{0j} = 0$ for the other $j$. $B_{i0} = 1$ if $i \in \{1, 2\}$, and $B_{i0} = 0$ for the other $i$.
  \item $B_{11} = B_{22} = 0$ and $B_{12} = B_{21} = 1$.
  \item The pair $(B_{i1}, B_{i2})$ is $(2, 0)$ for $3 \le i \le 5$, $(0, 2)$ for $6 \le i \le 8$, and $(1, 1)$ for $9 \le i \le 14$.
 \end{enumerate}
 
 \begin{theorem}[\texttt{conway\_z7\_induces\_orbit\_matrix}; \textsc{Proved}]
 \label{thm:z7_reduction}
-Let $A$ satisfy \texttt{ConwayAdj}. Let $s$ be a bijection of the vertex set $\{0, \dots, 98\}$ such that $s^7 = \mathrm{id}$, $s \ne \mathrm{id}$, and $A_{s(u)\,s(v)} = A_{uv}$ for all vertices $u$ and $v$. Then a matrix that satisfies \texttt{Z7OrbitMatrix} exists.
+Let $A$ satisfy \texttt{ConwayAdj}. Let $s$ be a bijection of the vertex set $\{0, \dots, 98\}$ with $s^7 = \mathrm{id}$, $s \ne \mathrm{id}$, and $A_{s(u)\,s(v)} = A_{uv}$ for all vertices $u$ and $v$. Then a matrix that satisfies \texttt{Z7OrbitMatrix} exists.
 \end{theorem}
 
-The Lean statement has no hypotheses other than those in Theorem~\ref{thm:z7_reduction}. It does not take an orbit partition, an orbit count, or a quotient matrix as input. The proof has these steps:
+The Lean statement has no other hypotheses. It does not take an orbit partition, an orbit count, or a quotient matrix as input. The proof has these steps:
 \begin{enumerate}
- \item \texttt{Z7Cycles.lean}: each orbit of $s$ has size 1 or 7. The number of fixed vertices is congruent to 99 modulo 7. Thus at least one fixed vertex $x_0$ exists.
- \item \texttt{GraphLocalCounts.lean}: \texttt{ConwayAdj} gives degree 14, one common neighbor for adjacent vertices, and two common neighbors for distinct nonadjacent vertices. The unique common neighbor defines a perfect matching on each neighborhood.
- \item \texttt{Z7FixedGeometry.lean} and \texttt{Z7GraphFrame.lean}: $s$ moves every neighbor of $x_0$. The set $\Gamma(x_0)$ is the union of two orbits of size 7, and no edge joins two vertices of the same such orbit. The vertex $x_0$ is the only fixed vertex.
- \item \texttt{Z7OrbitEnumeration.lean}: a computable list contains one representative of each orbit. The list has 15 entries, because one orbit has size 1 and $(99 - 1)/7 = 14$ orbits have size 7. Indices 0, 1, and 2 hold $x_0$ and the two orbits in $\Gamma(x_0)$.
- \item \texttt{OrbitQuotient.lean} and \texttt{OrbitReindex.lean}: the matrix $B$ is well defined. It satisfies the three equations of condition~1 and the bound $B_{ij} \le n_j$. If $n_i$ is odd, then $B_{ii}$ is even.
+ \item \texttt{Z7Cycles.lean}: each orbit of $s$ has size 1 or 7. The number of fixed vertices is congruent to 99 modulo 7. As a result, a fixed vertex $x_0$ exists.
+ \item \texttt{GraphLocalCounts.lean}: \texttt{ConwayAdj} gives degree 14, one common neighbor for adjacent vertices, and two common neighbors for distinct vertices that are not adjacent. The unique common neighbor gives a perfect matching on each neighborhood.
+ \item \texttt{Z7FixedGeometry.lean} and \texttt{Z7GraphFrame.lean}: $s$ moves each neighbor of $x_0$. The set $\Gamma(x_0)$ is the union of two orbits of size 7, and no edge joins two vertices of one of these orbits. The vertex $x_0$ is the only fixed vertex.
+ \item \texttt{Z7OrbitEnumeration.lean}: a computable list contains one representative of each orbit. The list has 15 entries. Indices 0, 1, and 2 hold $x_0$ and the two orbits in $\Gamma(x_0)$.
+ \item \texttt{OrbitQuotient.lean} and \texttt{OrbitReindex.lean}: the matrix $B$ is well defined. It satisfies condition~1 and the bound $B_{ij} \le n_j$. If $n_i$ is odd, then $B_{ii}$ is even.
  \item \texttt{Z7QuotientBoundary.lean} and \texttt{Z7RootedConstruction.lean}: conditions 3 and 4 follow from the structure of $\Gamma(x_0)$.
- \item \texttt{Z7CanonicalArithmetic.lean}: for $i \ge 3$, the quotient equation gives $B_{i1} + B_{i2} = 2$. The equations then force exactly three outer orbits of type $(2, 0)$, three of type $(0, 2)$, and six of type $(1, 1)$. They also give $B_{ii} \in \{0, 2\}$, and $B_{ij} \le 4$ for $i, j \ge 3$. An explicit permutation puts the outer orbits in the order of condition~5.
+ \item \texttt{Z7CanonicalArithmetic.lean}: for $i \ge 3$, the quotient equation gives $B_{i1} + B_{i2} = 2$. The equations then give three outer orbits of type $(2, 0)$, three of type $(0, 2)$, and six of type $(1, 1)$. An explicit permutation puts the outer orbits in the order of condition~5.
 \end{enumerate}
 
-For Theorem~\ref{thm:z7_reduction}, \texttt{\#print axioms} reports \texttt{[propext, Quot.sound]}. The new modules contain no \texttt{sorry}, no \texttt{native\_decide}, and no new axioms. The file \texttt{TestZ7Canonical.lean} computes orbit representatives for two finite permutations: a permutation of 99 points with one fixed point and fourteen 7-cycles, which gives 15 representatives, and the identity map, which gives 99. These checks test the definitions. They are not Conway graphs.
+\subsection{The exterior equations}
 
-The theorem gives necessary conditions only. It does not state that a matrix with these properties comes from a graph. \texttt{Z7OrbitMatrix.exterior\_row\_problem}, in \texttt{Conway/Z7ExteriorBlock.lean}, derives the $12 \times 12$ exterior equations from \texttt{Z7OrbitMatrix}. For that statement, \texttt{\#print axioms} reports \texttt{[propext, Quot.sound]}. The derivation does not use the DRAT proof, and it does not prove that no matrix exists. The statement \texttt{z7\_orbit\_matrix\_nonexistence} is still a \texttt{sorry}. \texttt{conway\_no\_z7\_automorphism} uses it and remains \textsc{Compiled}. The DRAT certificate of the exterior-row CNF is not checked inside the kernel.
+The 12 outer orbits have indices $3, \dots, 14$. We write them as $0, \dots, 11$. Let $\ell_i$ be $2$, $0$, or $1$ for the blocks $\{0,1,2\}$, $\{3,4,5\}$, and $\{6, \dots, 11\}$. Let
+\begin{equation}
+ T_{ij} = 12\,\delta_{ij} + 14 - \ell_i \ell_j - (2 - \ell_i)(2 - \ell_j).
+ \label{eq:target}
+\end{equation}
 
-\section{Canonical SAT Encodings and Symmetry Breaking}
+\begin{definition}[\texttt{ExteriorEquations}]
+A matrix $C \in \mathbb{N}^{12 \times 12}$ satisfies the exterior equations if, for all $i$ and $j$:
+$C_{ij} = C_{ji}$; $C_{ij} \le 4$; $C_{ii} \in \{0, 2\}$; $\sum_k C_{ik} = 12$; $C_{i0} + C_{i1} + C_{i2} = C_{i3} + C_{i4} + C_{i5}$; and $\sum_k C_{ik} C_{jk} + C_{ij} = T_{ij}$.
+\end{definition}
 
-To explore automorphism classes computationally, we map the graph constraints under a cyclic automorphism group $\langle g \rangle \cong \mathbb{Z}_p$ into Conjunctive Normal Form (CNF).
+The theorem \texttt{Z7OrbitMatrix.exterior\_row\_problem} (\textsc{Proved}) shows that the outer $12 \times 12$ block of each \texttt{Z7OrbitMatrix} satisfies the exterior equations.
+The theorem \texttt{no\_z7\_orbit\_matrix\_of\_no\_exterior\_equations} (\textsc{Proved}) gives the converse direction that the proof needs. If no matrix satisfies the exterior equations, then no \texttt{Z7OrbitMatrix} exists.
 
-\subsection{Orbit Parameterization and Crawford Symmetry Cuts}
+\subsection{Canonical first rows}
 
-Under the action of an automorphism $g$ of prime order $p$, the 99 vertices partition into $m$ orbits $\mathcal{O}_1, \dots, \mathcal{O}_m$, where $|\mathcal{O}_i| \in \{1, p\}$. The adjacency between two orbits of size $p$ is invariant under cyclic shifts. A circulant Boolean vector $c_{i,j} \in \{0,1\}^p$ parameterizes this adjacency, where $c_{i,j,k} = 1$ if vertex $0 \in \mathcal{O}_i$ connects to vertex $k \in \mathcal{O}_j$.
+A permutation $\sigma$ of $\{0, \dots, 11\}$ that fixes 0 and maps each block to itself keeps the exterior equations true for the matrix $C_{\sigma(i)\sigma(j)}$.
+Such a permutation can sort the entries of row 0 inside each block.
 
-The strongly regular graph conditions translate into exact cardinality constraints:
+\begin{theorem}[\texttt{exterior\_has\_canonical\_root}; \textsc{Proved}]
+Let $C$ satisfy the exterior equations. Then a permutation $\sigma$ of this type exists such that $C_{\sigma(i)\sigma(j)}$ satisfies the exterior equations. The row 0 of this matrix is in a fixed list of 33 rows.
+\end{theorem}
+
+The list is \texttt{z7RootValues}. The theorem \texttt{z7CanonicalRow\_covered} shows that each sorted row that satisfies the row conditions is in the list. These row conditions are the bound, the diagonal, the row sum, the balance, and $\sum_k C_{0k}^2 + C_{00} = 22$.
+
+\subsection{Five rows with arithmetic proofs}
+
+Five of the 33 rows fail for short arithmetic reasons. Each proof derives \texttt{False} from \texttt{ExteriorEquations} and the fixed row 0. No other hypothesis is necessary.
+\begin{itemize}
+ \item \textbf{Rows 22 and 26.} The theorem \texttt{exterior\_last\_entry\_diag\_bound} shows $C_{00} + C_{0,11} \le 4$ for each solution. The proof combines rows 0 and 11 and bounds their squared entries. Both rows have $C_{00} = 2$ and $C_{0,11} = 3$.
+ \item \textbf{Row 3.} This row is $(0,0,2,0,0,2,1,1,1,1,1,3)$. Let $x_k = C_{11,k}$. The row-sum and balance conditions make $x_6 + \dots + x_{11}$ even. Then the dot product of rows 0 and 11 is even. But the quadratic equation gives $12 - 3 = 9$ for this product.
+ \item \textbf{Rows 25 and 31.} For these rows, parity conditions in several rows make all entries of one row even. That row sums to 12, so the sum of the squares of its entries is at least 24. The quadratic equation gives a maximum of 22.
+\end{itemize}
+The modules are \texttt{Z7RootNormBounds.lean}, \texttt{Z7Root22Arithmetic.lean}, \texttt{Z7Root03Arithmetic.lean}, and \texttt{Z7ComplementParity.lean}.
+
+\subsection{Kernel searches for the other 28 rows}
+
+For the other 28 rows, a finite search in the kernel finds no extension of the fixed row 0. The search has three parts.
+\begin{enumerate}
+ \item \textbf{Row lists.} For an index $i$, the function \texttt{z7UnaryRows}~$i$ lists all rows that satisfy the conditions on one row: the bound, the diagonal, the row sum, the balance, and the diagonal quadratic equation. A generator makes the list. The generator removes partial rows with a Cauchy--Schwarz bound. The theorem \texttt{cauchy\_step} proves that bound. The theorem \texttt{z7UnaryRows\_of\_row} proves that each row of a solution is in the list. The lists have 7{,}576 rows for $i \le 5$ and 10{,}955 rows for $i \ge 6$.
+ \item \textbf{Domains.} Let $a$ be the fixed row 0. The domain of index $i$ contains each row $b$ of \texttt{z7UnaryRows}~$i$ with $b_0 = a_i$ and $\sum_k a_k b_k + a_i = T_{0i}$.
+ \item \textbf{Search.} The Boolean function \texttt{noExtension} selects rows for the indices $1, \dots, 11$ in sequence. After each selection, it removes the rows that do not agree with the selected row. It returns \texttt{true} if each branch stops with an empty domain. The theorem \texttt{noExtension\_sound} proves that a \texttt{true} result excludes each complete selection of rows that agree in pairs. The theorem \texttt{exterior\_pinned\_false\_of\_search} connects this result to \texttt{ExteriorEquations}.
+\end{enumerate}
+For each of the 28 rows, \texttt{decide +kernel} evaluates \texttt{noExtension} to \texttt{true}. This tactic computes in the kernel. It does not use compiled code, so it adds no axiom.
+A chain of lists removes the rows in sequence. Each step proves that the first row of a solution is in a shorter list. The last list is empty.
+
+\begin{theorem}[\texttt{no\_exterior\_equations}; \textsc{Proved}]
+No matrix $C \in \mathbb{N}^{12 \times 12}$ satisfies the exterior equations.
+\end{theorem}
+
+\begin{theorem}[\texttt{conway\_no\_z7\_automorphism}; \textsc{Proved}]
+\label{thm:no_z7}
+Let $A$ satisfy \texttt{ConwayAdj}. Then no bijection $s$ of $\{0, \dots, 98\}$ satisfies $s^7 = \mathrm{id}$, $s(i) \ne i$ for some $i$, and $A_{s(u)\,s(v)} = A_{uv}$ for all $u$ and $v$.
+\end{theorem}
+
+The module \texttt{Z7Main.lean} contains both theorems and \texttt{z7\_orbit\_matrix\_nonexistence}. For all three, \texttt{\#print axioms} reports \texttt{[propext, Quot.sound]}. The proof formalizes the result of Behbahani and Lam~\cite{behbahani2011strongly}. It is not a new mathematical result.
+
+\subsection{Memory limits of kernel computation}
+\label{sec:resources}
+
+The first form of the proof computed the 11 row lists again for each of the 28 rows. The kernel keeps its reduction caches for one declaration only. As a result, it did not use a list again in the next declaration. One root row took between 6.8 and 13.1 hours. The time was mostly in the domains for the indices $6, \dots, 11$.
+
+The resident set size that \texttt{ps} reported was near 2.4\,GB. The physical footprint of the process was near 21\,GB on a computer with 16\,GB of memory. The footprint includes compressed and swapped memory. In one domain, the Lean process used 18 minutes of processor time in 2.5 hours. The process waited for paged memory for most of that time. We now measure the physical footprint with \texttt{proc\_pid\_rusage} and stop a job at a set limit.
+
+Three changes keep each check small.
+\begin{enumerate}
+ \item \textbf{Stored lists.} Each list \texttt{z7UnaryRows}~$i$ is a theorem \texttt{z7UnaryRows\_cached\_$i$}. The theorem equates the generator output to a stored list of integer codes. The proof divides the generator at depth 4 into 114 to 326 small theorems. Each part is a separate \texttt{decide +kernel} check. The longest list proof took 390\,s and 715\,MB.
+ \item \textbf{Divided searches.} The search for one root row is a set of theorems. Each theorem covers 8 candidates for row 1. A short lemma joins the parts.
+ \item \textbf{A divided bound check.} The proof of \texttt{cauchy\_step} uses one check for each of five values. The single check needed more than 5\,GB.
+\end{enumerate}
+After these changes, one root row took about 2 minutes.
+A full sequential build of the 500 modules of the library had no failures. The largest physical footprint was 2.56\,GB. The build took 3 hours and 3 minutes on a laptop with 16\,GB of memory. Other jobs used the processor during that time.
+
+\subsection{Trusted base and reproduction}
+
+The proof trusts the Lean~4.33.1 kernel and the axioms \texttt{propext} and \texttt{Quot.sound}. The final axiom report does not contain \texttt{Classical.choice}, \texttt{sorryAx}, or \texttt{Lean.ofReduceBool}. A reader can check the result with these commands:
+\begin{lstlisting}
+lake build Conway.Z7Main
+lake env lean Conway/Z7Main.lean    # prints the axioms of the three theorems
+\end{lstlisting}
+
+\section{SAT encodings and certified refutations}
+\label{sec:sat}
+
+The Lean proof of Section~\ref{sec:z7} does not use the results of this section. These results are independent checks at the formula level. The step from the graph to each CNF is \textsc{Compiled}.
+
+\subsection{Orbit variables and symmetry breaking}
+
+Let $g$ be an automorphism of prime order $p$. The 99 vertices split into orbits of size 1 or $p$. The adjacency between two orbits of size $p$ does not change under cyclic shifts. A circulant Boolean vector $c_{i,j} \in \{0,1\}^p$ gives this adjacency. The entry $c_{i,j,k}$ is 1 if vertex 0 of $\mathcal{O}_i$ is adjacent to vertex $k$ of $\mathcal{O}_j$.
+The graph conditions become exact cardinality constraints:
 \begin{equation}
  \sum_{u \in \Gamma(x)} A_{u,v} =
  \begin{cases}
@@ -237,116 +342,78 @@ The strongly regular graph conditions translate into exact cardinality constrain
   2 & \text{if } x \not\sim v.
  \end{cases}
 \end{equation}
-We convert these pseudo-Boolean constraints to CNF with Tseitin variables. Exact cardinality constraints use PySAT sequential counters (\texttt{EncType.seqcounter}). The compilers used for this note do not emit sorting networks.
-
-To prune isomorphic search spaces, we enforce symmetry-breaking predicates following Crawford et al.~\cite{crawford1996symmetry}. Let $\mathcal{G} \le \Sym(m)$ be the automorphism group preserving the orbit partition. For each non-identity generator $\pi \in \mathcal{G}$, we enforce a lexicographical leader constraint: the assignment vector $X$ must precede its permuted image $\pi(X)$:
+Tseitin variables give the CNF. The exact cardinality constraints use the sequential counters of PySAT (\texttt{EncType.seqcounter}).
+Lexicographic leader constraints of Crawford et al.~\cite{crawford1996symmetry} remove symmetric copies. For each generator $\pi$ of the group that keeps the orbit partition, the assignment $X$ must satisfy
 \begin{equation}
  X \le_{\text{lex}} \pi(X).
  \label{eq:lex_leader}
 \end{equation}
-For variables $(x_1, \dots, x_n)$ and their images $(y_1, \dots, y_n) = (\pi(x_1), \dots, \pi(x_n))$, we introduce auxiliary variables $e_i \leftrightarrow (x_i = y_i)$ and enforce:
+For variables $(x_1, \dots, x_n)$ and their images $(y_1, \dots, y_n)$, auxiliary variables satisfy $e_i \leftrightarrow (x_i = y_i)$, and the encoder adds
 \begin{equation}
  (\neg x_i \land y_i) \lor (e_i \land (X_{i+1..n} \le_{\text{lex}} Y_{i+1..n})).
 \end{equation}
 
-\subsection{Compiler Verification and Defect Repair}
+\subsection{A defect in the encoders and its repair}
 
-Translating graph constraints into propositional clauses requires careful validation. In prototype implementations, primary Boolean variables were 1-indexed (with ID 1 for $x_1$), while helper functions such as \texttt{get\_and\_lit} and \texttt{add\_card\_equals} treated integer \texttt{1} as the Boolean constant \texttt{True}. When encoding $x_1 + x_2 = 1$ via \texttt{add\_card\_equals([1, 2], 1)}, the compiler evaluated literal 1 as constant \texttt{True}. This produced the degenerate unit clause \texttt{[-2]}, which enforced $x_2 = 0$ while omitting $x_1$. The formula then admitted $(x_1, x_2) = (0, 0)$ and rejected $(0, 1)$.
-\begin{example}[The Literal-1 Collision Defect]
+In earlier encoders, the variable index 1 was also the Boolean constant \texttt{True}.
+The functions \texttt{get\_and\_lit} and \texttt{add\_card\_equals} used the integer \texttt{1} for both meanings.
+For the constraint $x_1 + x_2 = 1$, the encoder wrote the unit clause \texttt{[-2]}.
+That clause sets $x_2 = 0$ and does not contain $x_1$.
+The formula then accepted $(x_1, x_2) = (0, 0)$ and rejected $(0, 1)$.
+\begin{example}[The literal-1 defect]
 \label{ex:literal1}
-The collision of variable ID 1 with the Boolean constant \texttt{True} changes an exact-1 constraint on $\{x_1, x_2\}$ into the unit clause $\neg x_2$. This defect shows why compiler primitives require end-to-end truth table tests.
+Because variable 1 was also the constant \texttt{True}, an exact-1 constraint on $\{x_1, x_2\}$ became the unit clause $\neg x_2$. For this reason, encoder primitives need truth-table tests.
 \end{example}
+The repaired encoders keep variable indices and Boolean constants apart. Explicit gate managers allocate the variables, and index 0 is an internal sentinel.
 
-We refactored the compiler architecture to separate variable indices from Boolean constants. Variables are now allocated through explicit Tseitin gate managers, reserving index 0 as an internal sentinel.
-
-To test the compilers, we keep a deterministic regression suite of 101 tests in \texttt{tests/}:
+The directory \texttt{tests/} contains a deterministic regression suite of 101 tests:
 \begin{enumerate}
- \item \textbf{Compiler-Helper Unit Tests (20 tests):} Verifies truth tables for conjunctions, cardinality constraints, circulant orbit variables, and Crawford lex-leader cuts for $Z_7$, $Z_3$ fixed-3, and $Z_3$ FPF compilers.
- \item \textbf{Geometric and Input-Audit Tests (11 tests):} Evaluates 2,394 cardinality constraints symbolically against the coordinate model, checking branch cut consistency and index mappings.
- \item \textbf{Supervisor Process Tests (8 tests):} Validates bounded execution, process lifecycle management, wall-time enforcement, and proof byte limits.
- \item \textbf{Orbit-Pair Tests (5 tests):} Check the orbit-pair enumeration for the case $f=1$.
- \item \textbf{Positive-Control Tests (32 tests):} Run the production positive and negative controls of Section~\ref{sec:positive_controls} on Paley(9), check the Berlekamp--van Lint--Seidel construction, and test the clause-check harness. This group also keeps older tests of standalone toy encoders, coordinate geometry, and relaxed subsystems. Those older tests do not show that a complete production formula admits a known graph.
- \item \textbf{Orbit-Matrix Tests (25 tests):} Check the quotient-level order-7 encoder against small exhaustive cases and known quotients (10 tests), and check the run supervisor for that encoder (15 tests). The supervisor tests check model validation, checker integrity, and the treatment of \texttt{UNKNOWN} results.
+ \item \textbf{Encoder primitives (20 tests).} Truth tables for conjunctions, cardinality constraints, circulant orbit variables, and lexicographic leader constraints in the order-7 encoder and in the two order-3 encoders.
+ \item \textbf{Input audit (11 tests).} A symbolic check of 2{,}394 cardinality constraints against the coordinate model of the involution case, the branch constraints, and the index maps.
+ \item \textbf{Run supervisor (8 tests).} Time limits, process control, and limits on the proof size.
+ \item \textbf{Orbit pairs (5 tests).} The orbit-pair enumeration for the involution case.
+ \item \textbf{Positive controls (32 tests).} The production controls of Section~\ref{sec:positive_controls} on Paley(9), the construction of the Berlekamp--van Lint--Seidel graph, and the clause-check harness. This group also contains older tests of small encoders.
+ \item \textbf{Orbit matrices (25 tests).} The quotient-level order-7 encoder on small exhaustive cases and known quotients (10 tests), and its run supervisor (15 tests).
 \end{enumerate}
-On 3 October 2026 all 101 tests passed on the integrated revision. Passing tests support \textsc{Compiled} status for the current compiler sources. They do not rewrite CNF files generated earlier, and they do not prove that those files express the intended graph constraints.
+On 3 October 2026, all 101 tests passed. The tests support \textsc{Compiled} status for the current encoder sources. They do not change CNF files from earlier runs, and they do not prove that such files express the graph conditions.
 
-\subsection{Positive Controls on the Production Compilers}
+\subsection{Positive controls}
 \label{sec:positive_controls}
 
-An \texttt{s UNSATISFIABLE} result cannot show that an encoding admits all graphs that it must admit. The literal-1 defect of Example~\ref{ex:literal1} made a formula too strong. A positive control applies the same compiler to a known graph with the same $\lambda$ and $\mu$. If the compiler removes that graph, the control fails.
+An \texttt{s UNSATISFIABLE} result cannot show that an encoding accepts all graphs that it must accept. The literal-1 defect made a formula too strong. A positive control applies the same encoder to a known graph with the same $\lambda$ and $\mu$. If the encoder rejects that graph, the control fails.
 
-Two production compilers now accept the vertex degree as an argument: the compiler for an involution with one fixed vertex (\texttt{build\_z2\_f1\_cnf.py}) and the compiler for a fixed-point-free automorphism of order 3 (\texttt{scripts/build\_z3\_canonical\_cnf.py}). The order-3 compiler also accepts the number of orbits. The values $\lambda = 1$ and $\mu = 2$ stay fixed. With the default arguments, the outputs of both compilers did not change: the SHA-256 digests agree with the outputs of the unmodified compiler sources. The default formulas have $666{,}309$ variables and $1{,}508{,}157$ clauses for the involution, and $852{,}324$ variables and $1{,}860{,}024$ clauses for order 3. This comparison does not use the CNF files of earlier runs.
+Two production encoders accept the vertex degree as an argument. The first is for an involution with one fixed vertex (\texttt{build\_z2\_f1\_cnf.py}). The second is for an automorphism of order~3 without fixed points (\texttt{scripts/build\_z3\_canonical\_cnf.py}). The order-3 encoder also accepts the number of orbits. The values $\lambda = 1$ and $\mu = 2$ do not change. With the default arguments, both outputs have the same SHA-256 digests as the outputs of the earlier sources. The default formulas have $666{,}309$ variables and $1{,}508{,}157$ clauses for the involution, and $852{,}324$ variables and $1{,}860{,}024$ clauses for order~3.
 
-Two known graphs with $\lambda = 1$ and $\mu = 2$ are the controls:
+The controls use two known graphs with $\lambda = 1$ and $\mu = 2$:
 \begin{itemize}
- \item Paley(9), which is $\mathrm{srg}(9, 4, 1, 2)$. For each of the two actions, the solver finds a model of the complete compiled formula. The decoded graph satisfies the strongly regular conditions, and the model satisfies all clauses.
- \item The Berlekamp--van Lint--Seidel graph, which is $\mathrm{srg}(243, 22, 1, 2)$~\cite{berlekamp1973strongly}. The script builds it as a Cayley graph on $\mathbb{F}_3^5$ from the description in~\cite{zaw2020deza}, and it checks $A^2 + A = 20I + 2J$ before use. The map $x \mapsto -x$ is an involution with one fixed vertex. A translation is a fixed-point-free automorphism of order 3. The known graph sets the primary variables. The check then finds values for the auxiliary variables such that all emitted clauses are true: $28{,}257{,}515$ clauses for the involution and $27{,}424{,}360$ clauses for order 3. The auxiliary variables are checked in disjoint batches, and the check rejects the reuse of an auxiliary variable from an earlier batch.
+ \item Paley(9), which is $\mathrm{srg}(9, 4, 1, 2)$. For each action, the solver finds a model of the complete formula. The decoded graph satisfies the strongly regular conditions.
+ \item The Berlekamp--van Lint--Seidel graph $\mathrm{srg}(243, 22, 1, 2)$~\cite{berlekamp1973strongly}. A script builds it as a Cayley graph on $\mathbb{F}_3^5$ from~\cite{zaw2020deza} and checks $A^2 + A = 20I + 2J$. The map $x \mapsto -x$ is an involution with one fixed vertex. A translation is an automorphism of order~3 without fixed points. The known graph sets the primary variables. The check finds values for the auxiliary variables that make all clauses true: $28{,}257{,}515$ clauses for the involution and $27{,}424{,}360$ clauses for order~3.
 \end{itemize}
-Negative controls also pass. If one primary value of the Paley(9) assignment is changed, the compiled formula becomes unsatisfiable. A truth-table test checks the literal-1 case of Example~\ref{ex:literal1} in both production compilers.
+Negative controls also pass. If one primary value of the Paley(9) assignment changes, the formula becomes unsatisfiable.
+These controls are \textsc{Compiled}. They do not prove that an encoder is correct for all inputs. They do not cover the order-7 encoder or the order-3 encoder with three fixed vertices.
 
-These controls are \textsc{Compiled}. They do not prove that a compiler is correct for all inputs, and each Berlekamp--van Lint--Seidel check uses one fixed graph. They do not cover the order-7 compiler of Section~\ref{sec:order7} or the order-3 compiler with three fixed vertices. No DRAT proof is involved. The two Berlekamp--van Lint--Seidel checks are not part of the default test run. The repository records their output in \texttt{tests/production\_positive\_control\_results.json}.
-
-A separate file has four tests of the fixed-3 encoding.
-The file is \texttt{tests/test\_z3\_fixed3\_encoding\_coverage.py}.
-The four tests passed.
-The four tests are \textsc{Compiled}.
-The tests check 54 fixed one-factor entries.
-The tests check the circulant adjacency literal.
-The tests check 148 degree cardinalities.
-The tests check 1520 common-neighbor pair orbits.
-Those tests call no solver on the Conway fixed-3 formula.
-\texttt{conway\_no\_z3\_fixed3\_automorphism} still contains \texttt{sorry}.
-These tests do not cover the order-7 compiler.
-These tests do not cover the fixed-point-free order-3 encoding.
-Crnkovi{\'c} and Maksimovi{\'c} (2020) already exclude this fixed-point case.
-These tests are not that exclusion.
-The 101-test count does not include these four tests.
-
-\section{Certified Order-7 CNF Refutation}
+\subsection{The canonical order-7 CNF}
 \label{sec:order7}
 
-Behbahani and Lam (2011)~\cite{behbahani2011strongly} excluded automorphisms of order 7 by a computer-assisted orbit-matrix argument. Cesarz and Woldar (2025)~\cite{cesarz2025automorphisms} proved, without a computer, that $7 \mid |\Aut(G)|$ implies $\Aut(G) \cong \mathbb{Z}_7$. Thakkar and Severini (2026)~\cite{thakkar2026forced} nevertheless report a single-fixed-point $\mathbb{Z}_7$ CP-SAT run that remained \texttt{UNKNOWN} after 48 hours on 14 cores, and they describe that symmetric case as still open. Here we report a verified SAT refutation for the canonical order-7 encoding.
+Let $g$ be an automorphism of order 7. Then the vertex set has one fixed vertex $x_0$ and 14 orbits of size 7. Two orbits are in $\Gamma(x_0)$, and 12 orbits are in $\Gamma_2(x_0)$. The canonical CNF uses 498 primary variables: 36 internal orbit valences and 462 circulant variables between orbits. The encoder adds lexicographic leader constraints for the 11 nonidentity elements of a stabilizer. The repaired encoder writes a formula with $177{,}097$ variables and $422{,}508$ clauses.
 
-\subsection{Encoding Parameters and Formula Statistics}
-
-Under a cyclic automorphism $g$ of order 7, the 99 vertices partition into:
-\begin{itemize}
- \item Exactly 1 fixed vertex $x_0$;
- \item 2 orbits of size 7 in the neighborhood $\Gamma(x_0)$ (because $k = 14$);
- \item 12 orbits of size 7 in the second subconstituent $\Gamma_2(x_0)$ ($84$ vertices).
-\end{itemize}
-This decomposition matches the orbit structure of Cesarz and Woldar~\cite{cesarz2025automorphisms}. The canonical CNF encoding uses 498 primary variables: 36 internal orbit valences and 462 cross-orbit circulant variables. We encode degree, $\lambda=1$, and $\mu=2$ constraints into CNF and add Crawford lex-leader cuts for the 11 non-identity elements of the stabilizer $G_{\mathbb{Z}_7}$. The resulting formula emitted by the repaired compiler has:
-\begin{equation}
- \text{Variables: } 177{,}097, \qquad \text{Clauses: } 422{,}508.
-\end{equation}
-
-\subsection{Solver Execution and Independent DRAT Verification}
-
-The formula was solved with local CaDiCaL 1.9.5~\cite{biere2019cadical}. That log records header \texttt{p cnf 177097 422508}, verdict \texttt{s UNSATISFIABLE}, exit 20, $58{,}054.87$\,s process time, $58{,}595.63$\,s real time, and $119{,}353{,}667$ conflicts, and it closed a $26{,}746{,}488{,}053$-byte proof at \texttt{/Volumes/Untitled/conway\_repro\_z7/proof\_z7\_canonical.drat}. The binary version string 3.0.1 and commit \texttt{c60730422e758ef1cebe7aeddf2dda31c996bf04} belong to an earlier run on the formula \texttt{p cnf 176613 421562}. The following lines are a non-contiguous extract from the 1.9.5 log:
+CaDiCaL 1.9.5~\cite{biere2019cadical} solved the formula. The log records the header \texttt{p cnf 177097 422508}, the verdict \texttt{s UNSATISFIABLE}, exit code 20, $58{,}054.87$\,s of process time, and $119{,}353{,}667$ conflicts. The proof file has $26{,}746{,}488{,}053$ bytes. These lines are an extract from the log:
 \begin{lstlisting}
-c DRAT proof file '/Volumes/Untitled/conway_repro_z7/proof_z7_canonical.drat' closed
 c DRAT 127774798 added clauses 50.10%
 c DRAT 127286510 deleted clauses 49.90%
 c DRAT 26746488053 bytes (25507.44 MB)
 s UNSATISFIABLE
 c total process time since initialization:     58054.87    seconds
-c total real time since initialization:        58595.63    seconds
 c exit 20
 \end{lstlisting}
-
-\texttt{drat-trim}~\cite{heule2013verifying} logged backward checking of this CNF against that proof and \texttt{s VERIFIED} after $103{,}482.837$\,s verification time. The command-line timeout is not in the log:
+\texttt{drat-trim}~\cite{heule2013verifying} checked this CNF against that proof in backward mode. It reported \texttt{s VERIFIED} after $103{,}482.837$\,s:
 \begin{lstlisting}
-c parsing input formula with 177097 variables and 422508 clauses
-c finished parsing, read 26746488053 bytes from proof file
-c detected empty clause; start verification via backward checking
-c 378191 of 422508 clauses in core                            
+c 378191 of 422508 clauses in core
 c 66748552 of 127774799 lemmas in core using 12821576879 resolution steps
 c 0 RAT lemmas in core; 62829297 redundant literals in core lemmas
 s VERIFIED
 c verification time: 103482.837 seconds
 \end{lstlisting}
-
-The checker extracted $378{,}191$ core clauses ($89.51\%$) and $66{,}748{,}552$ core lemmas ($52.24\%$) across $12{,}821{,}576{,}879$ resolution steps, requiring zero RAT lemmas (pure RUP resolution).
 
 \begin{table}[ht]
 \centering
@@ -356,179 +423,114 @@ The checker extracted $378{,}191$ core clauses ($89.51\%$) and $66{,}748{,}552$ 
 \label{tab:order7_benchmark}
 \begin{tabular}{@{}lllll@{}}
 \toprule
-Source & Object & Tool & Runtime & Outcome \\
+Source & Object & Tool & Time & Result \\
 \midrule
 Thakkar--Severini~\cite{thakkar2026forced} & CP model & CP-SAT & $>48$\,h (14 cores) & \texttt{UNKNOWN} \\
 This work (solve) & \texttt{p cnf 177097 422508} & CaDiCaL 1.9.5 & $58{,}054.87$\,s & \texttt{s UNSATISFIABLE} \\
-This work (verify) & 24.91\,GiB DRAT & \texttt{drat-trim} & $103{,}482.84$\,s & \texttt{s VERIFIED} \\
+This work (check) & 24.91\,GiB DRAT & \texttt{drat-trim} & $103{,}482.84$\,s & \texttt{s VERIFIED} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Cryptographic Integrity and Operational Status}
-
-Both artifacts are preserved with deterministic SHA-256 cryptographic checksums:
+The SHA-256 digests of the two files are:
 \begin{itemize}
  \item \texttt{conway\_z7\_canonical.cnf}:\\
    {\footnotesize\texttt{fc67a85f300151b628ffc5d808b5cb384e69efac2a87c9891aab2c8115e0af47}}
  \item \texttt{proof\_z7\_canonical.drat}:\\
    {\footnotesize\texttt{f312d2a83d85bd11f1c9c2428cb67566ca12b11c70527cfebf0f72572da14a39}}
 \end{itemize}
-Those two digests match the CNF and the $26{,}746{,}488{,}053$-byte proof in the Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}~\cite{conway99_zenodo}. The earlier record \href{https://doi.org/10.5281/zenodo.22983776}{10.5281/zenodo.22983776} stores this CNF beside a $192{,}218{,}491$-byte proof. Under our taxonomy:
-\begin{enumerate}
- \item The propositional refutation of \texttt{conway\_z7\_canonical.cnf} is \textsc{Proved}: the solver log ends in \texttt{s UNSATISFIABLE} and \texttt{drat-trim} reports \texttt{s VERIFIED} on that pair.
- \item The graph-to-CNF step is \textsc{Compiled}. The regression tests pass and do not kernel-certify the encoding. A Lean equivalence remains \textsc{Pending}.
- \item This is a checked refutation of this CNF. It does not re-prove the Behbahani--Lam exclusion~\cite{behbahani2011strongly}, and it does not decide the Thakkar--Severini CP-SAT instance~\cite{thakkar2026forced}.
-\end{enumerate}
+The Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}~\cite{conway99_zenodo} contains both files and the two logs. The earlier record \href{https://doi.org/10.5281/zenodo.22983776}{10.5281/zenodo.22983776} contains the same CNF with a $192{,}218{,}491$-byte proof from an earlier run. That record is not this certificate.
+The refutation of \texttt{conway\_z7\_canonical.cnf} is \textsc{Proved}. The step from the graph to this CNF is \textsc{Compiled}. This refutation does not decide the CP-SAT instance of Thakkar and Severini.
 
-\subsection{Exterior-Row CNF}
+\subsection{The exterior-row CNF}
 \label{sec:exterior_row}
 
-This subsection is component B. It is not component A, and it is not the canonical order-7 CNF.
-The exterior-row CNF is not the canonical order-7 CNF.
-The file name is \texttt{z7\_row\_problem.cnf}.
-The directory is \texttt{/Volumes/Untitled/conway\_z7\_row\_direct\_long\_20261003\_01}.
-The SHA-256 digest of \texttt{z7\_row\_problem.cnf} is {\footnotesize\texttt{b746471acd527e52da4706a354fc6fd0d225bb638c121f8b7ec6f965ec5a4ee4}}.
-The exterior-row CNF has $26{,}166$ variables.
-The exterior-row CNF has $311{,}703$ clauses.
-\texttt{scripts/z7\_row\_problem\_cnf.py} emits the exterior-row CNF.
-The script uses direct encoding.
-The exterior-row CNF states the 12 by 12 exterior row problem.
-The exterior-row CNF adds no Frob(21) block cuts.
-The exterior-row CNF adds no orbit-relabeling cuts.
-The exterior-row CNF identifies $C_{ij}$ with $C_{ji}$.
-The predicate requires this symmetry.
-CaDiCaL 1.9.5 ran on the exterior-row CNF.
-\texttt{solver.log} contains \texttt{s UNSATISFIABLE}.
-\texttt{solver.log} records exit 20.
-The solver used $9{,}051.98$ seconds of real time.
-The solver reported $32{,}331{,}971$ conflicts.
-The checker read $4{,}750{,}239{,}705$ bytes from the proof file.
-\texttt{checker.log} contains \texttt{s VERIFIED}.
-The checker finished in $8{,}879.590$ seconds.
-The core contains $201{,}494$ of $311{,}703$ clauses.
-The core contains $12{,}551{,}572$ of $56{,}577{,}564$ lemmas.
-The checker counted $1{,}425{,}060{,}916$ resolution steps.
-The core contains 0 RAT lemmas.
-The checker printed duplicate-literal warnings.
-The verdict line is \texttt{s VERIFIED}.
-This refutation is \textsc{Proved} for the exterior-row CNF only.
-The exterior-row CNF is not in Zenodo record \texttt{10.5281/zenodo.22995101}.
-The exterior-row proof is not in that Zenodo record.
-The file \texttt{tests/test\_z7\_row\_problem\_cnf.py} contains five tests.
-The five tests run the encoder on small exhaustive instances.
-That test file is \textsc{Compiled} evidence.
-The tests do not prove that every integer solution of the Lean predicate is a model of the exterior-row CNF.
+The script \texttt{scripts/z7\_row\_problem\_cnf.py} writes a direct encoding of the exterior equations. This file is \texttt{z7\_row\_problem.cnf}. It is not the canonical order-7 CNF.
+\begin{itemize}
+ \item The file has $26{,}166$ variables and $311{,}703$ clauses. Its SHA-256 digest is {\footnotesize\texttt{b746471acd527e52da4706a354fc6fd0d225bb638c121f8b7ec6f965ec5a4ee4}}.
+ \item The encoding identifies $C_{ij}$ with $C_{ji}$. It adds no symmetry constraints.
+ \item CaDiCaL 1.9.5 reported \texttt{s UNSATISFIABLE} with exit code 20, $9{,}051.98$\,s of real time, and $32{,}331{,}971$ conflicts.
+ \item \texttt{drat-trim} read $4{,}750{,}239{,}705$ bytes of proof and reported \texttt{s VERIFIED} after $8{,}879.590$\,s. The core has $201{,}494$ of $311{,}703$ clauses, $12{,}551{,}572$ of $56{,}577{,}564$ lemmas, and 0 RAT lemmas.
+\end{itemize}
+This refutation is \textsc{Proved} for this CNF. The file and its proof are not in the Zenodo record. Five tests in \texttt{tests/test\_z7\_row\_problem\_cnf.py} run the encoder on small exhaustive instances (\textsc{Compiled}). No proof shows that each solution of the Lean predicate is a model of this CNF.
 
-\subsection{Relation to the Lean Reduction and a Quotient-Level Formula}
+\subsection{Other order-7 formulas}
 
-Theorem~\ref{thm:z7_reduction} ends at the quotient matrix. The canonical order-7 CNF uses graph-level circulant variables. No Lean statement connects the quotient matrix to the canonical order-7 CNF. No Lean statement connects the graph to the canonical order-7 CNF. The graph-to-CNF step for the canonical order-7 CNF remains \textsc{Compiled}. The positive controls of Section~\ref{sec:positive_controls} do not cover the canonical order-7 compiler.
+A CNF of the 15-orbit quotient conditions has $397{,}296$ variables and $806{,}262$ clauses (\texttt{scripts/orbit\_matrix\_encoding.py}, model \texttt{z7-general}). A CaDiCaL run with a limit of 120\,s stopped with \texttt{c UNKNOWN}. This run is \textsc{Explored}.
+An older quotient formula adds restrictions from the Frobenius group of order 21. These restrictions do not follow from an automorphism of order 7. \texttt{drat-trim} verified a refutation of that formula. We make no claim about graphs from it.
 
-The repository also contains a CNF encoding of 15-orbit quotient conditions (\texttt{scripts/orbit\_matrix\_encoding.py}, model \texttt{z7-general}). This formula has $397{,}296$ variables and $806{,}262$ clauses. A bounded CaDiCaL 1.9.5 run with a 120\,s limit stopped with \texttt{c UNKNOWN} after $120.22$\,s real time and $81.18$\,s process time. The log has no terminal \texttt{s} line, so we did not run a checker. The partial proof file is not a certificate. This run is \textsc{Explored}. A proof that every \texttt{Z7OrbitMatrix} gives a model of this formula is \textsc{Pending}.
-That formula is not the exterior-row CNF. The two certified components stay separate. Component A, the derivation of the exterior equations, is \textsc{Proved} in Lean. Component B, the exterior-row CNF refutation, is \textsc{Proved} for that CNF only. The implication from \texttt{Z7OrbitMatrix} to the exterior-row CNF is \textsc{Pending}. The kernel does not check the DRAT proof. \texttt{z7\_orbit\_matrix\_nonexistence} still contains \texttt{sorry}, so \texttt{conway\_no\_z7\_automorphism} remains \textsc{Compiled}. The $397{,}296$-variable run remains \textsc{Explored}.
+\section{The open symmetric cases}
+\label{sec:open}
 
-The repository also keeps an older quotient formula with extra block restrictions. These restrictions come from the Frobenius group $\mathbb{Z}_7 \rtimes \mathbb{Z}_3$ of order 21, and they do not follow from an automorphism of order 7. \texttt{drat-trim} verified a refutation of that exact formula. We make no claim about graphs from it.
+Two cases stay open in the literature: an involution with exactly one fixed vertex, and an automorphism of order~3 without fixed points. This article gives no exclusion of either case.
 
-\section{Incidence Geometry and Search Limits for Open Branches}
+\subsection{The involution with one fixed vertex}
 
-The literature cited above leaves two prime-order actions unresolved by this note:
-\begin{enumerate}
- \item An involution ($p=2$) with exactly $f=1$ fixed point (Makhnev--Minakova);
- \item A fixed-point-free automorphism of order 3. Behbahani's fixed-point restriction does not remove it, and Crnkovi{\'c}--Maksimovi{\'c} do not exclude it when they exclude orders 6 and 9.
-\end{enumerate}
-
-\subsection{Incidence Geometry of the One-Fixed-Vertex Involution \texorpdfstring{($f=1$)}{(f=1)}}
-
-Let $t \in \Aut(G)$ be an involution with $\Fix(t) = \{x_0\}$. The rooted neighborhood $\Gamma(x_0)$ consists of 7 matched pairs under $t$. The second subconstituent $\Gamma_2(x_0)$ contains 84 vertices partitioned into 42 transposed pairs (orbits $O_0, \dots, O_{41}$).
-
-Each orbit $O_j = \{u, t(u)\}$ has a support in $\Gamma(x_0)$. This support is the set of matched pairs in $\Gamma(x_0)$ containing neighbors of $u$. We define the binary support-incidence matrix $C \in \{0, 1\}^{7 \times 42}$, where $C_{i,j} = 1$ if orbit $O_j$ connects to the $i$-th matched pair of $\Gamma(x_0)$. By construction, $C = [C_1 \mid C_1]$, where $C_1 \in \{0,1\}^{7 \times 21}$ is the vertex-edge incidence matrix of $K_7$.
-Computing the product gives the matrix equation:
+Let $t \in \Aut(G)$ be an involution with $\Fix(t) = \{x_0\}$. The neighborhood $\Gamma(x_0)$ contains 7 matched pairs. The set $\Gamma_2(x_0)$ contains 84 vertices in 42 orbits $O_0, \dots, O_{41}$ of size 2.
+The support of an orbit $O_j = \{u, t(u)\}$ is the set of matched pairs of $\Gamma(x_0)$ that contain neighbors of $u$.
+Let $C \in \{0, 1\}^{7 \times 42}$ have $C_{i,j} = 1$ if orbit $O_j$ connects to pair $i$.
+Then $C = [C_1 \mid C_1]$, where $C_1 \in \{0,1\}^{7 \times 21}$ is the vertex-edge incidence matrix of $K_7$, and
 \begin{equation}
  C C^T = 10 I_7 + 2 J_7.
  \label{eq:cct}
 \end{equation}
 
-\begin{proposition}[Exact Column Weight Distribution]
-For every binary matrix $C \in \{0, 1\}^{7 \times 42}$ satisfying $C C^T = 10 I_7 + 2 J_7$, each column has weight exactly 2.
+\begin{proposition}[Column weights]
+Each binary matrix $C \in \{0, 1\}^{7 \times 42}$ with $C C^T = 10 I_7 + 2 J_7$ has column weight 2 in each column.
 \end{proposition}
 \begin{proof}
-Let $k_j = \sum_{i=1}^7 C_{i,j}$ be the sum of column $j$. The total number of ones in $C$ is $\sum_{j=1}^{42} k_j = \Tr(C C^T) = \Tr(10I_7 + 2J_7) = 70 + 14 = 84$.
-The sum of squares of column sums equals the quadratic form:
+Let $k_j$ be the weight of column $j$. Then $\sum_j k_j = \Tr(C C^T) = 70 + 14 = 84$, and $\sum_j k_j^2 = \mathbf{1}^T (C C^T) \mathbf{1} = 70 + 98 = 168$. This gives
 \begin{equation}
- \sum_{j=1}^{42} k_j^2 = \mathbf{1}_7^T (C C^T) \mathbf{1}_7 = \mathbf{1}_7^T (10 I_7 + 2 J_7) \mathbf{1}_7 = 10(7) + 2(7^2) = 70 + 98 = 168.
+ \sum_{j=1}^{42} (k_j - 2)^2 = 168 - 4 \cdot 84 + 4 \cdot 42 = 0.
 \end{equation}
-The variance of $k_j$ around 2 is:
-\begin{equation}
- \sum_{j=1}^{42} (k_j - 2)^2 = \sum_{j=1}^{42} k_j^2 - 4 \sum_{j=1}^{42} k_j + 4(42) = 168 - 4(84) + 168 = 168 - 336 + 168 = 0.
-\end{equation}
-Because $(k_j - 2)^2 \ge 0$ for all $j$, we have $k_j = 2$ for all $j \in \{1, \dots, 42\}$.
+Each term is not negative, so $k_j = 2$ for all $j$.
 \end{proof}
-Note that $\Tr(C^T C) = \Tr(C C^T) = 84$, while the quadratic form $\mathbf{1}_7^T (C C^T) \mathbf{1}_7 = 168$ gives the sum of squared column weights.
 
-\subsection{Stabilizer Decomposition and Branching Classes}
-
-The binary matrix $C$ allows independent swaps of its 21 duplicate-column pairs. This generates a relabeling group $(S_2)^{21} \rtimes S_7$ of order $10,569,646,080$. However, in the signed rooted coordinate system of the graph, the valid coordinate symmetry group is:
-\begin{equation}
- W = (\mathbb{Z}_2)^7 \rtimes S_7, \qquad |W| = 2^7 \cdot 7! = 645,120.
-\end{equation}
-Fixing a distinguished orbit $O_0$ with support $\{0, 1\}$, the stabilizer $\Stab_W(O_0)$ has order 15{,}360 inside $W$. The global sign flip fixes every orbit label, so it lies in the kernel of the action on the 42 labels. The induced permutation group therefore has order 7{,}680, and the faithful stabilizer of $O_0$ has order 7{,}680. These orders were obtained by enumerating the stabilizer in the signed coordinate model. Under $\Stab_W(O_0)$, the remaining 41 orbits fall into three classes:
+The group $W = (\mathbb{Z}_2)^7 \rtimes S_7$ of order $645{,}120$ acts on the signed coordinates of the rooted graph. Fix the orbit $O_0$ with support $\{0, 1\}$. The stabilizer of $O_0$ in $W$ has order 15{,}360. The global sign change fixes each orbit label, so the permutation group on the 42 labels has order 7{,}680. We found these orders by enumeration in the signed coordinate model. Under this stabilizer, the other 41 orbits form three classes:
 \begin{itemize}
- \item \textbf{Class A (opposite phase, identical support):} Size 1, representative $O_{21}$, support $\{0, 1\}$, phase $-$. The abstract residual order is 15{,}360 and the faithful residual order is 7{,}680.
- \item \textbf{Class B (intersecting support):} Size 20, representative $O_1$, support $\{0, 2\}$, phase $+$. Then $|\{0, 1\} \cap \{0, 2\}| = 1$. The abstract residual order is 768 and the faithful residual order is 384.
- \item \textbf{Class C (disjoint support):} Size 20, representative $O_{11}$, support $\{2, 3\}$, phase $+$. Then $\{0, 1\} \cap \{2, 3\} = \emptyset$. The residual orders are again 768 and 384.
+ \item \textbf{Class A (same support, opposite phase):} size 1, representative $O_{21}$, support $\{0, 1\}$.
+ \item \textbf{Class B (support with one common pair):} size 20, representative $O_1$, support $\{0, 2\}$.
+ \item \textbf{Class C (disjoint support):} size 20, representative $O_{11}$, support $\{2, 3\}$.
 \end{itemize}
-An earlier draft assigned support $\{1, 6\}$ to $O_1$. That label is the support of $O_{10}$. Since $O_0$ has support $\{0, 1\}$, the index $O_{10}$ is another intersecting representative, in the same class as $O_1$, and it is not a disjoint representative. The representatives used here are $A=21$, $B=1$, and $C=11$. The input-audit tests check these indices against the compiler's edge list of $K_7$.
+An earlier draft gave support $\{1, 6\}$ to $O_1$. That support belongs to $O_{10}$, which is in class B and not in class C. The input-audit tests check the representatives $A=21$, $B=1$, and $C=11$ against the edge list of $K_7$ in the encoder.
 
-\subsection{Limits of Combinatorial Search: The Distributed Solver Campaign}
+\subsection{A solver campaign without a result}
 
-To test whether CDCL solvers can resolve the open branches without further theoretical reductions, we ran a multi-threaded search campaign using CaDiCaL on Google Cloud Platform (16 cores, dedicated instance). The search targeted the $Z_2$ ($f=1$) branches and the $Z_3$ FPF encoding.
+We ran CaDiCaL on Google Cloud Platform (16 cores) on the involution branches and on the order-3 encoding without fixed points. The campaign ran for 12.5 days and stopped on 23 September 2026. The solvers had more than $2.4 \times 10^9$ conflicts in total. They found no satisfying assignment and no refutation. The solver logs are not in this source, so a reader cannot calculate the total again.
 
-The campaign ran for 12.5 days and ended on 23 September 2026. The conflict total below is the aggregate recorded for that run. The solver logs are not part of this source, and the machines have been shut down, so a reader cannot recompute the total from this file:
-\begin{itemize}
- \item The solvers accumulated over \textbf{2.4 billion conflicts} ($> 2.4 \times 10^9$) across multiple random seeds and variable selection heuristics.
- \item The solvers found neither a satisfying assignment (graph witness) nor an unsatisfiable termination (refutation).
-\end{itemize}
-Two limits apply to the formulas of this campaign. First, the campaign started before the compiler repair of 21 September 2026, and we did not audit which compiler version wrote each formula. Some formulas can therefore contain the literal-1 defect of Example~\ref{ex:literal1}. Second, project records name $O_{10}$ as the representative of the disjoint class for at least part of the campaign. As shown above, $O_{10}$ is an intersecting representative. The campaign therefore may not cover the disjoint class.
-
-Under our taxonomy, this campaign is classified as \textsc{Explored}. Conflict counts, clause counts, and proof sizes do not measure the proportion of the mathematical search space eliminated. The 12.5-day run ended without a satisfying assignment or a refutation.
+Two limits apply. First, the campaign started before the encoder repair of 21 September 2026. Some formulas can contain the literal-1 defect. Second, project records name $O_{10}$ as the representative of class C for a part of the campaign. As a result, it is possible that the campaign does not cover class C.
+The campaign is \textsc{Explored}. Conflict counts and proof sizes do not measure the part of the search space that a run removes.
 
 \section{Conclusion}
 
-This report records the following boundary. It does not decide existence.
+The status of the results is as follows. The article does not decide existence.
 \begin{enumerate}
- \item The Lean library contains kernel-checked structural invariants and arithmetic refutations. Counting hypotheses that are merely assumed remain \textsc{Pending}. All Lean modules are available in the public repository.
- \item Component A is \textsc{Proved}. The Lean library derives the canonical 15-orbit quotient matrix from a Conway 99-graph with an automorphism of order 7 (Theorem~\ref{thm:z7_reduction}), and \texttt{Z7OrbitMatrix.exterior\_row\_problem} derives the $12 \times 12$ exterior equations. Neither statement proves that no matrix exists. \texttt{z7\_orbit\_matrix\_nonexistence} still contains \texttt{sorry}, so the Lean exclusion of order 7 remains \textsc{Compiled}.
- \item The current SAT compilers use Crawford symmetry breaking and sequential counters. A literal-index defect was repaired on 21 September 2026. The 101-test regression suite checks the current compiler sources. It does not repair CNF files written before that date. Positive controls on Paley(9) and on the Berlekamp--van Lint--Seidel graph exercise the production compilers for the involution with one fixed vertex and for the fixed-point-free action of order 3. They are \textsc{Compiled} and do not cover the order-7 compiler.
-A separate file has four \textsc{Compiled} tests of the fixed-3 encoding.
-Those tests call no solver on the Conway fixed-3 formula.
-Those tests are not the fixed-point exclusion of Crnkovi{\'c} and Maksimovi{\'c}.
-The 101-test count does not include those four tests.
- \item The canonical order-7 CNF from the repaired compiler is \textsc{Proved} as a formula. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE} in $58{,}054.87$\,s process time, and \texttt{drat-trim} reported \texttt{s VERIFIED} on the $26{,}746{,}488{,}053$-byte proof in $103{,}482.837$\,s. The SHA-256 digests of the canonical order-7 CNF and its DRAT proof match Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}.
-The earlier record \href{https://doi.org/10.5281/zenodo.22983776}{10.5281/zenodo.22983776} stores a $192{,}218{,}491$-byte proof from an earlier run.
-Component B is the exterior-row CNF, a different formula. CaDiCaL 1.9.5 returned \texttt{s UNSATISFIABLE}, and \texttt{drat-trim} reported \texttt{s VERIFIED}. That refutation is \textsc{Proved} for the exterior-row CNF only. The file is not in Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}. The implication from \texttt{Z7OrbitMatrix} to this CNF is \textsc{Pending}. The kernel does not check the DRAT proof.
-A 120-second run on the $397{,}296$-variable CNF ended with \texttt{c UNKNOWN}.
-That run is \textsc{Explored}.
-The $397{,}296$-variable CNF is not the exterior-row CNF.
- \item Every binary $7\times 42$ solution of $CC^T = 10I_7 + 2J_7$ has column weight 2. In the signed model the three $f=1$ representatives are $O_{21}$, $O_1$ with support $\{0, 2\}$, and $O_{11}$ with support $\{2, 3\}$. The multi-threaded search remained \textsc{Explored}.
+ \item The Lean library proves that a Conway 99-graph has no automorphism of order~7 (\texttt{conway\_no\_z7\_automorphism}, \textsc{Proved}, axioms \texttt{[propext, Quot.sound]}). This formalizes the known result of Behbahani and Lam. The proof uses no SAT solver and no external certificate.
+ \item Stored row lists and divided searches keep each kernel check below 3\,GB. Measurements of the resident set size did not show the real memory use. Measurements of the physical footprint showed it.
+ \item The library proves standard structural lemmas and arithmetic refutations (\textsc{Proved}). Graph-level wrappers with assumed counting hypotheses are \textsc{Compiled}. The two order-3 statements contain \texttt{sorry}.
+ \item Two CNF refutations, of the canonical order-7 CNF and of the exterior-row CNF, are \textsc{Proved} as formulas. The step from the graph to each CNF is \textsc{Compiled}.
+ \item The encoders have a regression suite and positive controls (\textsc{Compiled}). A 12.5-day campaign on the two open cases is \textsc{Explored}.
+ \item The involution with one fixed vertex and the automorphism of order~3 without fixed points are \textsc{Pending}.
 \end{enumerate}
 
-\paragraph{The Conway 99-Graph and the Rigidity Conjecture.}
-A central question is whether any Conway 99-graph must be rigid:
-\begin{conjecture}[Rigidity Conjecture]
+\paragraph{The rigidity conjecture.}
+\begin{conjecture}[Rigidity]
 If a strongly regular graph with parameters $(99, 14, 1, 2)$ exists, then $\Aut(G) = \{1\}$.
 \end{conjecture}
-A search that assumes a nontrivial automorphism ($Z_2$, $Z_3$, or $Z_7$) excludes every rigid graph from its search space. Refuting the open $f=1$ and fixed-point-free order-3 branches would prove the rigidity conjecture and would leave existence open.
+A search that adds a nontrivial automorphism cannot find a rigid graph. A refutation of the two open cases proves the conjecture. Existence then stays open.
 
 \section*{Declarations}
 
-\noindent\textbf{Statement of AI Use.} The author used large language models for code maintenance, test generation, and LaTeX editing. Kernel checks, regression tests, and retained solver logs cover only the statements and files identified in the text. Model output is not an independent mathematical review.
+\noindent\textbf{Use of AI tools.} The author used large language models for code maintenance, test generation, proof work, and LaTeX edits. The Lean kernel, the regression tests, and the retained solver and checker logs check only the statements and files that the text names. The output of a model is not an independent mathematical review.
 
 \medskip
-\noindent\textbf{Conflict of Interest.} The author declares no competing financial or non-financial interests.
+\noindent\textbf{Funding.} No funding was received for this work.
 
 \medskip
-\noindent\textbf{Data and Code Availability.} The Lean~4 library, the Python SAT compilers, the regression tests, and the execution scripts are available at \url{https://github.com/antoniomachuca/conway-99-graph}. The checked SAT pair is the CNF \texttt{p cnf 177097 422508} and the $26{,}746{,}488{,}053$-byte proof, together with the CaDiCaL 1.9.5 log and the \texttt{drat-trim} log, in the Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}~\cite{conway99_zenodo}. The earlier record \href{https://doi.org/10.5281/zenodo.22983776}{10.5281/zenodo.22983776} stores this CNF beside a $192{,}218{,}491$-byte proof.
-Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101} holds the canonical order-7 CNF and its proof. The exterior-row CNF is a different formula. Its checker log contains \texttt{s VERIFIED}, and neither that CNF nor its proof is in the Zenodo record. The repository files \texttt{tests/production\_positive\_control\_results.json} and \texttt{tests/z7\_general\_run\_result.json} record the positive-control output and the bounded quotient-level run, with SHA-256 digests. The partial proof file of that run is not deposited, because it is not a certificate. \texttt{tests/z7\_general\_run\_result.json} records the $397{,}296$-variable run, not the exterior-row CNF.
+\noindent\textbf{Conflict of interest.} The author has no competing financial or non-financial interests.
+
+\medskip
+\noindent\textbf{Data and code availability.} The Lean~4 library, the SAT encoders, the regression tests, and the scripts are at \url{https://github.com/antoniomachuca/conway-99-graph}. The order-7 proof is at commit \texttt{de9a5349552f6ebc3b989e1235f605d2a87b4ab8}. The tag \texttt{v1.0.0} marks the state of the repository for this article. The Zenodo record \href{https://doi.org/10.5281/zenodo.23307118}{10.5281/zenodo.23307118} contains an archive of this tag. The Zenodo record \href{https://doi.org/10.5281/zenodo.22995101}{10.5281/zenodo.22995101}~\cite{conway99_zenodo} contains the canonical order-7 CNF, its proof, the CaDiCaL 1.9.5 log, and the \texttt{drat-trim} log. The exterior-row CNF and its proof are not in that record. The files \texttt{tests/production\_positive\_control\_results.json} and \texttt{tests/z7\_general\_run\_result.json} record the positive-control output and the bounded quotient-level run, with SHA-256 digests.
 
 \medskip
 \noindent\textbf{Acknowledgments.} The author thanks the developers of CaDiCaL, \texttt{drat-trim}, PySAT, and Lean~4 for their open-source tools.

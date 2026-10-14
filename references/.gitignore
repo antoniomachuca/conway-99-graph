@@ -1,0 +1,4 @@
+# Copies of third-party papers are not distributed with this repository.
+*.pdf
+*.html
+*.txt

@@ -4,6 +4,7 @@ import Conway.CesarzWoldarTheorems
 import Conway.GrandClassification
 import Conway.Z7OrbitMatrix
 import Conway.Z7NonExistence
+import Conway.Z7Main
 
 namespace Matrix99
 

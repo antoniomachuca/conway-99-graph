@@ -1,4 +1,5 @@
 import Conway.Z7NonExistence
+import Conway.Z7Main
 
 namespace ConwayOrbitTest
 
