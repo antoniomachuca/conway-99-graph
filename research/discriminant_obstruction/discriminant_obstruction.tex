@@ -1,0 +1,296 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,longtable}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{xcolor}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\OK}{\mathcal{O}_K}
+\newcommand{\srg}{\operatorname{srg}}
+\newcommand{\Nm}{\operatorname{N}}
+\title{A discriminant obstruction for fixed-point-free automorphisms\\ of prime order of strongly regular graphs}
+\author{Working note (draft, not reviewed)}
+\date{13 October 2026}
+\begin{document}
+\maketitle
+
+\begin{center}\fbox{\parbox{0.92\textwidth}{\small\textbf{Status.} This note generalizes the fixed-point-free part of
+D.~Djematene's argument for $\srg(99,14,1,2)$ and order~$3$ (Zenodo, doi:10.5281/zenodo.23305123, unreviewed preprint). The proof
+below has been checked by its author and by one internal referee with an independent program, not by an external
+expert; the statement has been tested numerically on known graphs
+(Section~\ref{sec:val}). Nothing here is formalized. Section~\ref{sec:app} lists consequences for open parameter
+sets; their novelty has not been fully established (Section~\ref{sec:lit}).}}\end{center}
+
+\section{Setting and statement}
+
+Let $\Gamma$ be a connected $\srg(v,k,\lambda,\mu)$, not complete, with integral eigenvalues $k>r>s$ of multiplicities
+$1,f_r,f_s$. Its adjacency matrix satisfies $(A-rI)(A-sI)=\mu J$, and $(k-r)(k-s)=\mu v$.
+Let $\sigma$ be an automorphism of prime order $p$ without fixed points, so $v=pm$. Choose a representative $x_U$ in each
+orbit ($U=1,\dots,m$) and put $A_b[U,V]=A(x_U,\sigma^b x_V)$ for $b\in\Z/p$. Then $A(\sigma^c x_U,\sigma^{c+b}x_V)=A_b[U,V]$,
+$A_b^{\mathsf T}=A_{-b}$, and $A_0$ has zero diagonal. Let $\zeta$ be a primitive $p$-th root of unity, $K=\Q(\zeta)$,
+$\OK=\Z[\zeta]$, $K^+=\Q(\zeta+\zeta^{-1})$, $\pi=1-\zeta$, and
+\[
+Q=\sum_b A_b\in M_m(\Z),\qquad M=\sum_b \zeta^b A_b\in M_m(\OK).
+\]
+Let $\rho:\OK\to\F_p$ be reduction modulo $\pi$ ($\rho(\zeta)=1$); then $\rho(\bar z)=\rho(z)$ and $\rho\circ\tau=\rho$ for every
+$\tau\in\operatorname{Gal}(K/\Q)$. Write $\chi$ for the Legendre symbol modulo~$p$.
+
+For $\theta\in\{r,s\}$ let $\theta'$ be the other eigenvalue,
+$L_\theta=\Z^m\cap\ker(Q-\theta I)$ of rank $a$, $d=\det(B^{\mathsf T}B)$ for a basis $B$ of $L_\theta$, and, when $\OK$ is a principal
+ideal domain ($p\le19$), $L'_\theta=\OK^m\cap\ker(M-\theta I)$ of rank $a'$ and $d'=\det(B'^*B')$ for an $\OK$-basis $B'$.
+
+\begin{theorem}\label{thm:main}
+Assume $p\nmid(k-\theta)(\theta-\theta')$ and $p\le 19$. Then:
+\begin{enumerate}
+\item[(a)] $a=a'$; consequently $f_\theta=pa$, and $\sum_U A_b[U,U]=(k-\theta')/p$ for every $b\ne0$.
+\item[(b)] $d$ divides $((k-\theta)(\theta-\theta'))^a$; $d'$ is a totally positive element of $\mathcal{O}_{K^+}$ dividing
+$(\theta-\theta')^{a'}=(\theta-\theta')^a$ in $\OK$, so $\Nm_{K^+/\Q}(d')$ is a positive divisor of $|\theta-\theta'|^{a(p-1)/2}$.
+\item[(c)] $\chi(d)\equiv \Nm_{K^+/\Q}(d') \pmod p$; in particular, since $p\nmid d$ by (b), $\Nm_{K^+/\Q}(d')\equiv\pm1\pmod p$.
+\item[(d)] Let $g=\gcd(m,k-\theta)$. For every prime $\ell\mid m$ with $\ell\nmid (m/g)(\theta-\theta')$:
+$v_\ell(d)\equiv v_\ell(m)\pmod 2$.
+\end{enumerate}
+\end{theorem}
+
+Part (a) without (b)--(d) is a rank equality of the kind proved by Ishida (arXiv:2606.29183, Prop.~4.4) and holds for
+every prime $p$ (the proof below works over the localizations $\Z_{(p)}$ and $\OK{}_{,(\pi)}$). Its numerical content is
+automatic from the parameters: $(k-\theta)(k-\theta')=\mu pm$ and $p\nmid k-\theta$ give $p\mid k-\theta'$. The new
+information is in (c) and (d).
+
+\section{Proof}
+
+\begin{lemma}\label{lem:Phi}
+$Q$ is symmetric, $Q\one=k\one$ and $(Q-rI)(Q-sI)=p\mu J$. $M$ is Hermitian, $(M-rI)(M-sI)=0$, and $Q\equiv M\pmod\pi$ entrywise.
+\end{lemma}
+\begin{proof}
+For a matrix $X$ on the vertices with $X(\sigma u,\sigma w)=X(u,w)$ put $X_b[U,V]=X(x_U,\sigma^b x_V)$ and
+$\Phi(X)=\sum_b X_b\,t^b\in M_m(\Z[t]/(t^p-1))$. Invariance gives $(XY)_b=\sum_c X_cY_{b-c}$, so $\Phi$ is a ring
+homomorphism with $\Phi(I)=I$ and $\Phi(J)=(1+t+\dots+t^{p-1})J$. Apply $\Phi$ to $(A-rI)(A-sI)=\mu J$ and evaluate at $t=1$
+and $t=\zeta$. $Q^{\mathsf T}=Q$ and $M^*=M$ follow from $A_b^{\mathsf T}=A_{-b}$; $Q\one=k\one$ because row sums of $Q$ are
+degrees; $Q-M=\sum_b(1-\zeta^b)A_b$ and $\pi\mid 1-\zeta^b$.
+\end{proof}
+
+\begin{lemma}\label{lem:lat}
+Let $R$ be a principal ideal domain and $X\in M_n(R)$. Then $L=\ker_R X$ is a direct summand of $R^n$: there are $B\in
+R^{n\times a}$ whose columns form a basis of $L$ and $C\in R^{a\times n}$ with $CB=I_a$; and $BCY=Y$ for every matrix $Y$ whose
+columns lie in $L$.
+\end{lemma}
+\begin{proof}
+$R^n/L\cong X(R^n)$ is finitely generated and torsion-free, hence free, so the sequence splits. If the columns of $Y$ are
+$Bc_j$ then $BCBc_j=Bc_j$.
+\end{proof}
+
+\paragraph{Step 1: two annihilating matrices.} Let $N=(k-\theta)(Q-\theta'I)-p\mu J$ (integral, symmetric). Since
+$QJ=kJ$, $(Q-\theta I)N=(k-\theta)p\mu J-p\mu(k-\theta)J=0$. If $Qx=\theta x$ then $k\,\one^{\mathsf T}x=\one^{\mathsf T}Qx=\theta\,\one^{\mathsf T}x$,
+so $Jx=0$ and $Nx=(k-\theta)(\theta-\theta')x$. Let $N'=M-\theta'I$ (Hermitian); $(M-\theta I)N'=0$ and $N'y=(\theta-\theta')y$
+on $\ker(M-\theta I)$.
+
+\paragraph{Step 2: Gram identities.} With $B,C$ from Lemma~\ref{lem:lat} for $L_\theta$, put $G=B^{\mathsf T}B$ and $K=CNC^{\mathsf T}$.
+The columns of $N$ lie in $L_\theta$, so $BCN=N$; by symmetry $N=NC^{\mathsf T}B^{\mathsf T}$, hence $N=BKB^{\mathsf T}$. As $NB=(k-\theta)(\theta-\theta')B$,
+\[
+GK=B^{\mathsf T}(BCN)C^{\mathsf T}=B^{\mathsf T}NC^{\mathsf T}=(k-\theta)(\theta-\theta')(CB)^{\mathsf T}=(k-\theta)(\theta-\theta')I_a .
+\]
+So $d\det K=((k-\theta)(\theta-\theta'))^a$. Likewise with $B',C'$ for $L'_\theta$, $G'=B'^*B'$, $K'=C'N'C'^*$:
+$N'=B'K'B'^*$ and $G'K'=(\theta-\theta')I_{a'}$, so $d'\det K'=(\theta-\theta')^{a'}$. $G'$ and $K'$ are Hermitian, so $d',\det K'\in
+\OK\cap\mathbb{R}=\mathcal{O}_{K^+}$. For $\tau\in\operatorname{Gal}(K/\Q)$, $\tau(G')=\tau(B')^*\tau(B')$ is the Gram matrix of $a'$
+linearly independent vectors of $\mathbb{C}^m$, hence positive definite: $d'$ is totally positive. Taking norms gives (b).
+
+\paragraph{Step 3: reduction modulo $\pi$.} By Lemma~\ref{lem:Phi}, $\rho(M)=\rho(Q)=:\bar Q$, so $\bar N=\rho(k-\theta)(\bar Q-\theta'I)=
+\rho(k-\theta)\bar N'$. Hence, with $P=\bar C\bar B'\in\F_p^{a\times a'}$ and $P'=\bar C'\bar B$,
+\[
+\bar K=\rho(k-\theta)\,P\bar K'P^{\mathsf T},\qquad \bar K'=\rho(k-\theta)^{-1}\,P'\bar KP'^{\mathsf T}.
+\]
+$\det K=((k-\theta)(\theta-\theta'))^a/d$ is an integer whose prime factors divide $(k-\theta)(\theta-\theta')$, so $\bar K$ is
+invertible; $\rho(d')\rho(\det K')=\rho(\theta-\theta')^{a'}\neq0$, so $\bar K'$ is invertible. The two factorizations give
+$a\le a'$ and $a'\le a$. Thus $a=a'$, $P$ is invertible, and taking determinants,
+$\rho(k-\theta)^a\rho(\theta-\theta')^a\rho(d)^{-1}=\rho(k-\theta)^a\det(P)^2\rho(\theta-\theta')^a\rho(d')^{-1}$, i.e.
+$\rho(d')=\det(P)^2\rho(d)$. Hence $\chi(\rho(d'))=\chi(d)$. By Euler's criterion and $\rho\circ\tau=\rho$,
+$\chi(\rho(d'))=\rho(d')^{(p-1)/2}=\prod_{\tau\in\operatorname{Gal}(K^+/\Q)}\rho(\tau d')=\rho(\Nm_{K^+/\Q}(d'))$. This is (c).
+
+For (a): the isotypic decomposition of the $\theta$-eigenspace of $A$ under $\langle\sigma\rangle$ has a trivial part of
+dimension $a$ and, for each of the $p-1$ nontrivial characters, a part of dimension equal to the multiplicity of $\theta$ in the
+corresponding Galois conjugate of $M$, i.e.\ $a'$; so $f_\theta=a+(p-1)a'=pa$. With $c_b=\sum_UA_b[U,U]$ ($c_0=0$,
+$c_b=c_{-b}$), $\operatorname{tr}N=a(k-\theta)(\theta-\theta')$ and $\operatorname{tr}N'=a(\theta-\theta')$ give
+$(k-\theta)(\operatorname{tr}Q-\operatorname{tr}M)=p\mu m$; applying the same to all conjugates $M_j=\sum_b\zeta^{jb}A_b$ shows that
+$\sum_b c_b\zeta^{jb}$ does not depend on $j\neq0$, so $c_b=c$ for all $b\neq0$, and $pc=p\mu m/(k-\theta)=k-\theta'$.
+
+\paragraph{Step 4: gluing with $\one$.} $Q$ is symmetric and on $\one^\perp$ satisfies $(Q-rI)(Q-sI)=0$, so the $k$-eigenspace is
+$\Q\one$ and $W=\ker((Q-\theta I)(Q-kI))=\ker(Q-\theta I)\oplus\Q\one$. Let $L_W=\Z^m\cap W$ (rank $a+1$) with basis $B_W$, left inverse
+$C_W$ and $G_W=B_W^{\mathsf T}B_W$. Put $\alpha=m/g$, $\beta=(k-\theta)/g$ and $N_W=\alpha(Q-\theta'I)-\beta J$. Then
+$(Q-\theta I)(Q-kI)N_W=0$ (because $(Q-\theta I)(Q-\theta'I)=p\mu J$ and $(Q-kI)J=0$), $N_W$ is $\alpha(\theta-\theta')$ on
+$\ker(Q-\theta I)$, and $N_W\one=(\alpha(k-\theta')-\beta m)\one=\alpha(\theta-\theta')\one$ since $\beta m=\alpha(k-\theta)$. As in
+Step~2, $G_WK_W=\alpha(\theta-\theta')I_{a+1}$, so $\det G_W$ divides $(\alpha(\theta-\theta'))^{a+1}$. The columns of $[B\mid\one]$ lie in
+$L_W$, so $[B\mid\one]=B_WT$ with $T\in M_{a+1}(\Z)$; since $B^{\mathsf T}\one=0$ (Step~1), comparing Gram matrices gives
+$\mathrm{diag}(G,m)=T^{\mathsf T}G_WT$, hence $m\,d=\det(T)^2\det G_W$. For $\ell\mid m$, $\ell\nmid\alpha(\theta-\theta')$ this gives (d).
+\qed
+
+\begin{corollary}[test used below]\label{cor:test}
+Under the hypotheses of Theorem~\ref{thm:main}, let $S$ be the set of primes dividing $(k-\theta)(\theta-\theta')$. By (b) and (d),
+$\chi(d)=\prod_{\ell\in S}\chi(\ell)^{v_\ell(d)}$ where $v_\ell(d)\equiv v_\ell(m)$ for the primes of (d) and $v_\ell(d)$ is
+otherwise unconstrained (if $a=0$, $d=1$). By (b)--(c), $\chi(d)$ lies in the subgroup of $\F_p^\times$ generated by the primes
+dividing $\theta-\theta'$, intersected with $\{\pm1\}$. If the two sets of possible values are disjoint, or if some prime
+$\ell\mid m$ of (d) is not in $S$ (so $\ell$ cannot divide $d$) while $v_\ell(m)$ is odd, then $\Gamma$ has no fixed-point-free automorphism of order $p$.
+\end{corollary}
+
+\begin{remark}
+For $\srg(99,14,1,2)$, $p=3$, $\theta=3$: $S=\{7,11\}$, $m=33$, $g=11$, $\alpha(\theta-\theta')=21$, so $v_{11}(d)$ is odd and
+$\chi(d)=\chi(11)=-1$, while $\theta-\theta'=7\equiv1$ forces $\chi(d)=+1$. This is Djematene's contradiction.
+\end{remark}
+
+\section{Numerical validation}\label{sec:val}
+For triangular graphs $T(n)$ and their complements, with $\sigma$ a product of $p$-cycles on $\{1,\dots,n\}$ fixing at most one
+point ($n\equiv0,1\pmod p$; fixed-point-free on pairs), the script \texttt{obstruction.py} computes $L_\theta$, $L'_\theta$
+(through $\Z^{(p-1)m}$ and the trace form, whose determinant is $p^{(p-2)a'}\Nm_{K^+/\Q}(d')^2$), $a,a',d,\Nm(d')$, and checks
+(a)--(d). Cases with the hypothesis satisfied: $p=3$ ($n=7,9,10,15$), $p=5$ ($n=10,11,15$), $p=7$ ($n=14,15$), $p=11$
+($n=22,23$), $p=13$ ($n=13,14,27$), $p=17$ ($n=17,18$), $p=19$ ($n=19,20$), each with its complement: 36 applicable
+$(\Gamma,p,\theta)$ in all; every prediction holds, and Corollary~\ref{cor:test} never excludes these graphs. When the
+hypothesis fails, $a\neq a'$ does occur. A second, independently written program (SymPy, Smith normal form) reproduces the
+numbers on several of these graphs and checks two further families: the Petersen graph with a $5$-cycle ($a=a'=1$, $d=2$,
+$\Nm(d')=9$) and the collinearity graph of $GQ(3,3)$, $\srg(40,12,2,4)$, with a fixed-point-free automorphism of order $5$
+($a=a'=3$, $d=288$, $\Nm(d')=5184$). With its own parser it also reproduces the list of Section~\ref{sec:app} exactly.
+
+\paragraph{Falsification test on existing parameter sets.} Applied to the 1{,}076 parameter sets of the table for which a graph is
+known, Corollary~\ref{cor:test} excludes a fixed-point-free automorphism of order $p$ in a single case: $\srg(209,100,45,50)$ with
+$p=11$. The known graphs with these parameters are the descendants of the regular two-graph on $210$ points containing the
+$\mathrm{Sym}(7)$ graph $\srg(210,99,48,45)$ of Klin et al.\ (as in the SageMath database). Rebuilt independently, all $210$
+descendants are isomorphic, and the descendant has an automorphism group of order $24$ (computed with nauty), so it has no
+automorphism of order $11$ at all: no conflict with the theorem. Other two-graphs on $210$ points have not been examined.
+
+\section{Application to open parameter sets}\label{sec:app}
+Corollary~\ref{cor:test} was applied to the 2{,}889 parameter sets marked open in Brouwer's table ($v\le1300$; snapshot of
+October 2026), 2{,}819 with integral eigenvalues, for every prime $p\mid v$. Part (a) excludes nothing. The test excludes a
+fixed-point-free automorphism of order $p$ in 34 cases:
+
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+$(v,k,\lambda,\mu)$ & $p$ & $(v,k,\lambda,\mu)$ & $p$\\
+\midrule
+(88,27,6,9), (88,60,41,40) & 11 & (99,14,1,2) & 3\\
+(133,44,15,14) & 7 & (217,128,72,80) & 7\\
+(231,140,85,84) & 11 & (261,208,165,168) & 3\\
+(273,192,136,132) & 7 & (364,121,48,36) & 7\\
+(385,324,273,270) & 11 & (550,162,75,36), (550,486,429,432) & 11\\
+(561,60,9,6) & 11 & (616,240,89,96), (616,375,230,225) & 11\\
+(637,576,520,528) & 7 & (714,248,97,80) & 3\\
+(714,552,425,432) & 7 & (756,150,28,30), (756,605,484,484) & 7\\
+(780,410,229,200) & 5 & (826,132,26,20) & 7\\
+(924,142,20,22), (924,143,22,22) & 7 & (924,780,658,660), (924,781,660,660) & 7\\
+(945,64,8,4), (945,880,819,825) & 7 & (950,312,115,96) & 19\\
+(1045,324,123,90) & 11 & (1085,256,48,64) & 7\\
+(1148,666,379,396) & 7 & (1177,972,801,810) & 11\\
+(1248,1044,875,864) & 13 & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{corollary}[conditional on the literature check]\label{cor:88}
+An $\srg(88,27,6,9)$ has no automorphism of order $11$.
+\end{corollary}
+\begin{proof}
+An automorphism of order $11$ has a number of fixed points $f\equiv88\equiv0\pmod{11}$. Behbahani and Lam (thesis 2009,
+Table~16) list $f\in\{0,11,22\}$ as the candidates and find no orbit matrix for $f=11$ and $f=22$. So $f=0$, which
+Corollary~\ref{cor:test} excludes: for $\theta=3$, $\theta'=-6$, $m=8$, $k-\theta=24$, $g=8$, $\alpha(\theta-\theta')=9$, so
+$v_2(d)\equiv v_2(8)=3$ is odd; with $\chi(2)=-1$ and $\chi(3)=1$ modulo $11$ this forces $\chi(d)=-1$, while
+$\theta-\theta'=9$ and $3$ generates a subgroup of $\F_{11}^\times$ of order $5$ force $\chi(d)=+1$.
+\end{proof}
+
+\section{Automorphisms with fixed points}\label{sec:fix}
+
+Let now $\sigma$ have prime order $p$, fixed set $F$ ($f=|F|$, induced adjacency matrix $A_F$) and $m$ regular orbits, so
+$v=pm+f$. Put $a[U,t]=A(x_U,t)$ for $t\in F$. On $\sigma$-invariant vectors (one coordinate per orbit, one per fixed vertex) $A$
+acts by
+\[
+\tilde A=\begin{pmatrix}Q& a\\ p\,a^{\mathsf T}& A_F\end{pmatrix},\qquad \tilde A\one=k\one,\qquad
+(\tilde A-rI)(\tilde A-sI)=\mu\,\one w^{\mathsf T},\quad w=(p,\dots,p,1,\dots,1),
+\]
+and $\tilde A$ is self-adjoint for the form $D=\mathrm{diag}(pI_m,I_f)$ induced by $\Z^v$. On the other isotypic components the
+fixed vertices carry no weight (their coordinates are $\sigma$-invariant), the paths through $F$ and the term in $J$ are multiplied by
+$\sum_b\zeta^b=0$, and $M=\sum_b\zeta^bA_b$ still satisfies $(M-rI)(M-sI)=0$, $M^*=M$, $M\equiv Q\pmod\pi$.
+
+\begin{theorem}\label{thm:fix}
+Let $p\le19$, $\theta\in\{r,s\}$ with $p\nmid c:=(k-\theta)(\theta-\theta')$, and assume
+\[
+\textup{(F)}\qquad \det\bigl((k-\theta)(\theta I_f-A_F)+\mu J_f\bigr)\not\equiv0\pmod p .
+\]
+Let $L=\Z^{m+f}\cap\ker(\tilde A-\theta I)$ (rank $a$) with basis $B$, and $L'$, $a'$, $d'$ as before. Then every vector of $L$ has
+its fixed coordinates divisible by $p$, so $B^{\mathsf T}DB=p\,\tilde G$ with $\tilde G$ integral; with $\tilde d=\det\tilde G$:
+(a) $a=a'$, hence $p\mid f_\theta$; (b) $\tilde d\mid c^a$; (c) $\chi(\tilde d)\equiv\Nm_{K^+/\Q}(d')\pmod p$; (d) for every prime
+$\ell\ne p$ with $\ell\mid v$ and $\ell\nmid\alpha(\theta-\theta')$, $\alpha=v/\gcd(v,k-\theta)$: $v_\ell(\tilde d)\equiv v_\ell(v)\pmod 2$.
+\end{theorem}
+\begin{proof}
+Let $N=(k-\theta)(\tilde A-\theta'I)-\mu\one w^{\mathsf T}$. As before $(\tilde A-\theta I)N=0$ and $Nx=cx$ on $L$ (for such $x$,
+$w^{\mathsf T}x=\langle\one,x\rangle_D=0$). The rows of $N$ indexed by $t\in F$ are $(k-\theta)p\,a[U,t]-\mu p\equiv0$ on the orbit
+columns and $R=(k-\theta)(A_F-\theta'I)-\mu J_f$ on the fixed columns, so $c\,x_F\equiv Rx_F\pmod p$, i.e.
+$\bigl((k-\theta)(\theta I-A_F)+\mu J_f\bigr)x_F\equiv0$, and (F) gives $x_F\equiv0$. Put $X=N\,\mathrm{diag}(I_m,pI_f)=pND^{-1}$:
+it is integral, symmetric (because $DN$ is), with columns in $L$, so $X=BKB^{\mathsf T}$ with $K=CXC^{\mathsf T}$, and
+$B^{\mathsf T}DX=p\,c\,B^{\mathsf T}$ gives $\tilde GK=cI_a$. Modulo $p$, $\bar B=\binom{\bar B_1}{0}$, $\bar C_1\bar B_1=I$ and
+$\bar X=\mathrm{diag}\bigl(\rho(k-\theta)(\bar Q-\theta'I),0\bigr)$, so $\bar K=\rho(k-\theta)\,\bar C_1(\bar Q-\theta'I)\bar C_1^{\mathsf T}$ and
+$\rho(k-\theta)(\bar Q-\theta'I)=\bar B_1\bar K\bar B_1^{\mathsf T}$; Steps~3 of Theorem~\ref{thm:main} apply verbatim with $(B_1,C_1,\tilde d)$
+in place of $(B,C,d)$. For (d) use $W=\ker((\tilde A-\theta I)(\tilde A-kI))=\ker(\tilde A-\theta I)\oplus\Q\one$,
+$N_W=\alpha(\tilde A-\theta'I)-\beta\one w^{\mathsf T}$ with $\beta v=\alpha(k-\theta)$, which is $\alpha(\theta-\theta')$ on $W$; the same
+computation gives $G_WK_W=p\alpha(\theta-\theta')I$, and the $D$-Gram matrix of $[B\mid\one]$ is $\mathrm{diag}(p\tilde G,v)$, so
+$p^a\tilde d\,v=\det(T)^2\det G_W$.
+\end{proof}
+
+For $f=0$ condition (F) is empty and Theorem~\ref{thm:fix} is Theorem~\ref{thm:main}. Condition (F) is sufficient, not
+necessary, for the divisibility of the fixed coordinates (in $P(25)$ with $\theta=-3$, $\tilde d$ is integral although (F) fails). Since (a)--(d) do not involve $f$ or $A_F$,
+the arithmetic test of Corollary~\ref{cor:test} (with $v$ in place of $m$ in (d)) gives: \emph{if the test fails for $(v,k,\lambda,\mu,p,\theta)$,
+every automorphism of order $p$ has a fixed subgraph with $\det((k-\theta)(\theta I-A_F)+\mu J_f)\equiv0\pmod p$}; for $f=1$ this
+reads $(k-\theta)\theta+\mu\equiv0$. The same holds when $p\nmid f_\theta$ (by (a)); that consequence is of the rank-equality type
+and probably contained in Ishida's work.
+
+\begin{lemma}\label{lem:bigp}
+Let $p>\max(\lambda,\mu)$ and $\sigma\ne1$ of order $p$. Then two fixed vertices have only fixed common neighbours, so $\Gamma_F$ has
+exactly $\lambda$ common neighbours in $F$ for adjacent and $\mu$ for non-adjacent pairs. If $\mu\ge1$ and $f\ge2$, $\Gamma_F$ is
+connected, non-adjacent vertices of $\Gamma_F$ have equal degrees, and $\Gamma_F$ is the join of the regular graphs induced on the
+connected components of its complement. If $\mu\ge2$, then $f\le v/(p+1)$.
+\end{lemma}
+\begin{proof}
+A non-fixed common neighbour of two fixed vertices brings its whole orbit, $p>\max(\lambda,\mu)$ common neighbours. For non-adjacent
+$x,y\in F$, counting edges between $N_F(x)$ and $N_F(y)$ from both sides gives $\mu\lambda+(\deg x-\mu)\mu=\mu\lambda+(\deg y-\mu)\mu$.
+If $\mu\ge2$ and a fixed vertex $x$ had all its neighbours fixed, every vertex at distance $2$ from $x$ would have two fixed
+neighbours, hence be fixed, and $\sigma=1$; so every fixed vertex has a non-fixed neighbour, hence $\ge p$ of them, while every
+non-fixed vertex has at most one fixed neighbour: $pf\le v-f$.
+\end{proof}
+
+With Lemma~\ref{lem:bigp}, the admissible fixed subgraphs for $p>\max(\lambda,\mu)$, $\mu\ge2$ are $K_{\lambda+2}$, primitive
+$\srg(f,k_F,\lambda,\mu)$, and joins of single vertices, edgeless graphs, unions of cliques and primitive strongly regular graphs
+with the induced parameters; for each, (F) is computed from the spectrum (\texttt{scan\_fixed3.py}). Theorem~\ref{thm:fix} was
+checked on Paley graphs $P(25)$, $P(49)$ ($p=3$) and $P(81)$ ($p=5$) with multiplication by a square of order $p$ ($f=1$), and on
+$T(n)$ and complements with $p$-cycles fixing $2$--$6$ points ($p=5,7,17$): in all 16 cases where (F) holds, every prediction holds;
+in the 10 cases where the parameter test fails, (F) indeed fails.
+
+\begin{corollary}[candidates; see Section~\ref{sec:lit}]\label{cor:full}
+Combining Theorem~\ref{thm:fix}, Lemma~\ref{lem:bigp} and the arithmetic test (no search over graphs; the list of admissible
+fixed subgraphs is a parameter computation done by \texttt{scan\_fixed3.py} and should be checked by hand):
+\begin{itemize}
+\item $\srg(88,27,6,9)$ has no automorphism of order $11$ ($f\le7$, so $f=0$);
+\item $\srg(99,14,1,2)$ has no automorphism of order $3$ ($\Gamma_F\in\{\emptyset,K_3,\srg(9,4,1,2)\}$, all excluded with $\theta=3$);
+\item $\srg(342,33,4,3)$ has no automorphism of order $7$ ($\Gamma_F=K_6$, excluded with $\theta=-5$);
+\item $\srg(364,33,2,3)$ has no automorphism of order $5$ ($\Gamma_F=K_4$, excluded with $\theta=5$);
+\item $\srg(561,60,9,6)$ has no automorphism of order $11$ ($\Gamma_F\in\{\emptyset,K_{11}\}$, excluded with $\theta=9$);
+\item $\srg(650,55,0,5)$ has no automorphism of order $11$ ($f=1$, excluded with $\theta=5$ and with $\theta=-10$);
+\end{itemize}
+and the same for the complementary parameter sets, since $\mathrm{Aut}(\Gamma)=\mathrm{Aut}(\bar\Gamma)$ (the hypothesis
+$p>\max(\lambda,\mu)$ of Lemma~\ref{lem:bigp} is used for the listed parameter set, not for its complement). The second item is
+Djematene's theorem (fixed-point-free and triangle cases). For several values of $f$ the exclusion comes from the nonexistence of
+any admissible fixed subgraph rather than from (F).
+\end{corollary}
+
+\section{Literature status}\label{sec:lit}
+Behbahani--Lam (2011) list $2,3,5,11$ as the possible primes for $\srg(88,27,6,9)$, with the fixed-point-free order-11 case
+unresolved (5 orbit matrices). Efimov--Makhnev, \emph{On automorphisms of a strongly regular graph with parameters
+(88,27,6,9)}, Dokl.\ Math.\ 86 (2012) 488--491, has not been accessed. Kazarina--Makhnev, \emph{On automorphisms of strongly
+regular graphs with $\lambda=2$ and $\mu=3$}, Izv.\ UGTU 17 (2005) 174--194, probably treats $\srg(364,33,2,3)$ and has not been
+accessed. No work on automorphisms of $\srg(342,33,4,3)$, $\srg(561,60,9,6)$ or $\srg(650,55,0,5)$ was found in a first search.
+Ishida (arXiv:2606.29183, \S8) treats other parameter sets. Until these sources are read, the items of Corollary~\ref{cor:full}
+other than the second are candidates, not established new results.
+
+\end{document}
