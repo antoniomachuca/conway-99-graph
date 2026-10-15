@@ -34,6 +34,15 @@ theorem test_branch_matchings_partition_sound :
       cyclePartition (branchMatching i) == Partitions6[i.val]!) = true :=
   branchMatching_cyclePartition_sound
 
+/-- The fiber matchings set contains exactly 10,395 matchings. -/
+theorem test_fiber_matchings_length : FiberMatchings.length = 10395 :=
+  fiber_matchings_length
+
+/-- Full 11-branch orbit coverage holds for all matchings in FiberMatchings. -/
+theorem test_fiber_matchings_orbit_coverage (m : List (Nat × Nat)) (hm : m ∈ FiberMatchings) :
+    ∃ g : C2wrS6, isC2wrS6 g = true ∧ ∃ i : Fin 11, actMatching g m = branchMatching i :=
+  fiber_matchings_orbit_coverage m hm
+
 #print axioms Matrix99.block_A_conwayAdj_iff_residual84
 #print axioms Matrix99.conway_exists_iff_residual84
 #print axioms Matrix99.isNbrAut_M
@@ -48,5 +57,7 @@ theorem test_branch_matchings_partition_sound :
 #print axioms Matrix99.partitions6_sum
 #print axioms Matrix99.branchMatching_valid
 #print axioms Matrix99.branchMatching_cyclePartition_sound
+#print axioms Matrix99.fiber_matchings_orbit_coverage
+#print axioms Matrix99.fiber_matchings_length
 
 end Matrix99
