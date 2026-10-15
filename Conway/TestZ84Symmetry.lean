@@ -59,5 +59,6 @@ theorem test_fiber_matchings_orbit_coverage (m : List (Nat × Nat)) (hm : m ∈ 
 #print axioms Matrix99.branchMatching_cyclePartition_sound
 #print axioms Matrix99.fiber_matchings_orbit_coverage
 #print axioms Matrix99.fiber_matchings_length
+#print axioms Matrix99.test_fiber_matchings_orbit_coverage
 
 end Matrix99
