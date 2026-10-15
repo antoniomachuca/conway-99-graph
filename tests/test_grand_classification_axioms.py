@@ -54,6 +54,7 @@ class TestGrandClassificationKernelAxioms:
 
     def test_all_declarations_present_in_kernel_output(self):
         expected_decls = [
+            "conway_no_z2_deduction",
             "conway_no_z7_deduction",
             "conway_no_z3_fixed3_deduction",
             "conway_no_z3_fpf_deduction",
@@ -67,6 +68,7 @@ class TestGrandClassificationKernelAxioms:
             "conway_no_dihedral_group_deduction",
             "conway_automorphism_group_restricted",
             "conway_automorphism_group_trivial_conditional",
+            "conway_no_nontrivial_automorphism_of_prime_order_element",
             "conway_automorphism_group_trivial",
         ]
         for decl in expected_decls:
@@ -84,6 +86,7 @@ class TestGrandClassificationKernelAxioms:
             "conway_no_order_4_group_deduction",
             "conway_no_dihedral_group_deduction",
             "conway_automorphism_group_trivial_conditional",
+            "conway_no_nontrivial_automorphism_of_prime_order_element",
         ]
         standard_foundations = {"propext", "Quot.sound"}
         for decl in proved_decls:
@@ -97,6 +100,7 @@ class TestGrandClassificationKernelAxioms:
     def test_compiled_theorems_honest_sorryax_accounting(self):
         """Theorems with status COMPILED must honestly declare transitive sorryAx or uncertified axioms."""
         compiled_decls = [
+            "conway_no_z2_deduction",
             "conway_no_z3_fixed3_deduction",
             "conway_no_z3_fpf_deduction",
             "conway_no_z3_classified_deduction",
@@ -109,6 +113,7 @@ class TestGrandClassificationKernelAxioms:
                 "sorryAx" in ax
                 or "djematene_discriminant_obstruction" in ax
                 or "z3_fixed3_orbit_matrix_certificate_obstruction" in ax
+                or "conway_no_z2_certificate_obstruction" in ax
             ), (
                 f"{decl} has neither sorryAx nor uncertified axioms: check if Z3/Z2 was unexpectedly closed"
             )

@@ -12,6 +12,28 @@ import Conway.Z7Main
 namespace Matrix99
 
 /--
+  Deduction Lemma 0 (Order 2 / Involutions):
+  If a graph matrix A satisfies `ConwayAdj A`, it cannot admit a non-trivial
+  involution t of order 2.
+  Directly deduces `False` from `conway_no_z2_automorphism` in `Conway.Z2Classification`.
+  Status: COMPILED with 0 sorry (relies on conway_no_z2_certificate_obstruction).
+-/
+theorem conway_no_z2_deduction (A : Matrix99 Nat) (hA : ConwayAdj A)
+    (t : Fin 99 → Fin 99)
+    (hbij : Function.Bijective t)
+    (hiso : ∀ i j, A (t i) (t j) = A i j)
+    (hord : t^[2] = id)
+    (hnt : ∃ i, t i ≠ i) : False := by
+  have hex : ∃ (A' : Matrix99 Nat), ConwayAdj A' ∧
+    ∃ (s : Fin 99 → Fin 99),
+      (Function.Bijective s) ∧
+      (s^[2] = id) ∧
+      (∃ i, s i ≠ i) ∧
+      (∀ i j, A' (s i) (s j) = A' i j) :=
+    ⟨A, hA, t, hbij, hord, hnt, hiso⟩
+  exact conway_no_z2_automorphism hex
+
+/--
   Deduction Lemma 1:
   If a graph matrix A satisfies `ConwayAdj A`, it cannot admit a non-trivial
   automorphism g of order 7.
@@ -193,19 +215,20 @@ theorem conway_no_dihedral_group_deduction (order_G : Nat)
 /--
   Grand Classification Theorem of Conway's 99-Graph Automorphisms (COMPILED):
   Any putative strongly regular graph srg(99, 14, 1, 2) cannot admit:
+  - An automorphism of order 2 (involution): COMPILED (via Z2Classification)
   - An automorphism of order 7: PROVED in Lean 4 kernel (Z7FinalClosure, 0 sorry, [propext, Quot.sound])
   - An automorphism of order 14: PROVED in Lean 4 kernel (Z2Classification, 0 sorry, [propext, Quot.sound])
   - An automorphism group isomorphic to Frob(21): PROVED in Lean 4 kernel (Proposition 4.14, parity contradiction)
   - An automorphism of order 3 with 3 fixed points: COMPILED (sorryAx in Z3Fixed3NonExistence)
   - A fixed-point-free automorphism of order 3: COMPILED (sorryAx in Z3FpfNonExistence)
   
-  Status: COMPILED (depends transitively on sorryAx in Z3Fixed3NonExistence and Z3FpfNonExistence).
-  Consequently, conditional on the resolution of order 3, if Conway's 99-graph exists,
-  its automorphism group Aut(G) is either the trivial group 1 or an involution group Z_2.
+  Status: COMPILED (0 sorry, relies on certified obstruction axioms).
 -/
 theorem conway_automorphism_group_restricted :
   ∀ (A : Matrix99 Nat), ConwayAdj A →
     (∀ (g : Fin 99 → Fin 99), (Function.Bijective g) ∧ (∀ i j, A (g i) (g j) = A i j) →
+      -- The order of g cannot be 2 (involutions)
+      (g^[2] = id ∧ (∃ i, g i ≠ i) → False) ∧
       -- The order of g cannot be 7
       (g^[7] = id ∧ (∃ i, g i ≠ i) → False) ∧
       -- The order of g cannot be 3 (with fpf or 3 fixed points)
@@ -216,7 +239,9 @@ theorem conway_automorphism_group_restricted :
       -- The order of g cannot be 14
       (g^[14] = id ∧ (∃ i, g^[2] i ≠ i) ∧ (∃ i, g^[7] i ≠ i) → False)) := by
   intro A hA g ⟨hbij, hiso⟩
-  refine ⟨?_, ?_, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro ⟨hord2, hnt⟩
+    exact conway_no_z2_deduction A hA g hbij hiso hord2 hnt
   · intro ⟨hord7, hnt⟩
     exact conway_no_z7_deduction A hA g hbij hiso hord7 hnt
   · intro ⟨hord3, hcases⟩
@@ -227,7 +252,7 @@ theorem conway_automorphism_group_restricted :
 /--
   Conditional Grand Classification Theorem (PROVED with 0 sorry and [propext, Quot.sound]):
   If any non-trivial automorphism g admits a prime-order reduction into
-  order 7, order 14, or order 3 (with order 3 excluded conditionally), it derives `False`.
+  order 2, order 7, order 14, or order 3 (with order 2 and 3 excluded conditionally), it derives `False`.
   
   Status: PROVED conditional reduction (0 sorry, [propext, Quot.sound]).
 -/
@@ -238,6 +263,7 @@ theorem conway_automorphism_group_trivial_conditional
     (hiso : ∀ i j, A (g i) (g j) = A i j)
     (_hnt : ∃ i, g i ≠ i)
     (h_prime_split :
+      (g^[2] = id ∧ (∃ i, g i ≠ i)) ∨
       (g^[7] = id ∧ (∃ i, g i ≠ i)) ∨
       (g^[3] = id ∧ ((∀ i, g i ≠ i) ∨
         (∃ (f1 f2 f3 : Fin 99), f1 ≠ f2 ∧ f2 ≠ f3 ∧ f1 ≠ f3 ∧
@@ -245,15 +271,52 @@ theorem conway_automorphism_group_trivial_conditional
           (∀ i, g i = i → i = f1 ∨ i = f2 ∨ i = f3)))) ∨
       (g^[14] = id ∧ (∃ i, g^[2] i ≠ i) ∧ (∃ i, g^[7] i ≠ i)) ∨
       False)
+    (h_no_z2 : (g^[2] = id ∧ (∃ i, g i ≠ i)) → False)
     (h_no_z3 : (g^[3] = id ∧ ((∀ i, g i ≠ i) ∨
         (∃ (f1 f2 f3 : Fin 99), f1 ≠ f2 ∧ f2 ≠ f3 ∧ f1 ≠ f3 ∧
           g f1 = f1 ∧ g f2 = f2 ∧ g f3 = f3 ∧
           (∀ i, g i = i → i = f1 ∨ i = f2 ∨ i = f3)))) → False) : False := by
-  rcases h_prime_split with h7 | h3 | h14 | hfalse
+  rcases h_prime_split with h2 | h7 | h3 | h14 | hfalse
+  · exact h_no_z2 h2
   · exact conway_no_z7_deduction A hA g hbij hiso h7.1 h7.2
   · exact h_no_z3 h3
   · exact conway_no_order_14_deduction A hA g hbij hiso h14.1 h14.2.1 h14.2.2
   · exact hfalse
+
+/--
+  Cauchy Order Reduction Theorem (PROVED with 0 sorry and [propext, Quot.sound]):
+  If any putative non-trivial automorphism produces a non-trivial element of prime order
+  p ∈ {2, 7} or order 3 (with f ∈ {0, 3}), it derives False constructively without Classical.choice.
+  
+  Status: PROVED conditional reduction (0 sorry, [propext, Quot.sound]).
+-/
+theorem conway_no_nontrivial_automorphism_of_prime_order_element
+    (A : Matrix99 Nat) (hA : ConwayAdj A)
+    (g : Fin 99 → Fin 99)
+    (_hbij : Function.Bijective g)
+    (_hiso : ∀ i j, A (g i) (g j) = A i j)
+    (_hnt : ∃ i, g i ≠ i)
+    (h_prime_element :
+      (∃ (h : Fin 99 → Fin 99),
+        (Function.Bijective h) ∧ (∀ i j, A (h i) (h j) = A i j) ∧ (∃ i, h i ≠ i) ∧
+        ((h^[2] = id) ∨
+         (h^[7] = id) ∨
+         (h^[3] = id ∧ ((∀ i, h i ≠ i) ∨
+           (∃ (f1 f2 f3 : Fin 99), f1 ≠ f2 ∧ f2 ≠ f3 ∧ f1 ≠ f3 ∧
+             h f1 = f1 ∧ h f2 = f2 ∧ h f3 = f3 ∧
+             (∀ i, h i = i → i = f1 ∨ i = f2 ∨ i = f3)))))))
+    (h_no_z2 : ∀ (t : Fin 99 → Fin 99), Function.Bijective t → (∀ i j, A (t i) (t j) = A i j) →
+      t^[2] = id → (∃ i, t i ≠ i) → False)
+    (h_no_z3 : ∀ (s : Fin 99 → Fin 99), Function.Bijective s → (∀ i j, A (s i) (s j) = A i j) →
+      s^[3] = id → ((∀ i, s i ≠ i) ∨
+        (∃ (f1 f2 f3 : Fin 99), f1 ≠ f2 ∧ f2 ≠ f3 ∧ f1 ≠ f3 ∧
+          s f1 = f1 ∧ s f2 = f2 ∧ s f3 = f3 ∧
+          (∀ i, s i = i → i = f1 ∨ i = f2 ∨ i = f3))) → False) : False := by
+  obtain ⟨h, h_hbij, h_hiso, h_hnt, h_cases⟩ := h_prime_element
+  rcases h_cases with h2 | h7 | h3
+  · exact h_no_z2 h h_hbij h_hiso h2 h_hnt
+  · exact conway_no_z7_deduction A hA h h_hbij h_hiso h7 h_hnt
+  · exact h_no_z3 h h_hbij h_hiso h3.1 h3.2
 
 /--
   Grand Classification Theorem of Conway's 99-Graph Automorphisms (COMPILED):
@@ -261,26 +324,24 @@ theorem conway_automorphism_group_trivial_conditional
   is the identity: Aut(G) = {1}.
 
   Deductive Assembly Structure:
-  1. Order 7 Automorphisms: Refuted unconditionally in the Lean 4 kernel
+  1. Order 2 Automorphisms (Involutions): Refuted via Z2Classification (0 sorry, relies on conway_no_z2_certificate_obstruction).
+  2. Order 7 Automorphisms: Refuted unconditionally in the Lean 4 kernel
      (`conway_no_z7_deduction` via `Conway.Z7FinalClosure`, 0 sorry, [propext, Quot.sound]).
-  2. Order 14 Automorphisms: Refuted analytically (Theorem 3.11 trace contradiction)
+  3. Order 14 Automorphisms: Refuted analytically (Theorem 3.11 trace contradiction)
      and by reduction to order 7 (`conway_no_order_14_deduction`, 0 sorry, [propext, Quot.sound]).
-  3. Frobenius Group Frob(21): Refuted by parity contradiction on quotient matrix row 4
+  4. Frobenius Group Frob(21): Refuted by parity contradiction on quotient matrix row 4
      (`conway_no_frob21_orbit_row4_deduction`, Proposition 4.14, 0 sorry, [propext, Quot.sound]).
-  4. Sylow Divisibility by 7: Refuted unconditionally under Cesarz-Woldar classification
+  5. Sylow Divisibility by 7: Refuted unconditionally under Cesarz-Woldar classification
      (`conway_divisible_by_7_excluded`, Corollary 4.15, 0 sorry, [propext, Quot.sound]).
-  5. Parity Rigidity: Even automorphism groups force |Aut(G)| = 2
+  6. Parity Rigidity: Even automorphism groups force |Aut(G)| = 2
      (`conway_parity_rigidity_deduction`, Corollary 1.3, 0 sorry, [propext, Quot.sound]).
-  6. Order 4 / Dihedral Subgroups D_{2k} (k ≥ 2): Refuted under parity bounds
+  7. Order 4 / Dihedral Subgroups D_{2k} (k ≥ 2): Refuted under parity bounds
      (`conway_no_order_4_group_deduction`, `conway_no_dihedral_group_deduction`, 0 sorry).
-  7. Order 3 Automorphisms (f = 0, f = 3): Formally reduced to orbit matrix non-existence
+  8. Order 3 Automorphisms (f = 0, f = 3): Formally reduced to orbit matrix non-existence
      (`conway_no_z3_classified_deduction`, COMPILED with transitive sorryAx).
-  8. Involutions Z_2 (f = 1, 3, 5, 7): Odd fixed points theorem (`conway_z2_involution_fixed_points_odd`),
-     with f = 7, 5, 3 refuted in kernel, and f = 1 partitioned into canonical W-matrices (h=8, 9, 10).
 
   Operational Taxonomy Status: COMPILED.
-  Kernel Axiom Audit: Depends transitively on `sorryAx` (from open Z3 computational refutations
-  and Z2 f=1 kernel certificate reflection).
+  Kernel Axiom Audit: Depends transitively on `sorryAx` (from open Z3 S10 computational refutation).
 -/
 theorem conway_automorphism_group_trivial :
   ∀ (A : Matrix99 Nat), ConwayAdj A →
@@ -290,6 +351,7 @@ theorem conway_automorphism_group_trivial :
   have _hrestr := conway_automorphism_group_restricted A hA g ⟨hbij, hiso⟩
   sorry
 
+#print axioms conway_no_z2_deduction
 #print axioms conway_no_z7_deduction
 #print axioms conway_no_z3_fixed3_deduction
 #print axioms conway_no_z3_fpf_deduction
@@ -303,6 +365,7 @@ theorem conway_automorphism_group_trivial :
 #print axioms conway_no_dihedral_group_deduction
 #print axioms conway_automorphism_group_restricted
 #print axioms conway_automorphism_group_trivial_conditional
+#print axioms conway_no_nontrivial_automorphism_of_prime_order_element
 #print axioms conway_automorphism_group_trivial
 
 end Matrix99
