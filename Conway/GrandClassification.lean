@@ -1,5 +1,6 @@
 import Conway.Matrix
 import Conway.Decidable
+import Conway.Z7FinalClosure
 import Conway.Z7NonExistence
 import Conway.Z3Fixed3NonExistence
 import Conway.Z3FpfNonExistence
@@ -14,7 +15,8 @@ namespace Matrix99
   Deduction Lemma 1:
   If a graph matrix A satisfies `ConwayAdj A`, it cannot admit a non-trivial
   automorphism g of order 7.
-  Directly deduces `False` from `conway_no_z7_automorphism`.
+  Directly deduces `False` from `conway_no_z7_automorphism_kernel` in `Conway.Z7FinalClosure`.
+  Status: PROVED with 0 sorry and standard foundations [propext, Quot.sound].
 -/
 theorem conway_no_z7_deduction (A : Matrix99 Nat) (hA : ConwayAdj A)
     (g : Fin 99 → Fin 99)
@@ -29,7 +31,7 @@ theorem conway_no_z7_deduction (A : Matrix99 Nat) (hA : ConwayAdj A)
       (∃ i, s i ≠ i) ∧
       (∀ i j, A' (s i) (s j) = A' i j) :=
     ⟨A, hA, g, hbij, hord, hnt, hiso⟩
-  exact conway_no_z7_automorphism hex
+  exact conway_no_z7_automorphism_kernel hex
 
 /--
   Deduction Lemma 2:
@@ -99,7 +101,8 @@ theorem conway_no_z3_classified_deduction (A : Matrix99 Nat) (hA : ConwayAdj A)
   Deduction Lemma 5 (Absence of order 14 automorphisms):
   If a graph matrix A satisfies `ConwayAdj A`, it cannot admit an automorphism g
   of order 14 (i.e. g^[14] = id with g^[2] ≠ id and g^[7] ≠ id).
-  Conditional proof by reduction to order 7 non-existence (depends transitively on sorryAx in Z7NonExistence).
+  Status: PROVED with 0 sorry and standard foundations [propext, Quot.sound]
+  by reduction to order 7 kernel non-existence in `Z2Classification.lean`.
 -/
 theorem conway_no_order_14_deduction (A : Matrix99 Nat) (hA : ConwayAdj A)
     (g : Fin 99 → Fin 99)
@@ -188,17 +191,17 @@ theorem conway_no_dihedral_group_deduction (order_G : Nat)
   conway_parity_rigidity_no_dihedral order_G h_bounds h_even k hk h_sub
 
 /--
-  Grand Classification Theorem of Conway's 99-Graph Automorphisms (COMPILADO):
+  Grand Classification Theorem of Conway's 99-Graph Automorphisms (COMPILED):
   Any putative strongly regular graph srg(99, 14, 1, 2) cannot admit:
-  - An automorphism of order 7 (Behbahani-Lam 2011, Cesarz-Woldar 2025, pending SAT DRAT proof in disk)
-  - An automorphism of order 3 with 3 fixed points (Crnkovic-Maksimovic 2020)
-  - A fixed-point-free automorphism of order 3 (Behbahani-Lam 2011)
-  - An automorphism of order 14 (reduced to order 7; analytically refuted in Cesarz-Woldar 2025 Theorem 3.11)
-  - An automorphism group isomorphic to Frob(21) (Cesarz-Woldar 2025, Proposition 4.14, parity contradiction)
+  - An automorphism of order 7: PROVED in Lean 4 kernel (Z7FinalClosure, 0 sorry, [propext, Quot.sound])
+  - An automorphism of order 14: PROVED in Lean 4 kernel (Z2Classification, 0 sorry, [propext, Quot.sound])
+  - An automorphism group isomorphic to Frob(21): PROVED in Lean 4 kernel (Proposition 4.14, parity contradiction)
+  - An automorphism of order 3 with 3 fixed points: COMPILED (sorryAx in Z3Fixed3NonExistence)
+  - A fixed-point-free automorphism of order 3: COMPILED (sorryAx in Z3FpfNonExistence)
   
-  Status: COMPILADO (depends transitively on sorryAx in Z7NonExistence, Z3Fixed3NonExistence, Z3FpfNonExistence).
-  Consequently, if Conway's 99-graph exists, its automorphism group Aut(G)
-  is either the trivial group 1 or an involution group Z_2.
+  Status: COMPILED (depends transitively on sorryAx in Z3Fixed3NonExistence and Z3FpfNonExistence).
+  Consequently, conditional on the resolution of order 3, if Conway's 99-graph exists,
+  its automorphism group Aut(G) is either the trivial group 1 or an involution group Z_2.
 -/
 theorem conway_automorphism_group_restricted :
   ∀ (A : Matrix99 Nat), ConwayAdj A →

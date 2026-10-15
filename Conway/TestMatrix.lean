@@ -42,6 +42,8 @@ def testA : Matrix99 Nat := fun _ _ => 0
 #print axioms conway_no_order_14_analytical_trace_deduction
 #print axioms conway_no_frob21_orbit_row4_deduction
 #print axioms conway_divisible_by_7_excluded
+#print axioms conway_no_z7_deduction
+#print axioms conway_no_order_14_deduction
 
 -- Parity Rigidity Corollary (Corollary 1.3, Cesarz & Woldar 2025 + Crnković & Maksimović 2020)
 #print axioms even_divides_six_and_not_six_eq_two
