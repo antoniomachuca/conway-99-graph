@@ -39,7 +39,9 @@ from scripts.verify_z2_h9_parity import (
     classify_h9_degree_sequences,
     classify_h9_w_matrices_ke0,
     generate_all_4regular_9,
+    verify_co_neighbor_bounds_mixed_degrees,
     verify_general_parity_constraint,
+    verify_h8_h9_h10_coverage,
     verify_h9_all_internal_edges_parity,
     verify_positive_entry_obstruction,
 )
@@ -228,3 +230,67 @@ class TestDegreeSequences:
             assert sum(degs) % 2 == 0
             assert all(d in [3, 4] for d in degs)
             assert data["is_graphic"] is True
+
+
+class TestCoNeighborBoundsMixedDegrees:
+    """Verification of co-neighbor bounds mu <= 2 for mixed degrees k_e in {0, 2, 4, 6}."""
+
+    @pytest.fixture(scope="class")
+    def mixed_results(self):
+        return verify_co_neighbor_bounds_mixed_degrees()
+
+    def test_independent_set_lemma(self, mixed_results):
+        assert mixed_results["independent_set_lemma"] is True
+
+    def test_co_neighbor_bound_lemma(self, mixed_results):
+        assert mixed_results["co_neighbor_bound_lemma"] is True
+
+    def test_ke6_bipartite_degree_sum_refutation(self, mixed_results):
+        assert mixed_results["ke6_refuted"] is True
+        assert mixed_results["ke6_edges_needed"] == 18
+        assert mixed_results["ke6_max_capacity"] == 12
+        assert mixed_results["ke6_edges_needed"] > mixed_results["ke6_max_capacity"]
+
+    def test_ke4_subset_intersection_refutation(self, mixed_results):
+        assert mixed_results["ke4_refuted"] is True
+        assert mixed_results["ke4_valid_quads_count"] == 0
+
+    def test_ke2_clusters_and_saturation(self, mixed_results):
+        assert mixed_results["ke2_clusters_count"] == 4
+        assert mixed_results["ke2_refuted_by_saturation"] is True
+
+    def test_ke0_all_pairs_b2_rejection(self, mixed_results):
+        assert mixed_results["ke0_rejected_by_b2_count"] == 13
+        assert mixed_results["ke0_surviving_classes_count"] == 3
+        assert mixed_results["ke0_refuted_by_saturation"] is True
+
+    def test_all_mixed_degrees_refuted(self, mixed_results):
+        assert mixed_results["all_mixed_degrees_refuted"] is True
+        assert mixed_results["operational_state"] == "PROVED"
+
+
+class TestH8H9H10Coverage:
+    """Verification that h=8, h=9, and h=10 are completely covered and certified."""
+
+    @pytest.fixture(scope="class")
+    def coverage_results(self):
+        return verify_h8_h9_h10_coverage(REPO_ROOT)
+
+    def test_h8_certified(self, coverage_results):
+        assert coverage_results["h8_certified"] is True
+        assert coverage_results["h8_classes_count"] == 5
+        assert coverage_results["h8_operational_state"] == "PROVED"
+
+    def test_h9_certified(self, coverage_results):
+        assert coverage_results["h9_certified"] is True
+        assert coverage_results["h9_operational_state"] == "PROVED"
+
+    def test_h10_certified(self, coverage_results):
+        assert coverage_results["h10_certified"] is True
+        assert coverage_results["h10_classes_count"] == 16
+        assert coverage_results["h10_operational_state"] == "PROVED"
+
+    def test_all_certified_and_covered(self, coverage_results):
+        assert coverage_results["all_certified_and_covered"] is True
+        assert coverage_results["operational_state"] == "PROVED"
+
