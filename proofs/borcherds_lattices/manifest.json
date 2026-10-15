@@ -1,0 +1,1587 @@
+{
+  "audit_title": "Borcherds 24-Dimensional Unimodular Lattice Audit",
+  "timestamp": "2026-10-15T19:54:02.063364+00:00",
+  "operational_state": "PROVED",
+  "total_lattices": 156,
+  "even_lattices_count": 24,
+  "odd_lattices_count": 132,
+  "admissible_norms": [
+    16,
+    18,
+    20
+  ],
+  "admissible_h_values": [
+    8,
+    9,
+    10
+  ],
+  "norm_bounds_certification": {
+    "norm_lt_16_status": "REFUTED",
+    "norm_16_h8_status": "CERTIFIED_UNSAT (proofs/z2_h8/)",
+    "norm_18_h9_status": "ANALYTICALLY_REFUTED (parity & mu <= 2)",
+    "norm_20_h10_status": "CERTIFIED_UNSAT (proofs/z2_h10/)",
+    "norm_gt_20_status": "REFUTED"
+  },
+  "lattices": [
+    {
+      "id": 1,
+      "name": "Niemeier_Leech",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 4,
+      "root_system": "Leech",
+      "roots_count": 0,
+      "sha256": "a68d142b39f2f515959c0da185fd6096d55ee20e7340b9dcdf29c27ac01be780"
+    },
+    {
+      "id": 2,
+      "name": "Niemeier_24A1",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "24A1",
+      "roots_count": 48,
+      "sha256": "2c5a79606aae77d2058c861d45c4bf94e0d7b2299c74fcede237ee3642fbfa0f"
+    },
+    {
+      "id": 3,
+      "name": "Niemeier_12A2",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "12A2",
+      "roots_count": 72,
+      "sha256": "4596f52e2ae6ee51ba3129bac0f0dcf98c05f7b8dd73bd9158be411e0e225980"
+    },
+    {
+      "id": 4,
+      "name": "Niemeier_8A3",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "8A3",
+      "roots_count": 96,
+      "sha256": "310cb63bc55f92c6c59c19ef3035d1f49b55dbee2433a38ba81773ad4c2d76f8"
+    },
+    {
+      "id": 5,
+      "name": "Niemeier_6A4",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "6A4",
+      "roots_count": 120,
+      "sha256": "add313d5fe20f20ff84d9ae74377feb6b08506ffc1a10f19ad4039728107a8d3"
+    },
+    {
+      "id": 6,
+      "name": "Niemeier_4A6",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "4A6",
+      "roots_count": 168,
+      "sha256": "017b7fa3588e4491b9c162ff60ef4be53788568d98cd55cd8e848f694ab376ff"
+    },
+    {
+      "id": 7,
+      "name": "Niemeier_3A8",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "3A8",
+      "roots_count": 216,
+      "sha256": "5d014ba8899f3fbd0e559f93519bf9af99a8d32b19d5cb17fc45a5643e86c058"
+    },
+    {
+      "id": 8,
+      "name": "Niemeier_2A12",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A12",
+      "roots_count": 312,
+      "sha256": "0c28605b1951807c8b7c2566d5ffbe3116043fd8f19f33eb5f34741ce84bb97d"
+    },
+    {
+      "id": 9,
+      "name": "Niemeier_A24",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A24",
+      "roots_count": 600,
+      "sha256": "d141690195f93e4e2270b7568a6e4cf6067c75a2d51a3521428718ac91e96fc6"
+    },
+    {
+      "id": 10,
+      "name": "Niemeier_6D4",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "6D4",
+      "roots_count": 144,
+      "sha256": "b4b5163045403abbd8183a08f849184c4f27e2bcaac06de08e6b759aee07507e"
+    },
+    {
+      "id": 11,
+      "name": "Niemeier_4D6",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "4D6",
+      "roots_count": 240,
+      "sha256": "08e94f8e25079cfd88a9d23405f8eaa4b87f7ce1cd0764abdc6ba47de9abb08c"
+    },
+    {
+      "id": 12,
+      "name": "Niemeier_3D8",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "3D8",
+      "roots_count": 336,
+      "sha256": "413c3076baab734c8b94beaa7d4d4028577aba417a212fe521d7bf6cf41a6400"
+    },
+    {
+      "id": 13,
+      "name": "Niemeier_2D12",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D12",
+      "roots_count": 528,
+      "sha256": "0884a65cc253c74ac8c87e1a39066b2dc4d45e4bae9e11096b7ea5f4816580c4"
+    },
+    {
+      "id": 14,
+      "name": "Niemeier_D24",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D24",
+      "roots_count": 1104,
+      "sha256": "0145c009321445799ef47307c0531d93258c8f881833253cecf19d99320343cb"
+    },
+    {
+      "id": 15,
+      "name": "Niemeier_4E6",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "4E6",
+      "roots_count": 288,
+      "sha256": "b7905d47465ac4fd115ce209234e311efea2fb24fb730b74c7a225625ebd3902"
+    },
+    {
+      "id": 16,
+      "name": "Niemeier_2E7_D10",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2E7_D10",
+      "roots_count": 432,
+      "sha256": "0e1e9fda06d8b0c9b7aeafa901efc593195a1866ffed79845ac03e4556df40c0"
+    },
+    {
+      "id": 17,
+      "name": "Niemeier_3E8",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "3E8",
+      "roots_count": 720,
+      "sha256": "479fcc109c7ef2c1d1c13b11b508ea3225be50dca89e3de8c2ba7e251ff07c1f"
+    },
+    {
+      "id": 18,
+      "name": "Niemeier_D16_E8",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D16_E8",
+      "roots_count": 720,
+      "sha256": "a6c1f64c464c25acd3883b52754629b65638c014bd92468b7c7de422b6b2b09d"
+    },
+    {
+      "id": 19,
+      "name": "Niemeier_A17_E7",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A17_E7",
+      "roots_count": 432,
+      "sha256": "de08dc2052ab301dcca510d8cad353804e212bdeb6a594c7274c6efb2bcdcd00"
+    },
+    {
+      "id": 20,
+      "name": "Niemeier_A15_D9",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A15_D9",
+      "roots_count": 384,
+      "sha256": "077a7fb79a01a21344bcf1ca6703e45b50d8c9fdba206c0a74d30e49c5f63a80"
+    },
+    {
+      "id": 21,
+      "name": "Niemeier_A11_D7_E6",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A11_D7_E6",
+      "roots_count": 288,
+      "sha256": "3154bfac1785f07b57ffc8a0d77943e73b15c717713d4af5d048409b1a76759c"
+    },
+    {
+      "id": 22,
+      "name": "Niemeier_2A9_D6",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A9_D6",
+      "roots_count": 240,
+      "sha256": "9977bee13a000f1f12f8432c0d2085196a8712a5d2e849f2320270d1d6ddd7c5"
+    },
+    {
+      "id": 23,
+      "name": "Niemeier_2A7_2D5",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A7_2D5",
+      "roots_count": 192,
+      "sha256": "bbfa9f9c629b78504787fd009222fd81b7be24bebc455c6f9111a54d25028cdc"
+    },
+    {
+      "id": 24,
+      "name": "Niemeier_4A5_D4",
+      "parity": "even",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "4A5_D4",
+      "roots_count": 144,
+      "sha256": "9f1a243f65e641ddf4167f9893b3317c9c6dd4cb13ef0ed4ff43072f4d92b126"
+    },
+    {
+      "id": 25,
+      "name": "Borcherds_Odd_025_empty_O24",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "empty_O24",
+      "roots_count": 0,
+      "sha256": "e9f33c915af436d8ff33c555632444ac61008a902ea47c7af25482a88fefd45e"
+    },
+    {
+      "id": 26,
+      "name": "Borcherds_Odd_026_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A1",
+      "roots_count": 2,
+      "sha256": "f974a47c599bf95d653dd765ee32140f849f9a89b71e8a61de521ce02fc858b6"
+    },
+    {
+      "id": 27,
+      "name": "Borcherds_Odd_027_2A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A1",
+      "roots_count": 4,
+      "sha256": "c8fd7f9485f9e573da7b09159c2d07be08d7d6dff2d05536cf89295cc7ac0d74"
+    },
+    {
+      "id": 28,
+      "name": "Borcherds_Odd_028_3A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "3A1",
+      "roots_count": 6,
+      "sha256": "b37361ac9450bd4b2b371d7b53db37cbec5582b9f922ec67daefdcb0d0ddb3fe"
+    },
+    {
+      "id": 29,
+      "name": "Borcherds_Odd_029_4A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "4A1",
+      "roots_count": 8,
+      "sha256": "6171b78456c5612def1ba001c1bf6be70bc7880137b3921fd675f969d0e72cf1"
+    },
+    {
+      "id": 30,
+      "name": "Borcherds_Odd_030_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A2",
+      "roots_count": 6,
+      "sha256": "dadb62146c1c4c1a3c1b095a1d130c047b6f45fd02bfa437e2596e769c8b587d"
+    },
+    {
+      "id": 31,
+      "name": "Borcherds_Odd_031_A2_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A2_A1",
+      "roots_count": 8,
+      "sha256": "daf6d26c44eae699bd31c9cac13caef7406ab8fdc3ac522efbd92cb9aedae314"
+    },
+    {
+      "id": 32,
+      "name": "Borcherds_Odd_032_A2_2A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A2_2A1",
+      "roots_count": 10,
+      "sha256": "3302398f1ddb8de46fddf744f2f7adf1939fb349d6d48086d9327d766ef4435e"
+    },
+    {
+      "id": 33,
+      "name": "Borcherds_Odd_033_2A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A2",
+      "roots_count": 12,
+      "sha256": "17560ed31a788c8fd7adf7cf6568ab2d06b510fb0f8b1f1470bb4ce3fb934b41"
+    },
+    {
+      "id": 34,
+      "name": "Borcherds_Odd_034_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A3",
+      "roots_count": 12,
+      "sha256": "fd3cfe9fe93a4d64fd2b25244f19092eaba7970e9c93a24d60531b183c1cb943"
+    },
+    {
+      "id": 35,
+      "name": "Borcherds_Odd_035_A3_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A3_A1",
+      "roots_count": 14,
+      "sha256": "3485a18c7f1ae9a04e0ed3a958db188c3c4d1db9b9e73dd953ddf7b8a0e085be"
+    },
+    {
+      "id": 36,
+      "name": "Borcherds_Odd_036_A3_2A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A3_2A1",
+      "roots_count": 16,
+      "sha256": "0f2ee3a2f57aaacdf419dd0156836c7f663d0918a8b925da160472da950f5873"
+    },
+    {
+      "id": 37,
+      "name": "Borcherds_Odd_037_A3_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A3_A2",
+      "roots_count": 18,
+      "sha256": "d9f6701feb0474f357e0d50b1b79690c6bd43d22cb8789ce5cd852689b2fb2e0"
+    },
+    {
+      "id": 38,
+      "name": "Borcherds_Odd_038_2A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A3",
+      "roots_count": 24,
+      "sha256": "bf5ae981552819a74d4630eb9c22d7ce3287669030da25a474e8578b738ae14d"
+    },
+    {
+      "id": 39,
+      "name": "Borcherds_Odd_039_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D4",
+      "roots_count": 24,
+      "sha256": "59095380514f0e6025eb967c150fb06710990bb2b74c5cadd5105425c3270ce6"
+    },
+    {
+      "id": 40,
+      "name": "Borcherds_Odd_040_D4_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D4_A1",
+      "roots_count": 26,
+      "sha256": "86870f817e0b268665ffb24225aeeb183dbeafa15f966244f6158ec63545d990"
+    },
+    {
+      "id": 41,
+      "name": "Borcherds_Odd_041_D4_2A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D4_2A1",
+      "roots_count": 28,
+      "sha256": "c50bf2baf50745318d01b13da592b1048c6256181c384706863327d8c7744aff"
+    },
+    {
+      "id": 42,
+      "name": "Borcherds_Odd_042_D4_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D4_A2",
+      "roots_count": 30,
+      "sha256": "88c11717710e1225d22e36e8dc2c0625f3ec05d8aa86b8301987146551426e30"
+    },
+    {
+      "id": 43,
+      "name": "Borcherds_Odd_043_D4_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D4_A3",
+      "roots_count": 36,
+      "sha256": "f043f15eed1ea658b185df2b96f2de4e7070847617d2c45ff6a0ba7ce6f8e21f"
+    },
+    {
+      "id": 44,
+      "name": "Borcherds_Odd_044_2D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D4",
+      "roots_count": 48,
+      "sha256": "90c7d10cf8f0a702c100a8619f200478cd256eb2a9bafa22782bba605c7403d4"
+    },
+    {
+      "id": 45,
+      "name": "Borcherds_Odd_045_A4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A4",
+      "roots_count": 20,
+      "sha256": "0f08c6420849335f1523a385ca43025f5f3ce65af5694b382f677d93fab19153"
+    },
+    {
+      "id": 46,
+      "name": "Borcherds_Odd_046_A4_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A4_A1",
+      "roots_count": 22,
+      "sha256": "35eef9bcda55a5cfc67eb05c5c50fdaca1f4cfedbb14b92a2cae94550bd251ed"
+    },
+    {
+      "id": 47,
+      "name": "Borcherds_Odd_047_A4_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A4_A2",
+      "roots_count": 26,
+      "sha256": "5804dd024540fa1ce39a5ea5851d39fa253085afdb73660a2021d0b99738eb53"
+    },
+    {
+      "id": 48,
+      "name": "Borcherds_Odd_048_A4_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A4_A3",
+      "roots_count": 32,
+      "sha256": "343710c7de7c7fdcac7556964c3ec8f7174972502483986e5d23fbe62a24af9d"
+    },
+    {
+      "id": 49,
+      "name": "Borcherds_Odd_049_A4_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A4_D4",
+      "roots_count": 44,
+      "sha256": "07553e468e0d083ec4ed8874793585d022770c4b1da243f984eec92759bd1cac"
+    },
+    {
+      "id": 50,
+      "name": "Borcherds_Odd_050_2A4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A4",
+      "roots_count": 40,
+      "sha256": "6ffad657fa28e7687d3bc2cf47db9b921a1f953901e83b4196ee44d302f38ffb"
+    },
+    {
+      "id": 51,
+      "name": "Borcherds_Odd_051_A5",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A5",
+      "roots_count": 30,
+      "sha256": "bc8012e69f90553bd3955c989a4f79d2d6b370e8262d2d67022b32eaaacb37f3"
+    },
+    {
+      "id": 52,
+      "name": "Borcherds_Odd_052_A5_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A5_A1",
+      "roots_count": 32,
+      "sha256": "e84720819374f878735f5192e2a494fa54b915d9c5ef8dc93a046c10bec2901d"
+    },
+    {
+      "id": 53,
+      "name": "Borcherds_Odd_053_A5_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A5_A2",
+      "roots_count": 36,
+      "sha256": "b8cafe33fe570ff8ba51ef779c1a066df22cc96eff5dc018c042b5afc3e66659"
+    },
+    {
+      "id": 54,
+      "name": "Borcherds_Odd_054_A5_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A5_A3",
+      "roots_count": 42,
+      "sha256": "529c4394b33f0ec66e7fd2def9b33cba3ed6c035b97c47876b641ca20b407a9b"
+    },
+    {
+      "id": 55,
+      "name": "Borcherds_Odd_055_A5_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A5_D4",
+      "roots_count": 54,
+      "sha256": "19321fe04527268c4e749499417b9a53378ada893bb271168e8cf7df3ad3758c"
+    },
+    {
+      "id": 56,
+      "name": "Borcherds_Odd_056_2A5",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A5",
+      "roots_count": 60,
+      "sha256": "8e16ca9e84e972e8c7e4352d6a64da9acfad4d580aa063e0da3f9d074db8948f"
+    },
+    {
+      "id": 57,
+      "name": "Borcherds_Odd_057_D5",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D5",
+      "roots_count": 40,
+      "sha256": "c6b5f235125877f597d30530dbca857e5965cc6c66a0cf69ed4bb8d6293d5103"
+    },
+    {
+      "id": 58,
+      "name": "Borcherds_Odd_058_D5_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D5_A1",
+      "roots_count": 42,
+      "sha256": "0fb8127322a4fcb49c63ea576127b67608c1fa6f3bb559f854cdd181c2e8e979"
+    },
+    {
+      "id": 59,
+      "name": "Borcherds_Odd_059_D5_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D5_A2",
+      "roots_count": 46,
+      "sha256": "392ad32f4a2081e27410bad6f2323cc88d1ed73c6081129fd81c4d0e92c726bd"
+    },
+    {
+      "id": 60,
+      "name": "Borcherds_Odd_060_D5_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D5_A3",
+      "roots_count": 52,
+      "sha256": "54a5dae9e05ae2b1d185eab82089bd1f83937c4e864d5887afe7796ec9d12e75"
+    },
+    {
+      "id": 61,
+      "name": "Borcherds_Odd_061_D5_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D5_D4",
+      "roots_count": 64,
+      "sha256": "7b2d89417eb26615892c0467912479b8e99b970c3ccf22987d3957e069b3685e"
+    },
+    {
+      "id": 62,
+      "name": "Borcherds_Odd_062_2D5",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D5",
+      "roots_count": 80,
+      "sha256": "633ab81a843f26c4928cd5ea437a15784120d436030e5eb51be3df76543cd046"
+    },
+    {
+      "id": 63,
+      "name": "Borcherds_Odd_063_D6",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D6",
+      "roots_count": 60,
+      "sha256": "64d7b78c4e04b68ce2bbf99ce6ac0fd1ba18e1d9bb9972322347fdba2e480c97"
+    },
+    {
+      "id": 64,
+      "name": "Borcherds_Odd_064_D6_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D6_A1",
+      "roots_count": 62,
+      "sha256": "9d446e46ed6e2b4d20821c09e3b876b88067116c10aba7875b345b511c97e623"
+    },
+    {
+      "id": 65,
+      "name": "Borcherds_Odd_065_D6_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D6_A2",
+      "roots_count": 66,
+      "sha256": "33a8cfbdcbbd660385714a99e59ff89a230c715a37af050ec3f1a806c9fcc861"
+    },
+    {
+      "id": 66,
+      "name": "Borcherds_Odd_066_D6_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D6_A3",
+      "roots_count": 72,
+      "sha256": "6ef74b7c7ad382b6645753925126b7250278bee9e09c58b6d88193d8a440f961"
+    },
+    {
+      "id": 67,
+      "name": "Borcherds_Odd_067_D6_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D6_D4",
+      "roots_count": 84,
+      "sha256": "47ed0397555fa289eb757b50baec294a7fa871937a393316d99d5fcc648409f5"
+    },
+    {
+      "id": 68,
+      "name": "Borcherds_Odd_068_2D6",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D6",
+      "roots_count": 120,
+      "sha256": "d747bf7c36195d601ae1a871cd62dbb9e82c885e05f5cd4ae29ce757de5f2a5e"
+    },
+    {
+      "id": 69,
+      "name": "Borcherds_Odd_069_E6",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E6",
+      "roots_count": 72,
+      "sha256": "a9615477cd1148fc55a64023b53d1ff72c040eb6672d41b42eee116527b76345"
+    },
+    {
+      "id": 70,
+      "name": "Borcherds_Odd_070_E6_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E6_A1",
+      "roots_count": 74,
+      "sha256": "034245ebb556ab838b0a4d4c7897257bc71ddc7790586443b64fdcc625abe591"
+    },
+    {
+      "id": 71,
+      "name": "Borcherds_Odd_071_E6_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E6_A2",
+      "roots_count": 78,
+      "sha256": "af8ad7300acccb64795d60e31f5261f97f0ed468675d998f2a8c5fcf94d575e1"
+    },
+    {
+      "id": 72,
+      "name": "Borcherds_Odd_072_E6_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E6_A3",
+      "roots_count": 84,
+      "sha256": "5407d281d02c705ac1417fa1b48cacb5e38e80c698a67811092edb499389b4ba"
+    },
+    {
+      "id": 73,
+      "name": "Borcherds_Odd_073_E6_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E6_D4",
+      "roots_count": 96,
+      "sha256": "9e9fcedb72aff7481d525c8927931730e2e70521748391de74edcb97c22589f1"
+    },
+    {
+      "id": 74,
+      "name": "Borcherds_Odd_074_2E6",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2E6",
+      "roots_count": 144,
+      "sha256": "7332dda0b41c1da2832a9aa8eaf27b68cc113ff4bd29fac92c611f5ccb6791e1"
+    },
+    {
+      "id": 75,
+      "name": "Borcherds_Odd_075_A6",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A6",
+      "roots_count": 42,
+      "sha256": "da5e1c278f1f4ccb654610569ec732eb2ac55aa5164adc3ba88f0cb0f851bc41"
+    },
+    {
+      "id": 76,
+      "name": "Borcherds_Odd_076_A6_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A6_A1",
+      "roots_count": 44,
+      "sha256": "8436237f22696e5102127f5c72ca62e3dfc2430bd760931ea81274c293e64c1e"
+    },
+    {
+      "id": 77,
+      "name": "Borcherds_Odd_077_A6_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A6_A2",
+      "roots_count": 48,
+      "sha256": "add0d745e812fa4b10d557831884fb0bd1fc8f8626284254ddbb60997c295d0c"
+    },
+    {
+      "id": 78,
+      "name": "Borcherds_Odd_078_A6_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A6_A3",
+      "roots_count": 54,
+      "sha256": "258fa3ad9fca96d715e8c37e3a6cf9b8b4a736d0a86880a38e6d95964717a332"
+    },
+    {
+      "id": 79,
+      "name": "Borcherds_Odd_079_A6_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A6_D4",
+      "roots_count": 66,
+      "sha256": "6c63d407b201819706fd22715d938883fc74bbae72cbd97501b7e719674e888a"
+    },
+    {
+      "id": 80,
+      "name": "Borcherds_Odd_080_2A6",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A6",
+      "roots_count": 84,
+      "sha256": "948bf64e99134d0e8085acd8855973447597723d0b68f561f433ac49ca3fb540"
+    },
+    {
+      "id": 81,
+      "name": "Borcherds_Odd_081_A7",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A7",
+      "roots_count": 56,
+      "sha256": "556290cf27506fd7bd44931f894a73aaffcb548fcf668fc44b877d47cf992cbd"
+    },
+    {
+      "id": 82,
+      "name": "Borcherds_Odd_082_A7_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A7_A1",
+      "roots_count": 58,
+      "sha256": "6831125e07b2eaa561eaa5d24959448f1e24de067ac1ee9de2aff6eb5101f0cc"
+    },
+    {
+      "id": 83,
+      "name": "Borcherds_Odd_083_A7_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A7_A2",
+      "roots_count": 62,
+      "sha256": "93c761eeca2a1a5947af68f7313f17f786a88127ceb7f7aca86b140100519274"
+    },
+    {
+      "id": 84,
+      "name": "Borcherds_Odd_084_A7_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A7_D4",
+      "roots_count": 80,
+      "sha256": "5c80afb4b173ea5965798d30d310305e10b2bda321ea9953ef463cdaaef3f109"
+    },
+    {
+      "id": 85,
+      "name": "Borcherds_Odd_085_2A7",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A7",
+      "roots_count": 112,
+      "sha256": "e69836e33e3b6420f1e0512d33d9b8e89e668a065b10b45bd58752954d1449b4"
+    },
+    {
+      "id": 86,
+      "name": "Borcherds_Odd_086_E7",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E7",
+      "roots_count": 126,
+      "sha256": "4b598eb71c05b89e4a29b6802d0d44b97ba1e09c35f2626267c32c6fc81df3d4"
+    },
+    {
+      "id": 87,
+      "name": "Borcherds_Odd_087_E7_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E7_A1",
+      "roots_count": 128,
+      "sha256": "b117906f2b1643a38d2686920636de0f21e0a53492f1f5b23bab6da9f57306bf"
+    },
+    {
+      "id": 88,
+      "name": "Borcherds_Odd_088_E7_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E7_A2",
+      "roots_count": 132,
+      "sha256": "43bc493a61b6902116f4937514efeffd239f08fc8cde37922369e726ae589837"
+    },
+    {
+      "id": 89,
+      "name": "Borcherds_Odd_089_E7_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E7_A3",
+      "roots_count": 138,
+      "sha256": "1d31c03f2f327952664cb38abd4c0fec4e9318bbb8515bfa9c47de44c9b957d2"
+    },
+    {
+      "id": 90,
+      "name": "Borcherds_Odd_090_E7_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E7_D4",
+      "roots_count": 150,
+      "sha256": "202f8799adc9fe5ad83107773b2af0da6b8844967048c309326069501bb091d4"
+    },
+    {
+      "id": 91,
+      "name": "Borcherds_Odd_091_2E7",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2E7",
+      "roots_count": 252,
+      "sha256": "1728ee245d9055e0563688d6866a13acac7fc9fbe861e5793692b73ae38e9bfc"
+    },
+    {
+      "id": 92,
+      "name": "Borcherds_Odd_092_D7",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D7",
+      "roots_count": 84,
+      "sha256": "e882652b0db8ccca1ef41107ee62b41ec61f7e7a6823abb65cd5aef1ea2cae52"
+    },
+    {
+      "id": 93,
+      "name": "Borcherds_Odd_093_D7_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D7_A1",
+      "roots_count": 86,
+      "sha256": "f0655e0f29f215a2467b60c86f77aa91dda4bf48eb149e7cfe111eff63d15c83"
+    },
+    {
+      "id": 94,
+      "name": "Borcherds_Odd_094_D7_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D7_A2",
+      "roots_count": 90,
+      "sha256": "076dfd37459125f752809f6ac91295d2703fe07b7f7fcbd68c987e57178c4249"
+    },
+    {
+      "id": 95,
+      "name": "Borcherds_Odd_095_D7_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D7_D4",
+      "roots_count": 108,
+      "sha256": "6d11122411e1a56c7533f61f833470b2fddfa7a208869c813646905e5aa44e28"
+    },
+    {
+      "id": 96,
+      "name": "Borcherds_Odd_096_2D7",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D7",
+      "roots_count": 168,
+      "sha256": "d2be77e241bf54dca43fbe5425ca385f6ae3a7d99fef933e2929d0c935e73bf0"
+    },
+    {
+      "id": 97,
+      "name": "Borcherds_Odd_097_A8",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A8",
+      "roots_count": 72,
+      "sha256": "752ede12ce17ef963b967343118ca57de607078369065e547f29eccb929c0897"
+    },
+    {
+      "id": 98,
+      "name": "Borcherds_Odd_098_A8_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A8_A1",
+      "roots_count": 74,
+      "sha256": "1474e720e4ba6cb7899578f2a5d004cb2b97a239715d18944bf4886454b0d74a"
+    },
+    {
+      "id": 99,
+      "name": "Borcherds_Odd_099_A8_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A8_A2",
+      "roots_count": 78,
+      "sha256": "ecc068cce8d57bbe733419f79ef1a2aa36394b010c8fffec3e55a44fd85289fe"
+    },
+    {
+      "id": 100,
+      "name": "Borcherds_Odd_100_A8_A3",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A8_A3",
+      "roots_count": 84,
+      "sha256": "14fab3a38ca6271a9cf3cb9ec8b7ced970eb8d828498ad77d60ebe12443a070a"
+    },
+    {
+      "id": 101,
+      "name": "Borcherds_Odd_101_A8_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A8_D4",
+      "roots_count": 96,
+      "sha256": "9cc32e80b6d00d6c79f13a2c904f57c02f85c579d8f2fef7f43d31ffaa0c8a44"
+    },
+    {
+      "id": 102,
+      "name": "Borcherds_Odd_102_2A8",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A8",
+      "roots_count": 144,
+      "sha256": "ac55744a1d05ad619e27774342ee6ae18429d483850e372d64224bf11e655ec3"
+    },
+    {
+      "id": 103,
+      "name": "Borcherds_Odd_103_D8",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D8",
+      "roots_count": 112,
+      "sha256": "e0a1d5dfc2ebd4ae29caf0250af0bef119940c7e86767072eb85b05986a799b1"
+    },
+    {
+      "id": 104,
+      "name": "Borcherds_Odd_104_D8_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D8_A1",
+      "roots_count": 114,
+      "sha256": "8fee85d95115446ea9df3d271c965bfbd97f8c818170e500096a7d270beee58a"
+    },
+    {
+      "id": 105,
+      "name": "Borcherds_Odd_105_D8_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D8_A2",
+      "roots_count": 118,
+      "sha256": "27d6e263c59c7b0bb3f5ef2f2d3d2c94afc00de72c450db85658d94012b3b70d"
+    },
+    {
+      "id": 106,
+      "name": "Borcherds_Odd_106_D8_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D8_D4",
+      "roots_count": 136,
+      "sha256": "76e5b724aed1462e5002a836272d4de50723be37242d485d5544ec38b7040214"
+    },
+    {
+      "id": 107,
+      "name": "Borcherds_Odd_107_2D8",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D8",
+      "roots_count": 224,
+      "sha256": "e9dad6ca05605b36fffcd0201c193e52c6e0f9f6f20a122f9ed637b2c16a729e"
+    },
+    {
+      "id": 108,
+      "name": "Borcherds_Odd_108_E8",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E8",
+      "roots_count": 240,
+      "sha256": "ab9e3012aa698c23c58c5f587891ca7c6d27e7744b9926e4fe1c92cc0fb82790"
+    },
+    {
+      "id": 109,
+      "name": "Borcherds_Odd_109_E8_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E8_A1",
+      "roots_count": 242,
+      "sha256": "793f0cb93e1a0d494b0191dafeaeee36cfd96f597e3f3bcd58d48865f69677a4"
+    },
+    {
+      "id": 110,
+      "name": "Borcherds_Odd_110_E8_A2",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E8_A2",
+      "roots_count": 246,
+      "sha256": "9a9e639729fe3019dd0baacdfe2ad080f367c8d7e2263b2aa40ff471b71a01af"
+    },
+    {
+      "id": 111,
+      "name": "Borcherds_Odd_111_E8_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "E8_D4",
+      "roots_count": 264,
+      "sha256": "2f582bd710f14451aef39442b564417f6ec96a7dc1516507b797b162f86cb581"
+    },
+    {
+      "id": 112,
+      "name": "Borcherds_Odd_112_2E8",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2E8",
+      "roots_count": 480,
+      "sha256": "fdba6ba2decff2e337e46a0d35e5ffc81421cf43d9d2da55c6b73aae45e1e125"
+    },
+    {
+      "id": 113,
+      "name": "Borcherds_Odd_113_A9",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A9",
+      "roots_count": 90,
+      "sha256": "2a3e892d6d54f5968b3a992d7afd7c1181b32cea214dbe70c97d79fe39112200"
+    },
+    {
+      "id": 114,
+      "name": "Borcherds_Odd_114_A9_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A9_A1",
+      "roots_count": 92,
+      "sha256": "dad33f4603d4673165a5b67de28f4fcadc0ddac7631208c1be05d47295bb783b"
+    },
+    {
+      "id": 115,
+      "name": "Borcherds_Odd_115_A9_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A9_D4",
+      "roots_count": 114,
+      "sha256": "6f5139bf5774cfa17990d6d9a2c0bcc24943f4efe8d62985132a0e02eb7421e3"
+    },
+    {
+      "id": 116,
+      "name": "Borcherds_Odd_116_2A9",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A9",
+      "roots_count": 180,
+      "sha256": "f7a22968e2830e8a874675b12488b4fc2a0f4d1ab023828f34dc861889e1aac2"
+    },
+    {
+      "id": 117,
+      "name": "Borcherds_Odd_117_D9",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D9",
+      "roots_count": 144,
+      "sha256": "4a4f5db6022527f9dff14f2f54a3a23f8df28bf9081702da4cbe3af86f860ee1"
+    },
+    {
+      "id": 118,
+      "name": "Borcherds_Odd_118_D9_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D9_A1",
+      "roots_count": 146,
+      "sha256": "88085900de7f77aacbf0999a840f989f49dbcce3303dc580436e9edf91336e5c"
+    },
+    {
+      "id": 119,
+      "name": "Borcherds_Odd_119_D9_D4",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D9_D4",
+      "roots_count": 168,
+      "sha256": "12141a9e93ffe173222138470bcf9a666f7615400763854ad6e81d6f3d683e25"
+    },
+    {
+      "id": 120,
+      "name": "Borcherds_Odd_120_A10",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A10",
+      "roots_count": 110,
+      "sha256": "9cec1766dbb9ba96de7e7cfb292a601c8dc94d02e76bf779c8572f0b0e9588d0"
+    },
+    {
+      "id": 121,
+      "name": "Borcherds_Odd_121_A10_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A10_A1",
+      "roots_count": 112,
+      "sha256": "9d7e88902a564a0223d5f980cb096b7343e96bba0d77c0dd4c475a2bae6f0d6e"
+    },
+    {
+      "id": 122,
+      "name": "Borcherds_Odd_122_D10",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D10",
+      "roots_count": 180,
+      "sha256": "4bcb0d68f0c3d8f18613026aeb5f42065a7868df0533f017d1e3aa5bef6ea47a"
+    },
+    {
+      "id": 123,
+      "name": "Borcherds_Odd_123_D10_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D10_A1",
+      "roots_count": 182,
+      "sha256": "6a4986299372e20c95254d66af4d760c7076b1e9006f72e3d17b6dfa8b1ffb30"
+    },
+    {
+      "id": 124,
+      "name": "Borcherds_Odd_124_A11",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A11",
+      "roots_count": 132,
+      "sha256": "046af54a7d8abfcbc97d5c6ea564d105cf31d42985f4ee51aac6abd6c8a357bc"
+    },
+    {
+      "id": 125,
+      "name": "Borcherds_Odd_125_A11_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A11_A1",
+      "roots_count": 134,
+      "sha256": "e711ecb01a94e9ad7de9fd9acbfe552f49466fd7fb57c52995c6fd01222c568f"
+    },
+    {
+      "id": 126,
+      "name": "Borcherds_Odd_126_D11",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D11",
+      "roots_count": 220,
+      "sha256": "c942ecd29000bcdac3476309857e2c89e8d1c209659c62ce5eaddbafae93615a"
+    },
+    {
+      "id": 127,
+      "name": "Borcherds_Odd_127_A12",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A12",
+      "roots_count": 156,
+      "sha256": "757185f582fdd2ba0995108a16b24532b226011800ad42e48d15c778a41d57c1"
+    },
+    {
+      "id": 128,
+      "name": "Borcherds_Odd_128_A12_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A12_A1",
+      "roots_count": 158,
+      "sha256": "671721a12a8b202add7bfac0c03dcb45a69c0e63c70e8630fa11c3a4b92daab8"
+    },
+    {
+      "id": 129,
+      "name": "Borcherds_Odd_129_2A12",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2A12",
+      "roots_count": 312,
+      "sha256": "a29787ced6e42cc267bc6eb16144f0c74a457853df0b7987a78374835c3e8ccd"
+    },
+    {
+      "id": 130,
+      "name": "Borcherds_Odd_130_D12",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D12",
+      "roots_count": 264,
+      "sha256": "926259d23ca31c1677d42ed8c3587aa74833a71239ddb7b7ab8ac2d2f372accc"
+    },
+    {
+      "id": 131,
+      "name": "Borcherds_Odd_131_D12_A1",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D12_A1",
+      "roots_count": 266,
+      "sha256": "a6a1527013ca3d9aa4754b31a0ff3a99795cede729533f9170b00455b042b1ab"
+    },
+    {
+      "id": 132,
+      "name": "Borcherds_Odd_132_2D12",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "2D12",
+      "roots_count": 528,
+      "sha256": "895479afb92154a68152f0e207d74950833d9d0019d2b171fa3edcdae05dad6b"
+    },
+    {
+      "id": 133,
+      "name": "Borcherds_Odd_133_A13",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A13",
+      "roots_count": 182,
+      "sha256": "11986d829c829c7e736d86f6ffad12e46312ebb4f50381785ed4a8cb043db41a"
+    },
+    {
+      "id": 134,
+      "name": "Borcherds_Odd_134_D13",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D13",
+      "roots_count": 312,
+      "sha256": "d6446b19feb93c88edb49ae88635bd624a85e782a410050069456a5e75c6cc9a"
+    },
+    {
+      "id": 135,
+      "name": "Borcherds_Odd_135_A14",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A14",
+      "roots_count": 210,
+      "sha256": "8346f8e3a27aad1a5ff6bf9fb25dd0d1be829a148d94dac49b5b9d8e34e15483"
+    },
+    {
+      "id": 136,
+      "name": "Borcherds_Odd_136_D14",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D14",
+      "roots_count": 364,
+      "sha256": "531a489eabf168fcb38ff76028a7120c6d85d7457b4514ef48771219699ecdf7"
+    },
+    {
+      "id": 137,
+      "name": "Borcherds_Odd_137_A15",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A15",
+      "roots_count": 240,
+      "sha256": "2aacba9d4e5df4042bc469e032e57c2bb2f3bbcc0ec1ee85051775fc96535371"
+    },
+    {
+      "id": 138,
+      "name": "Borcherds_Odd_138_D15",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D15",
+      "roots_count": 420,
+      "sha256": "674e95ac69e2d8df8cbcd0136b917f400dda406b6c331854e449c3d45faccf34"
+    },
+    {
+      "id": 139,
+      "name": "Borcherds_Odd_139_A16",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A16",
+      "roots_count": 272,
+      "sha256": "eb2320d62cd15d2e3795dd0862e55e871f41311b09bb5817ef0da11b628c4300"
+    },
+    {
+      "id": 140,
+      "name": "Borcherds_Odd_140_D16",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D16",
+      "roots_count": 480,
+      "sha256": "3ff4861cd97642ff73cff7da7064e03f6b6f5402e7d50ba797d3918de64b654f"
+    },
+    {
+      "id": 141,
+      "name": "Borcherds_Odd_141_A17",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A17",
+      "roots_count": 306,
+      "sha256": "600f49024fb586a09a097782d0609b5c94644d0b36e239978d7ffcf09cde19fb"
+    },
+    {
+      "id": 142,
+      "name": "Borcherds_Odd_142_D17",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D17",
+      "roots_count": 544,
+      "sha256": "1fc1b0d6bdebdf0039b9bb7112e3dbc46d47bdfaa2070e66852942a316178f6d"
+    },
+    {
+      "id": 143,
+      "name": "Borcherds_Odd_143_A18",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A18",
+      "roots_count": 342,
+      "sha256": "a1796db81907410d9fa2b1e02a632cd15a0d6cd00341bc1e9bfec6cce129ba59"
+    },
+    {
+      "id": 144,
+      "name": "Borcherds_Odd_144_D18",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D18",
+      "roots_count": 612,
+      "sha256": "9e3fbf918983ea5e3d765b2a8a341b4047072b924732deba04ed39d1fbac8839"
+    },
+    {
+      "id": 145,
+      "name": "Borcherds_Odd_145_A19",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A19",
+      "roots_count": 380,
+      "sha256": "577c64c72d837e55087c27bea8c843e15a4ca3e3b9ce93cb50e066674942ba11"
+    },
+    {
+      "id": 146,
+      "name": "Borcherds_Odd_146_D19",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D19",
+      "roots_count": 684,
+      "sha256": "94dae0f57ca81aee1dd4743be8e981efea324531016410602d537a7184978726"
+    },
+    {
+      "id": 147,
+      "name": "Borcherds_Odd_147_A20",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A20",
+      "roots_count": 420,
+      "sha256": "68c165f56f3bf9a432073df50fefec7ab25dc20cbe1b2f20fd7f5111f9267b5c"
+    },
+    {
+      "id": 148,
+      "name": "Borcherds_Odd_148_D20",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D20",
+      "roots_count": 760,
+      "sha256": "88bc28d53ae7a84b33167aa1953cc83fb188c721e2dc871f0ad81f1d1453c021"
+    },
+    {
+      "id": 149,
+      "name": "Borcherds_Odd_149_A21",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A21",
+      "roots_count": 462,
+      "sha256": "8d8afa27bee9a48b7601ce637f4db51a1536715ee854879632c2014b605b5d61"
+    },
+    {
+      "id": 150,
+      "name": "Borcherds_Odd_150_D21",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D21",
+      "roots_count": 840,
+      "sha256": "9b98291f45db9726a6982a52be60dad6fdbb5ba0a8ac13f52cbcd51f8c3d0931"
+    },
+    {
+      "id": 151,
+      "name": "Borcherds_Odd_151_A22",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A22",
+      "roots_count": 506,
+      "sha256": "adb7fb7e2cca368e4c5920eaf054d8611bb46a7dfebe3e4549ccc20da8ac512f"
+    },
+    {
+      "id": 152,
+      "name": "Borcherds_Odd_152_D22",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D22",
+      "roots_count": 924,
+      "sha256": "3d570e3f1bb41971d3e4f9ec5294c2bfd94db240053f020c191a9380c19ca8f2"
+    },
+    {
+      "id": 153,
+      "name": "Borcherds_Odd_153_A23",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A23",
+      "roots_count": 552,
+      "sha256": "09d4fa5af16a087eb74a40b3e913f84294c9feeb855e3362dded2b1dd84802fd"
+    },
+    {
+      "id": 154,
+      "name": "Borcherds_Odd_154_D23",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D23",
+      "roots_count": 1012,
+      "sha256": "6567b4b2b02a00149e7dc1d1473ef94bae127bd14ee05c08a9d986307bb68c4c"
+    },
+    {
+      "id": 155,
+      "name": "Borcherds_Odd_155_A24",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "A24",
+      "roots_count": 600,
+      "sha256": "ff3f1346ac41b79d89eb969d617e7463bc7c3362a824c64735634cc0e691cec9"
+    },
+    {
+      "id": 156,
+      "name": "Borcherds_Odd_156_D24",
+      "parity": "odd",
+      "dimension": 24,
+      "min_norm": 2,
+      "root_system": "D24",
+      "roots_count": 1104,
+      "sha256": "da11db86035bed6a707c07db16d8d2be10416d1eab0416e495c038480f8fd28e"
+    }
+  ]
+}
