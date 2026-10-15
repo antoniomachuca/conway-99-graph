@@ -84,3 +84,9 @@ Thumbs.db
 cover_letter*
 manuscript/cover_letter*
 
+# Research ideas and scratch notes
+ideas.md
+
+# Agent internal scratch and transcripts
+.agents/
+
