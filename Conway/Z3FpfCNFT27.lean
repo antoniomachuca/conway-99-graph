@@ -921,6 +921,35 @@ theorem conway_no_z3_fpf_t27_of_cnf
     (fun ⟨G, hG⟩ => h11 (cnfB_sound 11 G hG))
     (fun ⟨G, hG⟩ => h10 (cnfS10_sound G hG))
 
+/-- Certified DRAT refutation of B6.cnf (CaDiCaL + drat-trim, proofs/z3_fpf_t27/B6.drat) -/
+axiom cnfB_6_unsat : ¬ Satisfiable (cnfB 6).2
+
+/-- Certified DRAT refutation of B7.cnf (CaDiCaL + drat-trim, proofs/z3_fpf_t27/B7.drat) -/
+axiom cnfB_7_unsat : ¬ Satisfiable (cnfB 7).2
+
+/-- Certified DRAT refutation of B8.cnf (CaDiCaL + drat-trim, proofs/z3_fpf_t27/B8.drat) -/
+axiom cnfB_8_unsat : ¬ Satisfiable (cnfB 8).2
+
+/-- Certified DRAT refutation of B9.cnf (CaDiCaL + drat-trim, proofs/z3_fpf_t27/B9.drat) -/
+axiom cnfB_9_unsat : ¬ Satisfiable (cnfB 9).2
+
+/-- Certified DRAT refutation of B11.cnf (CaDiCaL + drat-trim, proofs/z3_fpf_t27/B11.drat) -/
+axiom cnfB_11_unsat : ¬ Satisfiable (cnfB 11).2
+
+/-- Certified DRAT refutation of S10.cnf (CaDiCaL + drat-trim, proofs/z3_fpf_t27/S10.drat) -/
+axiom cnfS10_unsat : ¬ Satisfiable cnfS10.2
+
+/-- Certified non-existence of order-3 fixed-point-free automorphisms in branch t = 27 -/
+theorem conway_no_z3_fpf_t27_certified :
+    ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧ ∃ g : Fin 99 → Fin 99,
+      IsZ3FpfAutomorphism A g ∧
+      sumFin (fun x : Fin 99 => if A x (g x) = 1 then (1 : Nat) else 0) = 81 :=
+  conway_no_z3_fpf_t27_of_cnf
+    cnfB_6_unsat cnfB_7_unsat cnfB_8_unsat cnfB_9_unsat cnfB_11_unsat cnfS10_unsat
+
+#print axioms conway_no_z3_fpf_t27_of_cnf
+#print axioms conway_no_z3_fpf_t27_certified
+
 end CnfT27
 end Z3FpfGroupRing
 end Matrix99

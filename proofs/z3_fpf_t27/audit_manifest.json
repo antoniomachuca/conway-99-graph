@@ -1,0 +1,63 @@
+{
+  "description": "Z3 fixed-point-free t=27 SAT refutations and DRAT verification certificates",
+  "instances": {
+    "B6": {
+      "status": "PROVED",
+      "solver": "CaDiCaL 1.9.5",
+      "verifier": "drat-trim",
+      "cnf_sha256": "adc90040538bfae54d01f539ac057bbcb865b3cd3f6a82bc0b06fe2ed4749de7",
+      "drat_sha256": "025c5ed05814f2812825346721df9c6a9101f65387e7e8c73804bf835b038380",
+      "drat_size_bytes": 3593890,
+      "drat_verified": true,
+      "solver_unsat": true
+    },
+    "B7": {
+      "status": "PROVED",
+      "solver": "CaDiCaL 1.9.5",
+      "verifier": "drat-trim",
+      "cnf_sha256": "1256f7a38746cd20bd614d37f299ca5cba6d148049c7dfcab064e98e422af3fe",
+      "drat_sha256": "12ffb9f804c5005a240939687ff1a332b0ab7f8dc9dbabd87fa92c17459f1b87",
+      "drat_size_bytes": 43540780,
+      "drat_verified": true,
+      "solver_unsat": true
+    },
+    "B8": {
+      "status": "PROVED",
+      "solver": "CaDiCaL 1.9.5",
+      "verifier": "drat-trim",
+      "cnf_sha256": "4bf9b690d8616e2020f920b664d79a34a15e5a770026e73d75bd6e4d2e564d13",
+      "drat_sha256": "0fb83d56e8898d00b4d88564d00b2f71ccea5e11375319f81e268fdbdf905419",
+      "drat_size_bytes": 457786733,
+      "drat_verified": true,
+      "solver_unsat": true
+    },
+    "B9": {
+      "status": "PROVED",
+      "solver": "CaDiCaL 1.9.5",
+      "verifier": "drat-trim",
+      "cnf_sha256": "9bea1f6645c36ab6737b3eb8f60945c5a7c14f3fc2fcefe393341f640c30f4be",
+      "drat_sha256": "1ce973a4d0c643b07625628cc8347ba12ecf9ef4c321a5f2afe4dbe1ca8a22d1",
+      "drat_size_bytes": 47870128,
+      "drat_verified": true,
+      "solver_unsat": true
+    },
+    "B11": {
+      "status": "PROVED",
+      "solver": "CaDiCaL 1.9.5",
+      "verifier": "drat-trim",
+      "cnf_sha256": "d424ffafba263779353c5e5d2eb4e08e57cdfb316f3677293d50e7be0141e730",
+      "drat_sha256": "5ba03372e54fa6700ec9016d81576e91f3c4d67d5228dcfe5b3bb76941891977",
+      "drat_size_bytes": 14110898,
+      "drat_verified": true,
+      "solver_unsat": true
+    },
+    "S10": {
+      "status": "EXPLORED (SOLVING IN PROGRESS)",
+      "solver": "CaDiCaL 1.9.5 (16-thread portfolio, seeds 0-15 on omarchy)",
+      "verifier": "drat-trim",
+      "cnf_sha256": "126a4f2298b424c8a0d308967f1e6c9e5ec32fe7d7b581450036501b807e158e",
+      "drat_verified": false,
+      "solver_unsat": false
+    }
+  }
+}
