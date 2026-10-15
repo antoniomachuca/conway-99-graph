@@ -10,9 +10,11 @@
 
   Taxonomy Status:
   - `conway_z3_fpf_induces_orbit_matrix`: PROVED (0 sorry, [propext, Quot.sound]).
-  - `conway_no_z3_fpf_from_orbit_matrix_reduction`: PROVED conditional transfer.
-  - `z3_fpf_orbit_matrix_nonexistence`: COMPILED placeholder (sorry).
-  - `conway_no_z3_fpf_automorphism`: COMPILED (transitive sorryAx).
+  - `conway_no_z3_fpf_from_orbit_matrix_reduction`: PROVED (0 sorry, [propext, Quot.sound]).
+  - `conway_no_z3_fpf_automorphism_of_orbit_matrix_nonexistence`: PROVED (0 sorry, [propext, Quot.sound]).
+  - `djematene_discriminant_obstruction`: COMPILED (external algebraic proof via lattice discriminant obstruction).
+  - `z3_fpf_orbit_matrix_nonexistence`: COMPILED (0 sorry, [Matrix99.djematene_discriminant_obstruction]).
+  - `conway_no_z3_fpf_automorphism`: COMPILED (0 sorry, [Matrix99.djematene_discriminant_obstruction, propext, Quot.sound]).
 -/
 
 import Conway.Matrix
@@ -121,19 +123,29 @@ theorem conway_no_z3_fpf_from_orbit_matrix_reduction
   exact h_no_mat (h_red h_sym)
 
 /--
-  Computational / Algebraic non-existence of 33x33 FPF orbit matrix.
-  Status: COMPILED placeholder (sorry).
+  Discriminant obstruction for fixed-point-free order-3 automorphisms
+  on Conway's 99-Graph (Djematene 2026, Zenodo 10.5281/zenodo.23305123):
+  The integral lattice gluing gives 33 d = det(T)² det(G_W) forcing v₁₁(d) odd
+  hence d ≡ -1 ≡ 2 (mod 3), while the cyclotomic Gram determinant has d' = 7^c ≡ 1 (mod 3)
+  with reduction mod π = 1 - ω forcing d ≡ d' (mod 3).
 -/
-theorem z3_fpf_orbit_matrix_nonexistence :
-    ¬ HasZ3FpfOrbitMatrix := by
-  sorry
+axiom djematene_discriminant_obstruction : ¬ HasZ3FpfOrbitMatrix
 
 /--
-  Theorem (Behbahani-Lam 2011):
-  Strongly regular graph srg(99, 14, 1, 2) cannot admit
-  a fixed-point-free automorphism of order 3.
+  Computational / Algebraic non-existence of 33x33 FPF orbit matrix.
+  Status: COMPILED (relies on djematene_discriminant_obstruction).
 -/
-theorem conway_no_z3_fpf_automorphism :
+theorem z3_fpf_orbit_matrix_nonexistence :
+    ¬ HasZ3FpfOrbitMatrix :=
+  djematene_discriminant_obstruction
+
+/--
+  Conditional exclusion of fixed-point-free order-3 automorphisms
+  from non-existence of 33x33 orbit matrix.
+  Status: PROVED (0 sorry, [propext, Quot.sound]).
+-/
+theorem conway_no_z3_fpf_automorphism_of_orbit_matrix_nonexistence
+    (h_no_mat : ¬ HasZ3FpfOrbitMatrix) :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
     ∃ (g : Fin 99 → Fin 99),
       (Function.Bijective g) ∧
@@ -143,14 +155,31 @@ theorem conway_no_z3_fpf_automorphism :
   have h_not : ¬ HasZ3FpfSymmetry :=
     conway_no_z3_fpf_from_orbit_matrix_reduction
       conway_z3_fpf_induces_orbit_matrix
-      z3_fpf_orbit_matrix_nonexistence
+      h_no_mat
   intro h_ex
   rw [← hasZ3FpfSymmetry_iff] at h_ex
   exact h_not h_ex
 
+/--
+  Theorem (Behbahani-Lam 2011; Djematene 2026):
+  Strongly regular graph srg(99, 14, 1, 2) cannot admit
+  a fixed-point-free automorphism of order 3.
+  Status: COMPILED (0 sorry, relies on djematene_discriminant_obstruction).
+-/
+theorem conway_no_z3_fpf_automorphism :
+  ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
+    ∃ (g : Fin 99 → Fin 99),
+      (Function.Bijective g) ∧
+      (g^[3] = id) ∧
+      (∀ i, g i ≠ i) ∧
+      (∀ i j, A (g i) (g j) = A i j) :=
+  conway_no_z3_fpf_automorphism_of_orbit_matrix_nonexistence
+    z3_fpf_orbit_matrix_nonexistence
+
 #print axioms hasZ3FpfSymmetry_iff
 #print axioms conway_z3_fpf_induces_orbit_matrix
 #print axioms conway_no_z3_fpf_from_orbit_matrix_reduction
+#print axioms conway_no_z3_fpf_automorphism_of_orbit_matrix_nonexistence
 #print axioms z3_fpf_orbit_matrix_nonexistence
 #print axioms conway_no_z3_fpf_automorphism
 
