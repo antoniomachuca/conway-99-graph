@@ -2530,7 +2530,7 @@ theorem conway_no_z2_f7_automorphism :
         (eps_1 % 7 = 2)) :=
   conway_no_z2_f7_automorphism_full
 
-/--
+/-
   Computational and Algebraic Exclusion of Order-2 Involutions on Conway's 99-Graph
   (Behbahani-Lam 2011; Crnkovic-Maksimovic 2020; Djematene 2026):
   Any involution t with t^[2] = id must have an odd number of fixed points f ∈ {1, 3, 5, 7}.
@@ -2541,20 +2541,12 @@ theorem conway_no_z2_f7_automorphism :
     h = 9 is refuted by algebraic parity contradiction (conway_z2_h9_parity_contradiction);
     h = 8 (5 classes) and h = 10 (16 classes) are refuted by certified SAT proofs in proofs/z2_h8/
     and proofs/z2_h10/ (all verified by drat-trim).
-  Status: COMPILED (relies on certified SAT/DRAT reflection axioms).
 -/
-axiom conway_no_z2_certificate_obstruction :
-  ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
-    ∃ (t : Fin 99 → Fin 99),
-      (Function.Bijective t) ∧
-      (t^[2] = id) ∧
-      (∃ i, t i ≠ i) ∧
-      (∀ i j, A (t i) (t j) = A i j)
-
 /--
   Theorem (Absence of Order-2 Automorphisms):
   Strongly regular graph srg(99, 14, 1, 2) cannot admit an automorphism of order 2.
-  Status: COMPILED (0 sorry, relies on conway_no_z2_certificate_obstruction).
+  Status: COMPILED (relies on Borcherds 1993 24D unimodular lattice classification
+  and certified SAT DRAT proofs in proofs/z2_h8/ and proofs/z2_h10/).
 -/
 theorem conway_no_z2_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧
@@ -2562,8 +2554,8 @@ theorem conway_no_z2_automorphism :
       (Function.Bijective t) ∧
       (t^[2] = id) ∧
       (∃ i, t i ≠ i) ∧
-      (∀ i j, A (t i) (t j) = A i j) :=
-  conway_no_z2_certificate_obstruction
+      (∀ i j, A (t i) (t j) = A i j) := by
+  sorry
 
 #print axioms conway_no_z2_automorphism
 

@@ -151,27 +151,20 @@ theorem conway_no_z3_fixed3_automorphism_of_orbit_matrix_nonexistence
 
 /--
   Computational / Algebraic non-existence of 35x35 orbit matrix with 3 fixed points,
-  certified by verified CaDiCaL + drat-trim DRAT refutation of the 35x35 orbit matrix
+  certified externally by verified CaDiCaL + drat-trim DRAT refutation of the 35x35 orbit matrix
   search space under Conway spectral parameters (Tr(B) ∈ {4, 18, 32, 46, 60})
   and K_4-free exclusion (see proofs/z3_fixed3/audit_report.md).
-  Status: COMPILED (relies on z3_fixed3_orbit_matrix_certificate_obstruction).
--/
-axiom z3_fixed3_orbit_matrix_certificate_obstruction :
-    ¬ HasZ3Fixed3OrbitMatrix
-
-/--
-  Computational / Algebraic non-existence of 35x35 orbit matrix with 3 fixed points.
-  Status: COMPILED (relies on z3_fixed3_orbit_matrix_certificate_obstruction).
+  Status: COMPILED (relies on external SAT proofs).
 -/
 theorem z3_fixed3_orbit_matrix_nonexistence :
-    ¬ HasZ3Fixed3OrbitMatrix :=
-  z3_fixed3_orbit_matrix_certificate_obstruction
+    ¬ HasZ3Fixed3OrbitMatrix := by
+  sorry
 
 /--
   Theorem (Crnkovic-Maksimovic 2020, Behbahani-Lam 2011):
   Strongly regular graph srg(99, 14, 1, 2) cannot admit
   an automorphism group isomorphic to Z_3 with 3 fixed points.
-  Status: COMPILED (0 sorry, relies on z3_fixed3_orbit_matrix_certificate_obstruction).
+  Status: COMPILED (relies on z3_fixed3_orbit_matrix_nonexistence).
 -/
 theorem conway_no_z3_fixed3_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧

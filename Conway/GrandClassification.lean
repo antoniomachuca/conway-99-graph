@@ -402,25 +402,21 @@ theorem conway_automorphism_group_trivial_of_certificates
   exact funext h_eq
 
 /--
-  Cauchy/Sylow Prime-Order Element Reduction on Fin 99 for Conway's 99-graph.
--/
-axiom conway_cauchy_prime_reduction_axiom (A : Matrix99 Nat) (hA : ConwayAdj A) :
-  ConwayCauchyPrimeReduction A
-
-/--
   Grand Classification Theorem of Conway's 99-Graph Automorphisms (Production Form, COMPILED):
   Every automorphism of any adjacency matrix A satisfying `ConwayAdj A`
   is the identity: Aut(G) = {1}.
 
-  Zero sorry: The sorry on line 352 is completely eliminated.
-  Invokes `conway_automorphism_group_trivial_of_certificates` fed by the audited certificates.
+  Status: COMPILED (transitive sorryAx via unformalized Cauchy prime reduction
+  and external SAT/lattice certificates).
+  Kernel conditional proof is completely verified in `conway_automorphism_group_trivial_of_certificates`.
 -/
 theorem conway_automorphism_group_trivial :
   ∀ (A : Matrix99 Nat), ConwayAdj A →
     ∀ (g : Fin 99 → Fin 99), (Function.Bijective g) ∧ (∀ i j, A (g i) (g j) = A i j) →
       g = id := by
   intro A hA g ⟨hbij, hiso⟩
-  have h_cauchy := conway_cauchy_prime_reduction_axiom A hA
+  have h_cauchy : ConwayCauchyPrimeReduction A := by
+    sorry
   have h_no_z2 : ∀ (t : Fin 99 → Fin 99), Function.Bijective t → (∀ i j, A (t i) (t j) = A i j) →
       t^[2] = id → (∃ i, t i ≠ i) → False :=
     fun t ht_bij ht_iso ht_ord ht_nt => conway_no_z2_deduction A hA t ht_bij ht_iso ht_ord ht_nt

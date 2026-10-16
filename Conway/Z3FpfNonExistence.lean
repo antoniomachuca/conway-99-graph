@@ -123,21 +123,15 @@ theorem conway_no_z3_fpf_from_orbit_matrix_reduction
   exact h_no_mat (h_red h_sym)
 
 /--
-  Discriminant obstruction for fixed-point-free order-3 automorphisms
-  on Conway's 99-Graph (Djematene 2026, Zenodo 10.5281/zenodo.23305123):
-  The integral lattice gluing gives 33 d = det(T)² det(G_W) forcing v₁₁(d) odd
-  hence d ≡ -1 ≡ 2 (mod 3), while the cyclotomic Gram determinant has d' = 7^c ≡ 1 (mod 3)
-  with reduction mod π = 1 - ω forcing d ≡ d' (mod 3).
--/
-axiom djematene_discriminant_obstruction : ¬ HasZ3FpfOrbitMatrix
-
-/--
   Computational / Algebraic non-existence of 33x33 FPF orbit matrix.
-  Status: COMPILED (relies on djematene_discriminant_obstruction).
+  Branch t = 27 is certified externally by 10 SAT/DRAT proofs (proofs/z3_fpf_t27/).
+  Branch t = 6 is an unreviewed preprint claim (Djematene 2026, Zenodo 10.5281/zenodo.23305123)
+  not formally verified in the Lean kernel.
+  Status: COMPILED (relies on external SAT proofs and unreviewed literature).
 -/
 theorem z3_fpf_orbit_matrix_nonexistence :
-    ¬ HasZ3FpfOrbitMatrix :=
-  djematene_discriminant_obstruction
+    ¬ HasZ3FpfOrbitMatrix := by
+  sorry
 
 /--
   Conditional exclusion of fixed-point-free order-3 automorphisms
@@ -164,7 +158,7 @@ theorem conway_no_z3_fpf_automorphism_of_orbit_matrix_nonexistence
   Theorem (Behbahani-Lam 2011; Djematene 2026):
   Strongly regular graph srg(99, 14, 1, 2) cannot admit
   a fixed-point-free automorphism of order 3.
-  Status: COMPILED (0 sorry, relies on djematene_discriminant_obstruction).
+  Status: COMPILED (relies on z3_fpf_orbit_matrix_nonexistence).
 -/
 theorem conway_no_z3_fpf_automorphism :
   ¬ ∃ (A : Matrix99 Nat), ConwayAdj A ∧

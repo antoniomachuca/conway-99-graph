@@ -100,7 +100,7 @@ class TestGrandClassificationKernelAxioms:
             assert "Classical.choice" not in ax, f"{decl} contains Classical.choice"
 
     def test_compiled_theorems_honest_sorryax_accounting(self):
-        """Theorems with status COMPILED must honestly declare transitive sorryAx or uncertified axioms."""
+        """Theorems with status COMPILED must honestly declare transitive sorryAx (no invented axioms)."""
         compiled_decls = [
             "conway_no_z2_deduction",
             "conway_no_z3_fixed3_deduction",
@@ -109,15 +109,20 @@ class TestGrandClassificationKernelAxioms:
             "conway_automorphism_group_restricted",
             "conway_automorphism_group_trivial",
         ]
+        forbidden_invented_axioms = {
+            "djematene_discriminant_obstruction",
+            "z3_fixed3_orbit_matrix_certificate_obstruction",
+            "conway_no_z2_certificate_obstruction",
+            "conway_cauchy_prime_reduction_axiom",
+        }
         for decl in compiled_decls:
-            ax = self.axioms[decl]
-            assert (
-                "sorryAx" in ax
-                or "djematene_discriminant_obstruction" in ax
-                or "z3_fixed3_orbit_matrix_certificate_obstruction" in ax
-                or "conway_no_z2_certificate_obstruction" in ax
-            ), (
-                f"{decl} has neither sorryAx nor uncertified axioms: check if Z3/Z2 was unexpectedly closed"
+            ax = set(self.axioms[decl])
+            assert "sorryAx" in ax, (
+                f"{decl} missing sorryAx: transitive dependence on external uncertified steps must be honest"
+            )
+            intersect = ax.intersection(forbidden_invented_axioms)
+            assert not intersect, (
+                f"{decl} contains invented shortcut axioms {intersect} instead of honest sorryAx"
             )
 
     def test_zero_classical_choice_globally(self):
