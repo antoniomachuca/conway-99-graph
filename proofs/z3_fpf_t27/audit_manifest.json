@@ -9,7 +9,9 @@
       "drat_sha256": "025c5ed05814f2812825346721df9c6a9101f65387e7e8c73804bf835b038380",
       "drat_size_bytes": 3593890,
       "drat_verified": true,
-      "solver_unsat": true
+      "solver_unsat": true,
+      "drat_trim_result": "s VERIFIED",
+      "drat_trim_exit_code": 0
     },
     "B7": {
       "status": "PROVED",
@@ -19,7 +21,9 @@
       "drat_sha256": "12ffb9f804c5005a240939687ff1a332b0ab7f8dc9dbabd87fa92c17459f1b87",
       "drat_size_bytes": 43540780,
       "drat_verified": true,
-      "solver_unsat": true
+      "solver_unsat": true,
+      "drat_trim_result": "s VERIFIED",
+      "drat_trim_exit_code": 0
     },
     "B8": {
       "status": "PROVED",
@@ -29,7 +33,9 @@
       "drat_sha256": "0fb83d56e8898d00b4d88564d00b2f71ccea5e11375319f81e268fdbdf905419",
       "drat_size_bytes": 457786733,
       "drat_verified": true,
-      "solver_unsat": true
+      "solver_unsat": true,
+      "drat_trim_result": "s VERIFIED",
+      "drat_trim_exit_code": 0
     },
     "B9": {
       "status": "PROVED",
@@ -39,7 +45,9 @@
       "drat_sha256": "1ce973a4d0c643b07625628cc8347ba12ecf9ef4c321a5f2afe4dbe1ca8a22d1",
       "drat_size_bytes": 47870128,
       "drat_verified": true,
-      "solver_unsat": true
+      "solver_unsat": true,
+      "drat_trim_result": "s VERIFIED",
+      "drat_trim_exit_code": 0
     },
     "B11": {
       "status": "PROVED",
@@ -49,15 +57,25 @@
       "drat_sha256": "5ba03372e54fa6700ec9016d81576e91f3c4d67d5228dcfe5b3bb76941891977",
       "drat_size_bytes": 14110898,
       "drat_verified": true,
-      "solver_unsat": true
+      "solver_unsat": true,
+      "drat_trim_result": "s VERIFIED",
+      "drat_trim_exit_code": 0
     },
     "S10": {
-      "status": "EXPLORED (SOLVING IN PROGRESS)",
-      "solver": "CaDiCaL 1.9.5 (16-thread portfolio, seeds 0-15 on omarchy)",
+      "status": "PROVED",
+      "solver": "CaDiCaL 1.9.5 (seed 14 on omarchy)",
       "verifier": "drat-trim",
       "cnf_sha256": "126a4f2298b424c8a0d308967f1e6c9e5ec32fe7d7b581450036501b807e158e",
-      "drat_verified": false,
-      "solver_unsat": false
+      "drat_verified": true,
+      "solver_unsat": true,
+      "operational_state": "PROVED",
+      "drat_trim_result": "s VERIFIED",
+      "drat_trim_exit_code": 0,
+      "verification_time_seconds": 271.34,
+      "timestamp": "2026-10-16T00:00:06Z",
+      "drat_sha256": "1917bb1c592206fad045a2ed67bbdda57a009857788b0451acec6ceb55d56382",
+      "drat_size_bytes": 1591569163,
+      "solve_time_seconds": 25305.61
     }
   }
 }
