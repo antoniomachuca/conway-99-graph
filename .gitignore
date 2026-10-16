@@ -45,6 +45,7 @@ correspondence/
 # Operational Telegram bot, monitor, cloud, and local launcher scripts
 *.sh
 scripts/*.sh
+!scripts/fetch_s10_proof.sh
 resume_all.sh
 cloud_monitoring.log
 auto_stop_sunday.log

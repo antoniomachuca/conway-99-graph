@@ -75,7 +75,13 @@
       "timestamp": "2026-10-16T00:00:06Z",
       "drat_sha256": "1917bb1c592206fad045a2ed67bbdda57a009857788b0451acec6ceb55d56382",
       "drat_size_bytes": 1591569163,
-      "solve_time_seconds": 25305.61
+      "solve_time_seconds": 25305.61,
+      "drat_zst_sha256": "e1238865a19eb535bd7090252277a1e8951a5fc11c4edb467090e2f04b716653",
+      "drat_zst_size_bytes": 513076864,
+      "remote_location": "omarchy:/home/antoniomachuca/conway_kit/z3_s10/S10.drat.zst",
+      "check_log": "proofs/z3_fpf_t27/S10.check.log",
+      "solver_log": "proofs/z3_fpf_t27/S10.solver.log",
+      "fetch_script": "scripts/fetch_s10_proof.sh"
     }
   }
 }

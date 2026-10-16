@@ -69,6 +69,7 @@ class TestGrandClassificationKernelAxioms:
             "conway_automorphism_group_restricted",
             "conway_automorphism_group_trivial_conditional",
             "conway_no_nontrivial_automorphism_of_prime_order_element",
+            "conway_automorphism_group_trivial_of_certificates",
             "conway_automorphism_group_trivial",
         ]
         for decl in expected_decls:
@@ -87,6 +88,7 @@ class TestGrandClassificationKernelAxioms:
             "conway_no_dihedral_group_deduction",
             "conway_automorphism_group_trivial_conditional",
             "conway_no_nontrivial_automorphism_of_prime_order_element",
+            "conway_automorphism_group_trivial_of_certificates",
         ]
         standard_foundations = {"propext", "Quot.sound"}
         for decl in proved_decls:
