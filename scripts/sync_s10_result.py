@@ -24,14 +24,32 @@ def run_ssh(cmd: str) -> subprocess.CompletedProcess:
 
 
 def check_status():
+    # 1. Check if CaDiCaL or ParaFROST already produced status.done
     res = run_ssh(f"test -f {REMOTE_DIR}/status.done && cat {REMOTE_DIR}/status.done || echo 'PENDING'")
     output = res.stdout.strip()
-    return output
+    if output != "PENDING":
+        return output
+
+    # 2. Check if ParaFROST on GPU finished with UNSATISFIABLE
+    pf_check = run_ssh(f"grep -E 's UNSATISFIABLE|s SATISFIABLE' {REMOTE_DIR}/parafrost.log 2>/dev/null || echo 'NONE'")
+    pf_res = pf_check.stdout.strip()
+    if "s UNSATISFIABLE" in pf_res:
+        print("[*] ParaFROST on GPU RTX 2080 finished with UNSATISFIABLE! Verifying DRAT...")
+        verify_cmd = f"/home/antoniomachuca/conway_kit/tools/drat-trim/drat-trim {REMOTE_DIR}/S10.cnf {REMOTE_DIR}/parafrost.drat"
+        v_res = run_ssh(f"{verify_cmd} > {REMOTE_DIR}/S10.check.log 2>&1; echo EXIT_CODE:$?")
+        if "s VERIFIED" in run_ssh(f"cat {REMOTE_DIR}/S10.check.log").stdout:
+            # Terminate CPU workers
+            run_ssh("pkill -9 -f cadical || true")
+            status_line = "SUCCESS: winner=parafrost_gpu (RTX 2080), drat_trim=VERIFIED\n"
+            run_ssh(f"cp {REMOTE_DIR}/parafrost.log {REMOTE_DIR}/S10.solver.log; echo '{status_line}' > {REMOTE_DIR}/status.done")
+            return status_line
+
+    return "PENDING"
 
 
 def get_worker_stats():
     script = """python3 -c "
-import glob, os
+import glob, os, subprocess
 logs = sorted(glob.glob('/home/antoniomachuca/conway_kit/z3_s10/worker_*.log'))
 res = []
 for l in logs:
@@ -50,12 +68,22 @@ for l in logs:
                     vars_rem = parts[-1]
                     break
         res.append((os.path.basename(l), time_s, conflicts, vars_rem))
-for r in res[:4]:
+for r in res[:3]:
     print(f'{r[0]}: time={r[1]}s conf={r[2]} rem={r[3]}')
-print(f'... ({len(res)} workers total)')
+print(f'... ({len(res)} CaDiCaL CPU workers total)')
+
+# Check ParaFROST GPU
+pf_log = '/home/antoniomachuca/conway_kit/z3_s10/parafrost.log'
+if os.path.exists(pf_log):
+    with open(pf_log, 'rb') as f:
+        f.seek(max(0, os.path.getsize(pf_log) - 2000))
+        lines = f.read().decode('utf-8', errors='ignore').strip().split('\\n')
+        last = lines[-1] if lines else 'empty'
+        print(f'ParaFROST (GPU RTX 2080): {last[:80]}')
 " """
     res = run_ssh(script)
     return res.stdout.strip()
+
 
 
 def sync_and_finalize():
